@@ -1,0 +1,46 @@
+<div class="flex align-center justify-center gap-2 flex-col">
+    <label class="text-medium font-medium tracking-wide">Title</label>
+    <input type="text" name="title" class="w-full p-2 mb-4 border border-gray-300 rounded">
+</div>
+
+<div class="flex align-center justify-center gap-2 flex-col">
+    <label class="text-medium font-medium tracking-wide">Discription</label>
+    <textarea name="discription" cols="5" rows="5"
+        class="w-full p-2 mb-4 border border-gray-300 rounded"></textarea>
+</div>
+
+
+<div class="flex align-center justify-center gap-2">
+    <div class="w-full">
+        <label class="text-medium font-medium tracking-wide">DeadLine</label>
+        <input type="date" name="deadline" 
+            class="w-full p-2 mb-4 border border-gray-300 rounded">
+    </div>
+
+    <div class="w-full">
+        <label class="text-medium font-medium tracking-wide">Follow-up</label>
+        <input type="date" name="followup" 
+            class="w-full p-2 mb-4 border border-gray-300 rounded">
+    </div>
+</div>
+
+<div class="flex align-center justify-center gap-2">
+    <div class="w-full">
+        <label class="text-medium font-medium tracking-wide">Status</label>
+        <select name="status" class="w-full p-2 mb-4 border border-gray-300 rounded" >
+            <option value="pending" selected>pending</option>
+            <option value="completed">Completed</option>
+            <option value="in-process">In-process</option>
+        </select>
+    </div>
+
+    <div class="w-full">
+        <label class="text-medium font-medium tracking-wide">Priority</label>
+        <select name="priority" class="w-full p-2 mb-4 border border-gray-300 rounded">
+            <option value="Critical" selected>Critical</option>
+            <option value="High">High</option>
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+        </select>
+    </div>
+</div>

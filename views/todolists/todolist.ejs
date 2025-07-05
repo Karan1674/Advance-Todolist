@@ -1,0 +1,26 @@
+<div class="p-5 m-3">
+    <div class="flex align-center justify-between">
+        <button  class="bg-[#3ec2b0] p-4 text-white rounded-md font-bold" onclick="handle()"><span>➕</span> Add Task</button>
+        <input type="text" class="w-[90%] border rounded-md border-[#2f4858] pl-4" placeholder="search the task">
+    </div>
+
+    <div class="mt-12">
+        <% if(todolist?.length>0) { %>
+            <div class="tasks">
+                <% todolist.foreach(task=> { %>
+                    <div class="listdata">
+
+                    </div>
+                    <% } )%>
+            </div>
+            <% } else {%>
+                <div class="flex justify-center align-center  m-5 ">
+                    <p class="font-bold text-[#2f4858] text-xl">No Data Avaliable at this point</p>
+                </div>
+                <% } %>
+    </div>
+</div>
+
+<script>
+    
+</script>
