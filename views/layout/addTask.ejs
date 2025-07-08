@@ -153,21 +153,16 @@
         const handleDeleteSubTargets = (element) => {
             element.remove();
         }
-        
-        
+
         document.getElementById('searchInput').addEventListener('input', function () {
             const filter = this.value.toLowerCase();
-            console.log(filter)
-            
-            
-            const options = document.getElementById('dropDown').options;
-            document.getElementById('dropDown').classList='h-50'
-            
-            // console.log(options)
+            const dropdown = document.getElementById('dropDown');
+            const options = dropdown.options;
+
             for (let i = 0; i < options.length; i++) {
-                // const option = options[i];
-                // console.log(option)
-                options[i].style.display = option.text.toLowerCase().includes(filter) ? '' : 'none';
+                const option = options[i];
+                // Only hide options, do not remove
+                option.style.display = option.text.toLowerCase().includes(filter) ? '' : 'none';
             }
         });
 
