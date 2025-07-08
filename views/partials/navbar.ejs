@@ -1,6 +1,24 @@
 <div class="bg-gradient-to-r from-violet-200  to-fushsia-200 shadow-md mb-5 p-6">
-    <div class="flex items-center justify-between">
-      <h2 class="text-2xl font-extrabold text-[#2f4858] tracking-wide">📑 Task Manager</h2>
-      <button class="text-white bg-black px-3 py-1 rounded-sm" onclick="window.location.href='/addtask' ">Add Task</button>
+  <div class="flex items-center justify-between">
+    <h2 class="text-2xl font-extrabold text-[#2f4858] tracking-wide cursor-pointer" onclick="window.location.href='/'">📑 Task Manager</h2>
+    <div class="flex gap-8">
+      <%if (user){ %>
+        <div class="flex items-center justify-center gap-8">
+          <a class="font-semibold text-lg " href="/task">
+            Tasks</a>
+          <a class="font-semibold text-lg" href="/addtask ">Add
+            Task</a>
+        </div>
+        <% }%>
+
+          <%if (!user){ %>
+            <button class="text-white bg-blue-600 px-3 py-1 rounded-sm"
+              onclick="window.location.href='/signupPage' ">Sign
+              Up</button>
+            <% } else {%>
+              <button class="text-white bg-red-600 px-3 py-1 rounded-sm"
+                onclick="window.location.href='/logout' ">Logout</button>
+              <% } %>
     </div>
+  </div>
 </div>

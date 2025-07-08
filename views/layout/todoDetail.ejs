@@ -52,11 +52,11 @@
                                                 <p><span class="font-semibold">Priority:</span>
                                                     <%= task.priority %>
                                                 </p>
-                                                <% if(task.subTargets.length>0){ %>
+                                                <% if(task.subTargets.length>=1){ %>
 
                                                     <ul>
                                                         <p class="font-semibold mb-2">SubTargets:</p>
-                                                        <% task.subTargets.map((item)=>{%>
+                                                        <% task.subTargets && task.subTargets.map((item)=>{%>
                                                             <li class="flex justify-between items-center ">
                                                                 <p class="text-md w-[80%]">
                                                                     <%=item.value%>
@@ -76,7 +76,7 @@
 
                             </div>
                             <div class="flex justify-between px-12 items-center mt-6">
-                                <a href="/"
+                                <a href="/task"
                                     class="bg-[#2f4858] text-white px-4 py-2 rounded hover:bg-[#1e3342] flex items-center gap-2">
                                     <i class="fa-solid fa-arrow-left"></i> Back
                                 </a>
