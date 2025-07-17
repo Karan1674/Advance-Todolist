@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <%- include('../partials/header') %>
+
+  <body class="min-h-screen bg-gray-100 flex flex-col">
+    <%- include('../partials/navbar') %>
+
+    <div class="flex flex-grow">
+      <%- include('../partials/sidebar') %>
+
+      <div class="mx-auto flex-grow p-6 max-w-5xl w-full space-y-6">
+
+        <% if (filePath) { %>
+   
+          <div class="flex justify-end">
+            <a href="/download-pdf?filePath=<%= encodeURIComponent(filePath) %>"  download class="bg-blue-400 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded shadow">
+             Download PDF
+            </a>
+          </div>
+
+ 
+          <iframe 
+            src="/<%= filePath %>" 
+            frameborder="0" 
+            class="w-full h-[90vh] rounded border shadow">
+          </iframe>
+        <% } else { %>
+          <p class="text-gray-500">No PDF file available.</p>
+        <% } %>
+
+      </div>
+    </div>
+
+    <%- include('../partials/footer') %> 
+  </body>
+</html>

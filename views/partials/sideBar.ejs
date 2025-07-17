@@ -1,0 +1,69 @@
+<div
+  class="basis-[20%] w-64 bg-white py-12 border border-gray-200 p-6 lg:flex flex-col gap-6 hidden"
+>
+  <a class=" flex gap-3 items-center hover:text-blue-600" href="/task">
+    <i class="fa-solid fa-list-check "></i>
+    <span class="font-medium text-lg">Tasks</span>
+  </a>
+  <a
+    class=" flex gap-3 items-center hover:text-blue-600"
+    href="/addtask"
+  >
+    <i class="fa-solid fa-plus "></i>
+    <span class="font-medium text-lg">Add Task</span>
+  </a>
+
+  <a
+    href="/medialibrary"
+    class=" flex gap-3 items-center hover:text-blue-600"
+  >
+    <i class="fa-solid fa-photo-film "></i>
+
+    <span class="font-medium text-lg"> Media Library </span>
+  </a>
+  <% if (isAdmin) { %>
+  <a
+    class="flex gap-3 items-center hover:text-blue-600"
+    href="/assigntask"
+  >
+    <i class="fa-solid fa-tasks "></i>
+    <span class="font-medium text-lg">Assign Tasks</span>
+  </a>
+  <a
+    class=" flex gap-3 items-center hover:text-blue-600"
+    href="/assignedtask"
+  >
+    <i class="fa-solid fa-tasks "></i>
+    <span class="font-medium text-lg">Assigned Tasks</span>
+  </a>
+  <% } else { %>
+  <a
+    class=" flex gap-3 items-center hover:text-blue-600"
+    href="/Admintask"
+  >
+    <i class="fa-solid fa-tasks "></i>
+    <span class="font-medium text-lg">Admin Tasks</span>
+  </a>
+  <% } %>
+  <a
+    class=" hover:text-blue-600 flex gap-3 items-center"
+    href="/profile"
+  >
+    <i class="fa-solid fa-user "></i>
+    <span class="font-medium text-lg">Profile</span>
+  </a>
+
+    <a
+    class=" hover:text-blue-600 flex gap-3 items-center"
+    href="/downloadTask"
+  >
+   <i class="fa-solid fa-download"></i>
+    <span class="font-medium text-lg">Download</span>
+  </a>
+  <% if (user) { %>
+  <a class="text-red-500 flex gap-3 items-center rounded-md" href="/logout">
+    <i class="fa-solid fa-right-from-bracket"></i>
+    <span class="font-medium text-lg">Logout</span>
+  </a>
+  <% } %>
+</div>

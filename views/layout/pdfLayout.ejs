@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Task Management Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .status-pending { background-color: #fef3c7; color: #92400e; }
+    .status-completed { background-color: #d1fae5; color: #065f46; }
+    .status-in-process { background-color: #e0f2fe; color: #1e40af; }
+  </style>
+</head>
+<div class="bg-gray-100 text-gray-900">
+
+  <div class="max-w-6xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+
+    <h1 class="text-4xl font-extrabold mb-10 text-center text-blue-700">Task Data</h1>
+
+    <% tasks.forEach(task => { %>
+      <div class="mb-12 bg-white rounded-xl shadow-lg overflow-hidden transition hover:shadow-xl relative">
+
+        <div class="absolute top-4 right-4 px-3 py-1 text-sm font-semibold rounded-full
+                    <% if (task.status === 'pending') { %>status-pending<% } %>
+                    <% if (task.status === 'completed') { %>status-completed<% } %>
+                    <% if (task.status === 'in-process') { %>status-in-process<% } %>">
+          <%= task.status %>
+        </div>
+
+
+        <% if (task.filename) { %>
+          <div class="w-full h-64 bg-gray-100 overflow-hidden flex items-center justify-center">
+            <img src="http://localhost:3000/uploads/<%= task.filename %>" alt="Task Image" class="object-cover h-full w-full" />
+          </div>
+        <% } %>
+
+      
+        <div class="p-6">
+      
+          <h2 class="text-2xl font-bold text-blue-800 mb-4"><%= task.title %></h2>
+
+  
+          <p class="text-gray-700 leading-relaxed"><%- task.discription %></p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-sm text-gray-600 mb-6 my-12">
+            <div><strong> Deadline:</strong> <%= new Date(task.deadline).toLocaleDateString() %></div>
+            <div><strong> Follow-up:</strong> <%= new Date(task.followup).toLocaleDateString() %></div>
+            <div><strong> Priority:</strong> <%= task.priority %></div>
+            <div><strong> Assigned To:</strong> <%= task.userId?.firstName %> <%= task.userId?.lastName %></div>
+            <% if (task.assignedBy && task.assignedBy.trim() !== '') { %>
+              <div><strong> Assigned By:</strong> <%= task.assignedBy %></div>
+            <% } %>
+          </div>
+
+     
+          <% if (task.subTargets.length > 0) { %>
+            <div class="mb-6">
+              <h3 class="text-lg font-semibold text-gray-800 mb-2"> Subtasks</h3>
+              <ul class="space-y-2">
+                <% task.subTargets.forEach(sub => { %>
+                  <li class="flex items-center">
+                    <input type="checkbox" disabled <%= sub.completed ? "checked" : "" %> class="mr-2">
+                    <span class="<%= sub.completed ? 'line-through text-gray-500' : '' %>"><%= sub.value %></span>
+                  </li>
+                <% }) %>
+              </ul>
+            </div>
+          <% } %>
+
+
+          <div>
+            <h3 class="text-lg font-semibold text-gray-800 mb-3"> Comments</h3>
+            <% if (task.comments.length === 0) { %>
+              <p class="text-gray-500 italic">No comments added yet.</p>
+            <% } else { %>
+              <ul class="space-y-3">
+                <% task.comments.forEach(comment => { %>
+                  <li class="border rounded-md p-3 bg-gray-50">
+                    <p class="text-gray-800 mb-1"><%= comment.comment %></p>
+                    <span class="block text-xs text-gray-500">Submitted: <%= new Date(comment.submittedAt).toLocaleString() %></span>
+                  </li>
+                <% }) %>
+              </ul>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+
+  </div>
+
+</body>
+</html>

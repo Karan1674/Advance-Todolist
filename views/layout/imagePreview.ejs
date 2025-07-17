@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+  <%- include('../partials/header.ejs') %>
+
+  <body class="min-h-screen bg-gray-100 flex flex-col">
+    <%- include('../partials/navbar.ejs') %>
+
+    <div class="flex flex-grow">
+      <%- include('../partials/sidebar') %>
+
+      <main class="flex-grow p-6 py-8">
+        <% if(Library) { %>
+        <div class="w-full max-w-5xl mx-auto p-6 rounded shadow relative">
+          <div
+            class="absolute right-2 top-1"
+            onclick="window.location.href='/medialibrary'"
+          >
+            <i class="fa-solid fa-xmark text-2xl"></i>
+          </div>
+          <div
+            class="flex max-w-4xl p-2 bg-white h-150 mx-auto items-center justify-center"
+          >
+            <div class="flex flex-col gap-5">
+              <img src="../../<%=Library[0].url%>" alt="mediaImage" class="h-110" />
+
+              <div class="flex-wrap gap-2 flex items-center">
+                <%Library[0].tag.split(',').forEach((item)=>{ %>
+                <span
+                  class="text-white bg-blue-200 p-2 rounded-full hover:bg-blue-400 text-sm"
+                  ><%=item %>
+                </span>
+                <% }) %>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="editImage" class="flex w-full  max-w-5xl mx-auto mt-8 justify-center items-center">
+          <div
+            class="bg-white w-full h-[450px]  relative p-6 rounded shadow-sm text-center"
+          >
+            <div class="flex justify-center mt-5 gap-4">
+              <button
+                id="showMediaData"
+                class="px-4 py-3 w-1/2 text-lg font-semibold bg-gray-300 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
+              >
+                Media Image
+              </button>
+              <button
+                id="showUrlData"
+                class="px-4 py-3 w-1/2 text-lg font-semibold bg-gray-300 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
+              >
+                URL
+              </button>
+            </div>
+
+            <form
+              action="/EditMedia/<%= Library[0]._id %>"
+              method="post"
+              enctype="multipart/form-data"
+              class="h-[200px] mediaForm"
+            >
+              <div
+                class="showMedia mt-4 flex justify-center flex-col items-center w-full h-full rounded-md border-2 border-dashed border-gray-500 bg-[#c8dadf] <%= Library[0].type === 'image' ? 'flex' : 'hidden' %>"
+                onclick="document.getElementById('mediaInput').click()"
+              >
+                <label class="image-name">Edit an image</label>
+                <input
+                  id="mediaInput"
+                  type="file"
+                  name="mediaImage"
+                  accept="image/*"
+                  class="p-2 w-full hidden text-gray-700"
+                />
+              </div>
+
+              <div
+                class="showurl mt-12  flex justify-center flex-col w-full <%= Library[0].type ==='url' ? 'flex' : 'hidden' %>"
+              >
+                <input
+                  id="urlInput"
+                  type="text"
+                  name="url"
+                  value="<%= Library[0].url %>"
+                  placeholder="Enter URL"
+                  class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                />
+              </div>
+
+              <div>
+                <input
+                  id="tagInput"
+                  name="tag"
+                  type="text"
+                  value="<%= Library[0].tag %>"
+                  placeholder="Enter tag"
+                  class="w-full p-2 mt-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                />
+
+                <div class="w-full flex items-end justify-end">
+                  <button
+                    type="submit"
+                    class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                  >
+                    Submit
+                  </button>
+                </div>
+              </div>
+            </form>
+
+          </div>
+        </div>
+        <% } %>
+      </main>
+    </div>
+    <%- include('../partials/footer.ejs') %>
+  </body>
+
+  <script>
+      const showMedia = document.querySelector(".showMedia");
+    const showMediaData = document.querySelector("#showMediaData");
+    const showUrlData = document.querySelector("#showUrlData");
+    const showurl = document.querySelector(".showurl");
+    const mediaForm = document.querySelector(".mediaForm");
+    const tagInput = document.querySelector("#tagInput");
+    const mediaInput = document.querySelector("#mediaInput");
+    const urlInput = document.querySelector("#urlInput");
+
+
+    mediaInput.addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+      const maxSize = 5 * 1024 * 1024; 
+      if (file.size > maxSize) {
+        alert('File size exceeds 5MB. Please choose a smaller image.');
+        event.target.value = ''; 
+      }
+    }
+  });
+
+    document
+      .getElementById("mediaInput")
+      .addEventListener("change", (event) => {
+        const file = event.target.files[0];
+        if (file) {
+          console.log("Selected file:", file.name);
+          const label = document.querySelector(".showMedia label");
+          console.log(label);
+          label.innerHTML = `Selected: ${file.name}`;
+        }
+      });
+
+   showMediaData.addEventListener("click", () => {
+      showMedia.classList.remove("hidden");
+      showurl.classList.add("hidden");
+    
+    });
+    
+    showUrlData.addEventListener("click", () => {
+        showMedia.classList.add("hidden");
+        showurl.classList.remove("hidden");
+
+    });
+    
+    mediaInput.addEventListener('input',()=>{        
+        urlInput.value = "";
+    })
+    
+    urlInput.addEventListener('input',()=>{
+        mediaInput.value = "";
+    })
+  </script>
+</html>

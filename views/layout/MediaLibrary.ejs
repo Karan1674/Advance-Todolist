@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+  <%- include('../partials/header') %>
+  <body class="min-h-screen bg-gray-100 flex flex-col">
+    <%- include('../partials/navbar.ejs') %>
+
+    <div class="flex flex-grow">
+      <%- include('../partials/sidebar') %>
+
+      <div class="flex-grow mt-5 basis-[70%]">
+        <div class="m-2 px-5 my-5 flex justify-center flex-row gap-2">
+          <input
+            type="text"
+            class="border py-2 px-2 rounded-md border border-gray-400 basis-[90%]"
+            placeholder="Search The Media With its Tag"
+            id="searchInput"
+          />
+          <button
+            class="AddMediaPopup bg-green-500 px-2 rounded-md text-white py-2"
+            id="AddMedia"
+          >
+            Add Image
+          </button>
+        </div>
+        <div class="flex flex-wrap  gap-4 mt-12 m-8">
+          <% if(media) { %> <% media.medialibrary.forEach((item,index)=>{ %>
+          <div
+            class="mediaDataCard h-[200px] w-[200px] relative"
+            data-tags="<%= item.tag%>"
+          >
+            <img src="../../<%= item.url %>" class="h-full object-cover" alt="" />
+            <div class="inset-0 bg-black opacity-20 h-full absolute"></div>
+            <i
+              class="icon fa-solid fa-ellipsis-vertical absolute right-2 top-2 text-white text-2xl font-bold"
+            ></i>
+
+            <div
+              class="absolute hidden bg-white rounded-md text-black top-8 right-2"
+            >
+              <ul class="flex items-center justify-center w-full flex-col">
+                <li
+                  class="p-2 cursor-pointer px-2 py-1 w-full text-sm hover:bg-gray-300"
+                  onclick="handleCopy('<%=item.url%>', this.parentElement.parentElement)"
+                >
+                  Copy Url
+                </li>
+                <li
+                  class="p-2 cursor-pointer px-2 py-1 w-full text-sm hover:bg-gray-300"
+                  onclick=" window.location.href='/imagepreview/<%= item._id %>#editImage'"
+                >
+                  Edit
+                </li>
+                <li
+                  class="p-2 px-2 cursor-pointer py-1 w-full text-sm hover:bg-gray-300"
+                  onclick="handleDelete('<%=item._id%>', this.parentElement.parentElement)"
+                >
+                  Delete
+                </li>
+                <li
+                  class="p-2 px-2 cursor-pointer py-1 w-full text-sm hover:bg-gray-300"
+                  onclick=" 
+                  window.location.href='/imagepreview/<%= item._id %>'
+           "
+                >
+                  Preview
+                </li>
+              </ul>
+            </div>
+          </div>
+          <% }) %> <% } else{ %>
+          <p>No Media Data To Show</p>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="popupMedia"
+      class="fixed hidden bg-black inset-0 opacity-100 flex justify-center items-center"
+    >
+      <div
+        class="popupContent bg-white w-[50%] h-[50%] relative p-6 rounded-lg shadow-lg text-center"
+      >
+        <div class="flex justify-center mt-5 gap-4">
+          <button
+            id="showMediaData"
+            class="px-4 py-3 w-1/2 text-lg font-semibold bg-gray-300 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
+          >
+            Media Image
+          </button>
+          <button
+            id="showUrlData"
+            class="px-4 py-3 w-1/2 text-lg font-semibold bg-gray-300 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
+          >
+            URL
+          </button>
+        </div>
+
+        <form
+          action="/submitMedia"
+          method="post"
+          enctype="multipart/form-data"
+          class="h-[50%] mediaForm"
+        >
+          <div
+            class="showMedia mt-4 flex justify-center flex-col items-center w-full h-full rounded-md border-2 border-dashed border-gray-500 bg-[#c8dadf]"
+            onclick="document.getElementById('mediaInput').click()"
+          >
+            <label class="image-name">Upload an image</label>
+            <input
+              id="mediaInput"
+              type="file"
+              name="mediaImage"
+              accept="image/*"
+              class="p-2 w-full hidden text-gray-700"
+            />
+          </div>
+
+          <div class="showurl mt-12 hidden flex justify-center flex-col w-full">
+            <input
+              id="urlInput"
+              type="text"
+              name="url"
+              placeholder="Enter URL"
+              class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+            />
+          </div>
+
+          <div>
+            <input
+              id="tagInput"
+              name="tag"
+              type="text"
+              placeholder="Enter tag"
+              class="w-full p-2 mt-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+            />
+
+            <div class="w-full flex items-end justify-end">
+              <button
+                type="submit"
+                class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <div class="absolute right-2 top-1" id="cross">
+          <i
+            class="fa-solid fa-xmark text-2xl cursor-pointer"
+            onclick="closePopup()"
+          ></i>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="popup"
+      class="hidden fixed bg-black inset-0 flex justify-center items-center"
+    >
+      <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+        <p class="text-lg font-semibold text-[#2f4858] mb-4">
+          Are you sure you want to delete this Image?
+        </p>
+        <div class="flex justify-center gap-6">
+          <button
+            id="no"
+            class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
+          >
+            No
+          </button>
+          <button
+            id="yes"
+            class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+          >
+            Yes
+          </button>
+        </div>
+      </div>
+    </div>
+    <%- include('../partials/footer') %>
+  </body>
+
+  <script>
+    const icons = document.querySelectorAll(".icon");
+
+    const showMedia = document.querySelector(".showMedia");
+    const showMediaData = document.querySelector("#showMediaData");
+    const showUrlData = document.querySelector("#showUrlData");
+    const showurl = document.querySelector(".showurl");
+    const mediaForm = document.querySelector(".mediaForm");
+
+    const tagInput = document.querySelector("#tagInput");
+    const mediaInput = document.querySelector("#mediaInput");
+    const urlInput = document.querySelector("#urlInput");
+
+    const searchInput = document.getElementById("searchInput");
+mediaInput.addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+      const maxSize = 5 * 1024 * 1024; 
+      if (file.size > maxSize) {
+        alert('File size exceeds 5MB. Please choose a smaller image.');
+        event.target.value = ''; 
+      }
+    }
+  });
+    searchInput.addEventListener("input", function () {
+      const value = this.value.toLowerCase();
+      const mediaDataCard = document.querySelectorAll(".mediaDataCard");
+      mediaDataCard.forEach((card) => {
+       let allTags = card.dataset.tags.split(",");
+       allTags= allTags.map((tag) => tag.trim().toLowerCase());
+        const isMatch = allTags.some((tag) => tag.includes(value));
+        card.style.display = isMatch ? "block" : "none";
+      });
+    });
+
+    icons.forEach((icon) => {
+      icon.addEventListener("click", () => {
+        const dropdown = icon.nextElementSibling;
+        dropdown.classList.toggle("hidden");
+      });
+    });
+
+    document.querySelector("#AddMedia").addEventListener("click", () => {
+      const popup = document.querySelector("#popupMedia");
+      popup.classList.remove("hidden");
+    });
+
+    function closePopup() {
+      mediaForm.reset();
+      document.getElementById("popupMedia").classList.add("hidden");
+    }
+
+    document.getElementById("mediaInput").addEventListener("change", (event) => {
+        const file = event.target.files[0];
+        if (file) {
+          console.log("Selected file:", file.name);
+          const label = document.querySelector(".showMedia label");
+          console.log(label);
+          label.innerHTML = `Selected: ${file.name}`;
+        }
+      });
+
+    showMediaData.addEventListener("click", () => {
+      showMedia.classList.remove("hidden");
+      showurl.classList.add("hidden");
+      urlInput.value = "";
+      tagInput.value = "";
+    });
+
+    showUrlData.addEventListener("click", () => {
+      showMedia.classList.add("hidden");
+      showurl.classList.remove("hidden");
+      mediaInput.value = "";
+      tagInput.value = "";
+    });
+
+    const handleCopy = (url, dropdown) => {
+      navigator.clipboard.writeText(url);
+      dropdown.classList.add("hidden");
+    };
+
+    const handleDelete = (imageId, dropdown) => {
+      event.stopPropagation();
+      const popup = document.querySelector("#popup");
+      popup.classList.remove("hidden");
+      const nobtn = document.querySelector("#no");
+      const yesbtn = document.querySelector("#yes");
+      nobtn.addEventListener("click", () => {
+        popup.classList.add("hidden");
+      });
+      yesbtn.addEventListener("click", async () => {
+        popup.classList.add("hidden");
+
+        try {
+          const response = await fetch("/deleteImage/" + imageId, {
+            method: "POST",
+          });
+
+          console.log(response);
+          if (response.ok) {
+            window.location.reload();
+          } else {
+            alert("Failed to delete task");
+          }
+        } catch (error) {
+          console.error("Error deleting task:", error);
+          alert("Error occurred while deleting");
+        } finally {
+          dropdown.classList.add("hidden");
+        }
+      });
+    };
+  </script>
+</html>

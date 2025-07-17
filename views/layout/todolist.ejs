@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/header') %>
+
+<body class="min-h-screen bg-gray-100 flex flex-col">
+
+  <%- include('../partials/navbar') %>
+
+
+  <div class="flex flex-grow">
+
+    <%- include('../partials/sidebar') %>
+
+    <div class="flex-grow p-5 ">
+      <div class="flex items-center mt-5 justify-center gap-2">
+        <input type="text" class="w-[80%] border rounded-md p-3 border-gray-200 bg-white pl-4"
+               placeholder="search the task" id="searchInput">
+        <% if(isShow) { %>
+        <button class="bg-green-600 p-3 text-white rounded-md font-bold"
+                onclick="window.location.href='/addtask'">
+          <span><i class="fa-solid fa-plus" style="color: #ffffff;"></i></span> Add Task
+        </button>
+        <% } %>
+      </div>
+
+      <div class="my-20">
+        <% if(todolist && todolist?.length > 0) { %>
+        <div class="flex gap-12 flex-wrap justify-center">
+          <% todolist.forEach(task => { %>
+          <div onclick="window.location.href='/taskDetail/<%= task._id %>'"
+               class="task-card cursor-pointer border border-gray-200 shadow-md rounded-md p-4 w-[400px] flex gap-3 flex-col bg-white relative">
+            <h3 class="task-title text-lg font-semibold ml-8 text-[#2f4858] mb-4">
+              <%= task.title %>
+            </h3>
+            <div class="text-sm text-gray-700 mb-1 text-justify mb-3 flex-grow line-clamp-2">
+              <%- task.discription %>
+            </div>
+            <p class="text-sm space-x-2">
+              <span class="font-medium">Deadline:</span>
+              <span><%= task.deadline.toDateString() %></span>
+            </p>
+            <p class="text-sm space-x-2">
+              <span class="font-medium">Follow-up:</span>
+              <span><%= task.followup.toDateString() %></span>
+            </p>
+            <% if(isShow) { %>
+            <button type="submit" onclick="handleDelete('<%= task._id %>')"
+                    class="text-red-500 hover:text-red-700 absolute top-2 right-2">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+            <% } %>
+            <div class="my-2">
+              <div class="flex justify-end">
+                <p class="text-sm p-2 px-4 rounded-lg text-white <%=
+                  task.status == 'completed' ? 'bg-green-500' : task.status == 'pending' ? 'bg-red-500' : 'bg-yellow-500' %>">
+                  <%= task.status %>
+                </p>
+              </div>
+              <p class="text-sm absolute top-0 -left-8 bg-black text-white p-2 rounded-bl-lg rounded-tl-lg px-3">
+                <%= task.priority %>
+              </p>
+            </div>
+          </div>
+          <% }) %>
+        </div>
+        <% } else { %>
+        <div class="flex justify-center items-center m-5">
+          <p class="font-bold text-[#2f4858] text-xl">No Data Available at this point</p>
+        </div>
+        <% } %>
+      </div>
+
+      <div class="flex items-center justify-center gap-8 my-4">
+        <button class="prebtn">Previous</button>
+        <div class="pages flex items-center justify-center gap-8"></div>
+        <button class="nextbtn">Next</button>
+      </div>
+    </div>
+  </div>
+
+
+  <%- include('../partials/footer') %>
+
+
+  <%- include('../partials/popup') %>
+
+  <script src="../../public/delete.js"></script>
+  <script>
+
+
+    const cards = document.querySelectorAll('.task-card');
+    document.getElementById('searchInput').addEventListener('input', function () {
+      const value = this.value.toLowerCase();
+
+      cards.forEach(card => {
+        const title = card.querySelector('.task-title').innerText.toLowerCase();
+        card.style.display = title.includes(value) ? 'flex' : 'none';
+      });
+    });
+
+    const items = 3;
+    const pageNumber = Math.ceil(cards.length / items);
+    let currentPage = 1;
+    const nextbtn = document.querySelector('.nextbtn');
+    const prebtn = document.querySelector('.prebtn');
+
+    const showcard = () => {
+      cards.forEach((card, index) => {
+        const start = (currentPage - 1) * items;
+        const end = currentPage * items;
+        card.style.display = (index >= start && index < end) ? 'flex' : 'none';
+      });
+    };
+
+    nextbtn.addEventListener('click', () => {
+      if (currentPage < pageNumber) {
+        prebtn.disabled = false;
+        currentPage++;
+        buttonShow();
+        showcard();
+      } else {
+        nextbtn.disabled = true;
+      }
+    });
+
+    prebtn.addEventListener('click', () => {
+      if (currentPage > 1) {
+        nextbtn.disabled = false;
+        currentPage--;
+        buttonShow();
+        showcard();
+      } else {
+        prebtn.disabled = true;
+      }
+    });
+
+    const pages = document.querySelector('.pages');
+    const buttonShow = () => {
+      pages.innerHTML = '';
+      for (let i = 1; i <= pageNumber; i++) {
+        const btn = document.createElement('button');
+        btn.innerText = i;
+        btn.className = `px-3 py-1 rounded border ${i === currentPage ? 'bg-green-600 text-white' : 'bg-white text-green-600'}`;
+        btn.addEventListener('click', () => {
+          currentPage = i;
+          buttonShow();
+          showcard();
+        });
+        pages.appendChild(btn);
+      }
+    };
+    showcard();
+    buttonShow();
+  </script>
+</body>
+</html>

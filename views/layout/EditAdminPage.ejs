@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include("../partials/header" ) %>
+  <body class="min-h-screen bg-gray-100 flex flex-col">
+    <%- include('../partials/navbar.ejs') %>
+
+    <div class="flex flex-grow">
+      <%- include('../partials/sidebar') %>
+
+    <div class="flex-grow">
+         <% if(task.status!='completed' ) { %>
+
+
+                    <section class=" w-full max-w-5xl mx-auto">
+                        <form action="/editAdminTask/<%= task._id%>" method="post" enctype="multipart/form-data"
+                            class="flex justify-center gap-2 flex-col bg-white p-12 rounded-md shadow-md">
+
+                            <h2 class="text-2xl font-bold mb-6 text-center">Edit Your Task</h2>
+                            <div class="flex align-center justify-center gap-4">
+                                <div class="flex w-full justify-center gap-2 flex-col">
+                                    <label class="text-medium font-medium tracking-wide">Title</label>
+                                    <input type="text" name="title" value="<%=task.title%>"
+                                        class="w-full p-2 mb-4 border border-gray-300 rounded">
+                                </div>
+                                <div class="flex  w-full justify-center gap-2 flex-col">
+                                    <label class="text-medium font-medium tracking-wide">Image</label>
+                                    <input type="file" name="taskImage" accept="image/*" value="<%=task.filename%>"
+                                        class="w-full p-2 mb-4 border border-gray-300 rounded">
+                                </div>
+                            </div>
+                            <div class="flex  justify-center gap-2 flex-col">
+                                <label class="text-medium font-medium tracking-wide">Discription</label>
+                                <!-- <textarea name="discription" cols="5" rows="5"
+                                    class=" mb-4 border border-gray-300 text-justify p-2 rounded"><%=task.discription %>
+                                </textarea> -->
+              <textarea id="editor"  class="w-full p-2 border border-gray-300 rounded" name="discription">
+                <%- task.discription %>
+              </textarea>
+
+
+                            </div>
+
+                             <div class="flex justify-center gap-2 flex-col">
+            <label for="assignedTo">Assign A Task</label>
+
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search by name or email..."
+              class="p-2 border border-gray-300 mt-2 rounded"
+              value=""
+            />
+
+            <select
+              id="dropDown"
+              name="assignedTo"
+              class="border border-gray-300 p-2 rounded"
+              required
+              size="5"
+            >
+              <% allUsers && allUsers.forEach((user) => { %>
+              <option
+                value="<%= user._id %>"
+                data-name="<%= (user.firstName + ' ' + user.lastName).toLowerCase() %>"
+                data-email="<%= user.email.toLowerCase() %>"
+                class="border border-b-2 border-gray-200 p-2"
+               <%= task.userId.toString() === user._id.toString() ? 'selected' : '' %>
+
+
+              >
+                <%= user.firstName %> <%= user.lastName %> (<%= user.email %>)
+
+          
+              </option>
+
+              <% }); %>
+            </select>
+          </div>
+
+
+                            <div class="flex justify-center gap-2">
+                                <div class="w-full flex justify-center gap-2 flex-col">
+                                    <label class="text-medium font-medium tracking-wide">DeadLine</label>
+                                    <input type="date" name="deadline"
+                                        value="<%=task.deadline.toISOString().split('T')[0] %>"
+                                        class="w-full p-2 mb-4 border border-gray-300 rounded">
+                                </div>
+
+                                <div class="w-full flex justify-center gap-2 flex-col">
+                                    <label class="text-medium font-medium tracking-wide">Follow-up</label>
+                                    <input type="date" name="followup"
+                                        value="<%= task.followup.toISOString().split('T')[0] %>"
+                                        class="w-full p-2 mb-4 border border-gray-300 rounded">
+                                </div>
+                            </div>
+
+                            <div class="flex  justify-center gap-2">
+                                <div class="w-full flex justify-center gap-2 flex-col">
+                                    <label class="text-medium font-medium tracking-wide">Status</label>
+                                    <select name="status" class="w-full p-2 mb-4 border border-gray-300 rounded">
+                                        <option value="pending" <%=task.status==='pending' ? 'selected' : '' %>
+                                            >Pending
+                                        </option>
+                                        <option value="completed" <%=task.status==='completed' ? 'selected' : '' %>
+                                            >Completed</option>
+                                        <option value="in-process" <%=task.status==='in-process' ? 'selected' : '' %>
+                                            >In-Process</option>
+
+                                    </select>
+                                </div>
+
+                                <div class="w-full flex justify-center gap-2 flex-col">
+                                    <label class="text-medium font-medium tracking-wide">Priority</label>
+                                    <select name="priority" class="w-full p-2 mb-4 border border-gray-300 rounded">
+                                        <option value="Low" <%=task.priority==='Low' ? 'selected' : '' %>
+                                            >Low
+                                        </option>
+                                        <option value="Medium" <%=task.priority==='Medium' ? 'selected' : '' %>
+                                            >Medium
+                                        </option>
+                                        <option value="High" <%=task.priority==='High' ? 'selected' : '' %>
+                                            >High
+                                        </option>
+                                        <option value="Critical" <%=task.priority==='Critical' ? 'selected' : '' %>
+                                            >Critical</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="w-full">
+                                <% if(task.subTargets.length>0){%>
+                                    <div class=" flex items-center justify-between">
+                                        <label class="text-medium font-medium tracking-wide">Sub
+                                            targets</label>
+                                    </div>
+                                    <div class="grid grid-cols-2 w-full gap-2 mt-1   ">
+                                        <% task.subTargets.forEach((item,index)=>{%>
+                                            <div class="relative">
+                                                <input type="text" name="subtargets[]" value="<%= item.value%>"
+                                                    class="w-full p-2 pr-8 mb-4 border border-gray-300 rounded">
+                                                <input type="checkbox" class="absolute right-2 top-3 h-5 w-5"
+                                                    name="completed[]" value="<%= index %>" <% if(item.completed) {%>
+                                                checked <%}%> >
+                                            </div>
+                                            <% })%>
+                                    </div>
+                                    <%}%>
+
+                            </div>
+
+                            <button type="submit" class="text-white font-bold bg-green-600 p-2 px-8  rounded-md">
+                                <i class="fa-solid fa-plus" style="color: #ffffff;"></i>
+                                Edit Task</button>
+
+                        </form>
+                    </section>
+                    <% } %>
+    </div>
+
+    </div>
+    <%- include("../partials/footer" ) %>
+    
+</body>
+<script>
+  const editor = new Jodit("#editor", {
+    height: 400,
+    toolbarAdaptive: false,
+    uploader: {
+      insertImageAsBase64URI: true
+    }
+  });
+
+    const searchInput = document.getElementById("searchInput");
+    const dropDown = document.getElementById("dropDown");
+
+    dropDown.classList.add("hidden");
+
+    searchInput.addEventListener("click", function () {
+      dropDown.classList.remove("hidden");
+    });
+
+    searchInput.addEventListener("input", function () {
+
+      const filter = this.value.toLowerCase();
+      const options = dropDown.querySelectorAll("option");
+      options.forEach((option) => {
+        const name = option.dataset.name.toLowerCase() || "";
+        const email = option.dataset.email.toLowerCase() || "";
+
+        if (name.includes(filter) || email.includes(filter)) {
+          option.classList.remove("hidden");
+        } else {
+          option.classList.add("hidden");
+        }
+      });
+    });
+
+    dropDown.addEventListener("input", function () {
+      const selectedOption = this.options[this.selectedIndex];
+      if (selectedOption) {
+        const name = selectedOption.dataset.name;
+        const email = selectedOption.dataset.email;
+        searchInput.value = `${name} (${email})`;
+      }
+    });
+</script>
+</html>

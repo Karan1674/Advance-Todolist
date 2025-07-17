@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <%- include('../partials/header.ejs') %>
+  <body class="min-h-screen bg-gray-100 flex flex-col">
+
+    <%- include('../partials/navbar.ejs') %>
+ <div class="flex flex-grow">
+  <% if(user) {%>
+     <%- include('../partials/sidebar') %> 
+<%}%>
+    <main class="flex-grow w-full max-w-6xl mx-auto px-4 py-10">
+        <section class="bg-white min-h-[50vh] shadow-md rounded-md  p-10 text-center">
+    <h1 class="text-5xl my-10 font-bold text-[#2f4858] ">Welcome to Task Manager</h1>
+    <p class="text-lg px-16 text-gray-600 mb-10">
+      Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptate aut unde facilis placeat? Ipsa veritatis perferendis cupiditate. Atque est eum voluptas! Adipisci sunt officiis quae aliquam quisquam rem, vitae similique?
+    </p>
+      <% if (user) { %>
+        <div class="bg-white p-8">
+          
+          
+            <h1 class="text-3xl font-bold text-[#2f4858] mb-2">Welcome, <%= user.firstName %> <%= user.lastName%>!</h1>
+          
+          <% if (isAdmin) { %>
+            <p class="text-green-600 font-semibold">You are logged in as an <strong>Admin</strong>.</p>
+          <% } else { %>
+            <p class="text-gray-700 mt-3">You are logged in as a regular user. Continue Your journey with Task Manager</p>
+          <% } %>
+        </div>
+      <% } else { %>
+        
+    
+          <a href="/loginPage" class="bg-blue-600 text-white text-lg px-6 py-3 rounded hover:bg-blue-700 transition">
+            Log In to Get Started
+          </a>
+          <% } %>
+        </section>
+
+ 
+      <section class="mt-12">
+        <h2 class="text-3xl font-bold text-[#2f4858] text-center mb-8">Key Features</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+          <div class="bg-white p-8 rounded-md shadow text-center">
+            <i class="fa-solid fa-check-circle text-blue-500 text-3xl mb-4"></i>
+            <h3 class="text-xl font-semibold mb-4">Task Management</h3>
+            <p class="text-gray-600">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Perferendis, culpa.</p>
+          </div>
+          <div class="bg-white p-8 rounded-md shadow text-center">
+            <i class="fa-solid fa-chart-line text-blue-500 text-3xl mb-4"></i>
+            <h3 class="text-xl font-semibold mb-4">Progress Tracking</h3>
+            <p class="text-gray-600">Lorem ipsum dolor sit amet consectetur adipisicing elit. Reprehenderit, facilis.</p>
+          </div>
+          <div class="bg-white p-8 rounded-md shadow text-center">
+            <i class="fa-solid fa-users text-blue-500 text-3xl mb-4"></i>
+            <h3 class="text-xl font-semibold mb-4">User Roles</h3>
+            <p class="text-gray-600">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Totam, quibusdam?</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    </div>
+    <%- include('../partials/footer.ejs') %>
+
+  </body>
+</html>

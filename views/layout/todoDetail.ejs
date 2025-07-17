@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+  <%- include('../partials/header') %>
+
+    <body class="min-h-screen bg-gray-100 flex flex-col">
+    <%- include('../partials/navbar.ejs') %>
+
+    <div class="flex flex-grow">
+      <%- include('../partials/sidebar') %>
+
+    <div class="flex flex-col w-full ">
+      
+      <% if(task){ %>
+      <main class="p-6">
+        <div class="mx-5 relative bg-white shadow-md rounded-md p-6">
+          <h1
+            class="text-2xl font-bold text-[#2f4858] mb-4 flex items-center gap-2"
+          >
+            <i class="fa-solid fa-list-check text-[#3ec2b0]"></i>
+            Task Details
+          </h1>
+          <div class="flex flex-col justify-center align-center">
+            <%if( task.filename) {%>
+            <div
+              class="w-full bg-gray-200 p-3 flex -center h-[400px] justify-center"
+            >
+              <img
+                src="../../uploads/<%=task.filename%>"
+                class="h-full"
+                alt="task image"
+              />
+            </div>
+            <% } else{ %>
+            <div
+              class="w-full bg-gray-200 p-3 flex items-center h-[400px] justify-center"
+            >
+              <span class="font-bold text-lg">No Image</span>
+            </div>
+
+            <% } %>
+
+            <div class="space-y-4 mt-4 p-5 px-12 w-full text-gray-700">
+              <p>
+                <span class="font-semibold">Title:</span>
+                <%= task.title %>
+              </p>
+              <div class="my-2 mb-5">
+                <!-- <span class="font-semibold">Description:</span> -->
+                <%- task.discription %>
+              </div>
+              <div class="flex justify-between">
+                <p>
+                  <span class="font-semibold">Deadline:</span>
+                  <%= task.deadline.toDateString() %>
+                </p>
+                <p>
+                  <span class="font-semibold">Follow-up:</span>
+                  <%= task.followup.toDateString() %>
+                </p>
+              </div>
+              <p
+                class="font-semibold absolute top-1 right-1 px-3 py-1 text-sm rounded-full text-white <%= task.status =='completed'? 'bg-green-500' : task.status=='pending'? 'bg-red-500': 'bg-yellow-500' %>"
+              >
+                <%= task.status %>
+              </p>
+              <p>
+                <span class="font-semibold">Priority:</span>
+                <%= task.priority %>
+              </p>
+              <% if(task.subTargets.length>=1){ %>
+
+              <ul>
+                <p class="font-semibold mb-2">SubTargets:</p>
+                <% task.subTargets && task.subTargets.map((item)=>{%>
+                <li class="flex justify-between items-center">
+                  <p class="text-md w-[80%]"><%=item.value%></p>
+                  <p class="space-x-2 text-md flex items-center justify-start">
+                    <span class="font-semibold text-sm">Completed:</span>
+                    <span> <%=item.completed %> </span>
+                  </p>
+                </li>
+                <hr class="my-2 text-gray-200" />
+
+                <% })%>
+              </ul>
+
+              <% } %>
+            </div>
+          </div>
+          <div class="flex justify-between px-12 items-center mt-6">
+            <a
+              href="#"
+              onclick="window.history.back(); return false;"
+              class="bg-[#2f4858] text-white px-4 py-2 rounded hover:bg-[#1e3342] flex items-center gap-2"
+            >
+              <i class="fa-solid fa-arrow-left"></i> Back
+            </a>
+
+            <!-- <form action="/deletetask/<%= task._id %>" method="POST"> -->
+            <div class="flex justify-center gap-3">
+              <% if(task.status!='completed'){ %>
+              <button
+                type="button"
+                onclick="window.location.href='/edittaskpage/<%=task._id%>'"
+                class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex items-center gap-2"
+              >
+                <i class="fa-solid fa-pen-to-square"></i> Edit
+              </button>
+              <%}%> <% if(isShow){ %>
+
+              <button
+                type="submit"
+                onclick="handleDelete('<%= task._id %>')"
+                class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 flex items-center gap-2"
+              >
+                <i class="fa-solid fa-trash"></i> Delete
+              </button>
+              <% } %>
+            </div>
+
+            <!-- </form> -->
+          </div>
+        </div>
+      </main>
+      <% }%>
+
+      <section class="mx-5 p-6">
+        <div class="mb-2 rounded-md shadow-md p-6 bg-white">
+          <h2
+            class="text-center tracking-wide text-[#2f4858] font-bold text-xl mb-5"
+          >
+            Comments
+          </h2>
+          <% if(comments.length>0) {%>
+          <ul class="space-y-2 mb-5">
+            <% comments.forEach(c=> { %>
+            <li
+              class="bg-gray-100 flex justify-center gap-2 flex-col p-3 rounded"
+            >
+              <div class="flex justify-between flex-row gap-2">
+                <p><%= c.comment %></p>
+                <small class="text-xs px-2 text-gray-500">
+                  Posted on <%= c.submittedAt.toDateString() %>
+                </small>
+              </div>
+              <% if(c.commentfile) { %>
+              <a
+                href="/commentfileShow/<%= c._id %>"
+                class="text-sm text-blue-400 underline"
+              >
+                <%= c.commentfile %>
+              </a>
+              <% } %>
+            </li>
+            <% }) %>
+          </ul>
+          <% } else { %>
+          <p class="text-gray-500 mb-5">No comments yet.</p>
+          <% } %>
+
+          <form
+            action="/addComment/<%= task._id %>"
+            method="post"
+            enctype="multipart/form-data"
+            class="flex justify-center flex-col"
+          >
+            <div class="flex justify-center flex-col gap-2">
+              <input
+                type="file"
+                name="commentfile"
+                class="w-full border border-gray-300 p-2 rounded mb-2"
+              />
+              <textarea
+                name="comment"
+                required
+                class="w-full border border-gray-300 p-2 rounded mb-2"
+                placeholder="Write a comment..."
+              ></textarea>
+            </div>
+            <button
+              type="submit"
+              class="text-white tracking-wide bg-green-600 rounded-md mt-5 p-2 px-5"
+            >
+              <i class="fa-solid fa-plus" style="color: #ffffff"></i>
+              Add Comment
+            </button>
+          </form>
+        </div>
+      </section>
+      <%- include('../partials/footer') %>
+    </div>
+
+    </div>
+
+    <%-include('../partials/popup')%>
+  </body>
+
+<script src="../../public/delete.js"></script>
+
+</html>

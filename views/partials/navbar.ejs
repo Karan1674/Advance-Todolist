@@ -1,0 +1,156 @@
+<div class="bg-gradient-to-r from-violet-200 to-fuchsia-200 shadow-md p-6">
+  <div class="flex items-center justify-between">
+    <h2
+      class="md:text-2xl text-xl font-extrabold text-[#2f4858] tracking-wide cursor-pointer"
+      onclick="window.location.href='/'"
+    >
+      <i class="fa-solid fa-list-check"></i> Task Manager
+    </h2>
+
+    <div class="lg:flex gap-8 hidden">
+      <% if (user) { %>
+      <div class="flex items-center justify-center gap-8">
+        <a class="font-semibold text-lg" href="/task">Tasks</a>
+        <!--  <a class="font-semibold text-lg" href="/addtask">Add Task</a>
+        <% if (isAdmin) { %>
+        <a class="font-semibold text-lg" href="/assigntask">Assign Task</a>
+        <a class="font-semibold text-lg" href="/assignedtask">Assigned Task</a>
+        <% } else { %>
+        <a class="font-semibold text-lg" href="/Admintask">Admin Task</a>
+        <% } %> -->
+        <a class="font-semibold text-lg" href="/profile">Profile</a>
+      </div>
+      <% } %> <% if (!user) { %>
+      <button
+        class="text-white bg-blue-600 px-3 py-1 rounded-sm"
+        onclick="window.location.href='/loginPage'"
+      >
+        Login In
+      </button>
+      <% } else { %>
+      <button
+        class="text-white bg-red-600 px-3 py-1 rounded-sm"
+        onclick="window.location.href='/logout'"
+      >
+        Logout
+      </button>
+      <% } %>
+    </div>
+
+    <div
+      onclick="handleHamburger()"
+      class="hamburger-icon lg:hidden mr-2 flex items-center gap-1 flex-col justify-center cursor-pointer"
+      onkeypress="handleHamburger()"
+    >
+      <div class="bg-black h-[4px] w-8"></div>
+      <div class="bg-black h-[4px] w-8"></div>
+      <div class="bg-black h-[4px] w-8"></div>
+    </div>
+
+    <div
+      class="menu transform translate-x-full transition-transform duration-300 ease-in-out fixed top-[80px] right-0 w-[70%] sm:w-[50%] h-full bg-white shadow-lg z-50 border-l border-gray-300"
+    >
+      <div class="flex flex-col items-center mt-6 space-y-4 px-6">
+        <% if (user) { %>
+
+        <div class="w-24 h-24 rounded-full border overflow-hidden relative">
+          <div
+            class="w-full h-full bg-center bg-cover"
+            style="
+              background-image: url('../../uploads/<%= user.profilePic %>');
+            "
+          ></div>
+          <div class="absolute inset-0 bg-black opacity-40 rounded-full"></div>
+        </div>
+
+        <a
+          href="/profile"
+          onclick="handleHamburger()"
+          class="w-full text-center py-2 font-semibold text-gray-800 hover:bg-gray-100 rounded"
+          >Profile</a
+        >
+        <hr class="bg-gray-100 w-full" />
+        <a
+          href="/task"
+          onclick="handleHamburger()"
+          class="w-full text-center py-2 font-semibold text-gray-800 hover:bg-gray-100 rounded"
+          >Tasks</a
+        >
+        <hr class="bg-gray-100 w-full" />
+        <a
+          href="/addtask"
+          onclick="handleHamburger()"
+          class="w-full text-center py-2 font-semibold text-gray-800 hover:bg-gray-100 rounded"
+          >Add Task</a
+        >
+        <hr class="bg-gray-100 w-full" />
+        <a
+          href="/medialibrary"
+          onclick="handleHamburger()"
+          class="w-full text-center py-2 font-semibold text-gray-800 hover:bg-gray-100 rounded"
+        >
+          Media Library
+        </a>
+        <hr class="bg-gray-100 w-full" />
+
+  <a
+          href="/downloadTask"
+          onclick="handleHamburger()"
+          class="w-full text-center py-2 font-semibold text-gray-800 hover:bg-gray-100 rounded"
+        >
+          Download
+        </a>
+        <hr class="bg-gray-100 w-full" />
+
+        <% if (isAdmin) { %>
+        <a
+          href="/assigntask"
+          onclick="handleHamburger()"
+          class="w-full text-center py-2 font-semibold text-gray-800 hover:bg-gray-100 rounded"
+          >Assign Task</a
+        >
+        <hr class="bg-gray-100 w-full" />
+        <a
+          href="/assignedtask"
+          onclick="handleHamburger()"
+          class="w-full text-center py-2 font-semibold text-gray-800 hover:bg-gray-100 rounded"
+          >Assigned Task</a
+        >
+        <hr class="bg-gray-100 w-full" />
+        <% } else { %>
+        <a
+          href="/Admintask"
+          onclick="handleHamburger()"
+          class="w-full text-center py-2 font-semibold text-gray-800 hover:bg-gray-100 rounded"
+          >Admin Task</a
+        >
+        <hr class="bg-gray-100 w-full" />
+
+        <% } %>
+
+        <button
+          onclick="window.location.href='/logout'"
+          class="w-full py-2 text-red-600 font-bold hover:bg-red-100 rounded"
+        >
+          Logout
+        </button>
+        <% } else { %>
+
+        <button
+          onclick="window.location.href='/signupPage'"
+          class="w-full py-2 text-blue-600 font-bold hover:bg-blue-100 rounded"
+        >
+          Sign Up
+        </button>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const menu = document.querySelector(".menu");
+  function handleHamburger() {
+    menu.classList.toggle("translate-x-full");
+  }
+</script>

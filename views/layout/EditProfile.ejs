@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <%- include('../partials/header')%>
+  <body class="min-h-screen bg-gray-100 flex flex-col">
+    <%- include('../partials/navbar.ejs') %>
+
+    <div class="flex flex-grow">
+      <%- include('../partials/sidebar') %>
+
+      <div class="flex-grow mt-10">
+        <div class="max-w-3xl mx-auto p-5">
+          <form
+            action="/editProfile"
+            method="post"
+            enctype="multipart/form-data"
+            class="flex items-start border border-gray-200 justify-center gap-2 shadow-md rounded-md flex-col p-6 py-8"
+          >
+            <h2 class="text-center w-full my-5 mb-12 font-semibold text-2xl">
+              Update Your Profile
+            </h2>
+            <div class="flex items-center justify-between gap-4 w-full">
+              <div class="flex w-full justify-center gap-2 flex-col">
+                <label
+                  for="firstName"
+                  class="text-medium font-medium tracking-wide"
+                  >First Name</label
+                >
+                <input
+                  type="text"
+                  class="w-full p-2 mb-4 border border-gray-300 rounded"
+                  name="firstName"
+                  value="<%= user.firstName%>"
+                  required
+                />
+              </div>
+
+              <div class="flex w-full justify-center gap-2 flex-col">
+                <label
+                  for="lastName"
+                  class="text-medium font-medium tracking-wide"
+                  >Last Name</label
+                >
+                <input
+                  type="text"
+                  class="w-full p-2 mb-4 border border-gray-300 rounded"
+                  name="lastName"
+                  value="<%= user.lastName%>"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- <div class="flex w-full justify-center gap-2 flex-col">
+                <label for="email" class="text-medium font-medium tracking-wide">Email</label>
+                <input type="text"  class="w-full p-2 mb-4 border border-gray-300 rounded" name="email"  value="<%= user.email%>" required>
+            </div> -->
+
+            <div class="flex w-full justify-center gap-2 flex-col">
+              <label
+                for="profilePic"
+                class="text-medium font-medium tracking-wide"
+                >Profile Pic</label
+              >
+              <input
+                type="file"
+                accept="image/*"
+                class="w-full p-2 mb-4 border border-gray-300 rounded"
+                name="profilePic"
+              />
+            </div>
+
+            <div>
+              <% if (user.profilePic) { %>
+              <img
+                src="../../uploads/<%= user.profilePic %>"
+                alt="Current Profile Pic"
+                class="h-50 object-cover mb-2"
+              />
+              <% } %>
+            </div>
+
+            <div class="flex items-center w-full justify-between gap-5">
+              <a
+                href="#"
+                onclick="window.history.back(); return false;"
+                class="bg-[#2f4858] text-white px-4 py-2 rounded hover:bg-[#1e3342] flex items-center gap-2"
+              >
+                <i class="fa-solid fa-arrow-left"></i> Back
+              </a>
+              <button
+                type="submit"
+                class="rounded bg-green-500 p-2 my-2 text-white font-medium"
+              >
+                Update
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <%- include('../partials/footer')%>
+  </body>
+</html>
