@@ -15,16 +15,21 @@ email :{
 },
 password :{
     type:String,
-    required:true
 },
 profilePic :{
     type:String,
-    required:true
 },
 otp: {
         type: String,
-        required: true
     },
+      googleId: {
+    type: String,
+  },
+  packageDetails: {
+    type: String,
+    enum:['starter', 'pro', 'premium'],
+    default: 'starter',
+  },
 
 },{timestamps: true })
 

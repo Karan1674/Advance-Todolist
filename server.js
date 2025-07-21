@@ -14,10 +14,22 @@ const userStoragelimit = require("./models/userStoragelimit");
 const puppeteer = require("puppeteer");
 const fs = require("fs");
 const ejs = require("ejs");
+dotenv.config();
+const { OAuth2Client } = require("google-auth-library");
+const stripe = require("stripe")(process.env.Stripe_Secret_key);
+const pricingPlans = require("./public/pricingPlans.js");
+const paymentDetail = require("./models/paymentDetail.js");
+const crypto = require("crypto");
 
+const { default: axios, get, head } = require("axios");
+const { type } = require("os");
+const bodyParser = require("body-parser");
+const Razorpay = require("razorpay");
+const { error } = require("console");
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const app = express();
-dotenv.config();
 const port = 3000;
 
 app.use(cookieParser());
@@ -39,21 +51,45 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use("/task-reports", express.static(path.join("task-reports")));
 
+const razorPayInstance = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
+
 connectDB();
+app.use(express.json());
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(express.urlencoded({ extended: true }));
 
 const isAuthenicated = async (req, res, next) => {
   try {
     const token = req.cookies.token;
+const toastMessage = req.query.message || "";
+  const toastType = req.query.type || "info"; // success, error, or inf
 
     if (!token) {
-      return res.render("layout/Home.ejs", { user: null, isAdmin: false });
+      return res.render("layout/Home.ejs", {
+        user: null,
+        isAdmin: false,
+        pricingPlans,
+        toastMessage,
+        toastType,
+      });
     }
+
     const decode = jwt.verify(token, process.env.SECRET_KEY);
 
     if (!decode) {
-      return res.render("layout/Home.ejs", { user: null, isAdmin: false });
+      return res.render("layout/Home.ejs", {
+        user: null,
+        isAdmin: false,
+        pricingPlans,
+        toastMessage,
+        toastType,
+      });
     }
 
     req.id = decode.userId;
@@ -81,42 +117,68 @@ const isAdminCheck = async (req, res, next) => {
 app.get("/", isAuthenicated, isAdminCheck, async (req, res) => {
   const userId = req.id;
 
+  const toastMessage = req.query.message || "";
+  const toastType = req.query.type || "info"; // success, error, or inf
+
   const isAdmin = req.isAdmin;
   if (userId) {
     const userData = await user.findById(userId);
     if (userData) {
-      return res.render("layout/Home.ejs", { user: userData, isAdmin });
+      return res.render("layout/Home.ejs", {
+        user: userData,
+        isAdmin,
+        pricingPlans,
+        toastMessage,
+        toastType,
+      });
     } else {
       return res.redirect("/loginPage");
     }
   }
-  return res.render("layout/Home.ejs", { user: null, isAdmin: false });
+  return res.render("layout/Home.ejs", {
+    user: null,
+    isAdmin: false,
+    pricingPlans,
+    toastMessage,
+    toastType,
+  });
 });
 
-app.get("/signupPage", async (req, res) => {
+app.get("/signupPage/:plan", async (req, res) => {
   const token = req.cookies.token;
+  const toastMessage = req.query.message || "";
+  const toastType = req.query.type || "info"; // success, error, or info
+  const plan = req.params.plan || "starter";
+  if (plan == "pro" || plan == "premium") {
+    return res.redirect(
+      "/signupPage/starter?message=First Create your Account or Sign In your Account&type=info"
+    );
+  }
 
   if (!token) {
-    return res.render("layout/SignUp.ejs");
+    return res.render("layout/SignUp.ejs", { toastMessage, toastType, plan });
   } else {
-    return res.redirect("/task");
+    return res.redirect("/task?message=Already logged in&type=info");
   }
 });
 
 app.post("/userSignUp", upload.single("profilePic"), async (req, res) => {
   try {
     const { firstName, lastName, email, password } = req.body;
-
     const profilePic = req.file;
 
     if (!firstName || !lastName || !email || !password || !profilePic) {
-      return res.redirect("/signupPage");
+      return res.redirect(
+        "/signupPage?message=All fields are required&type=error"
+      );
     }
 
     const userExist = await user.findOne({ email });
 
     if (userExist) {
-      return res.redirect("/signupPage");
+      return res.redirect(
+        "/signupPage?message=Email already registered&type=error"
+      );
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
@@ -127,20 +189,29 @@ app.post("/userSignUp", upload.single("profilePic"), async (req, res) => {
       email,
       password: hashPassword,
       profilePic: profilePic.filename,
+      otp: "",
+      Package: "starter",
     });
-    return res.redirect("/loginPage");
+    return res.redirect(
+      "/loginPage?message=Signup successful! Please log in&type=success"
+    );
   } catch (error) {
     console.log(error);
+    return res.redirect(
+      "/signupPage?message=An error occurred during signup&type=error"
+    );
   }
 });
 
 app.get("/loginPage", async (req, res) => {
   const token = req.cookies.token;
+  const toastMessage = req.query.message || "";
+  const toastType = req.query.type || "info";
 
   if (!token) {
-    return res.render("layout/Login");
+    return res.render("layout/Login.ejs", { toastMessage, toastType });
   } else {
-    return res.redirect("/");
+    return res.redirect("/?message=Already logged in&type=info");
   }
 });
 
@@ -149,15 +220,21 @@ app.post("/userlogin", async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.redirect("/loginPage");
+      return res.redirect(
+        "/loginPage?message=Email and password are required&type=error"
+      );
     }
 
     const userData = await user.findOne({ email });
 
-    const isPasswordMatch = await bcrypt.compare(password, userData.password);
+    if (!userData) {
+      return res.redirect("/loginPage?message=User not found&type=error");
+    }
+
+    const isPasswordMatch = bcrypt.compare(password, userData.password);
 
     if (!isPasswordMatch) {
-      return res.redirect("/loginPage");
+      return res.redirect("/loginPage?message=Incorrect password&type=error");
     }
 
     const tokenData = {
@@ -174,16 +251,205 @@ app.post("/userlogin", async (req, res) => {
       maxAge: 24 * 60 * 60 * 1000,
     });
 
-    res.redirect("/");
+    res.redirect("/?message=Login successful&type=success");
   } catch (error) {
     console.log(error);
+    return res.redirect(
+      "/loginPage?message=An error occurred during login&type=error"
+    );
+  }
+});
+
+app.post("/googleSignIn/:plan", async (req, res) => {
+  try {
+    const { credential } = req.body;
+    const plan = req.params.plan || "starter";
+    console.log(plan);
+    if (!credential) {
+      return res.redirect(
+        "/signupPage?message=Google authentication failed&type=error"
+      );
+    }
+
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+
+    const {
+      sub: googleId,
+      email,
+      given_name: firstName,
+      family_name: lastName,
+      picture: profilePic,
+    } = payload;
+
+    let userData = await user.findOne({ email });
+
+    if (!userData) {
+      userData = await user.create({
+        firstName: firstName || "User",
+        lastName: lastName || "Google",
+        email,
+        googleId,
+        profilePic: profilePic || "",
+        password: "",
+        otp: "",
+        packageDetails: plan,
+      });
+    } else if (!userData.googleId) {
+      userData.googleId = googleId;
+      userData.profilePic = profilePic || userData.profilePic;
+      await userData.save();
+    }
+
+    const tokenData = {
+      userId: userData._id,
+    };
+
+    const token = jwt.sign(tokenData, process.env.SECRET_KEY, {
+      expiresIn: "1d",
+    });
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false,
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    return res.redirect("/?message=Google Sign-In successful&type=success");
+  } catch (error) {
+    console.log(error);
+    return res.redirect("/signupPage?message=Google Sign-In failed&type=error");
+  }
+});
+
+app.get("/forgetPassword", async (req, res) => {
+  try {
+    const toastMessage = req.query.message || "";
+    const toastType = req.query.type || "info";
+    res.render("layout/ForgetPassword", { toastMessage, toastType });
+  } catch (error) {
+    res.redirect("/forgetPassword?message=Error loading page&type=error");
+  }
+});
+
+function generateOtp() {
+  let otp = "";
+  for (let i = 0; i < 6; i++) {
+    otp = otp + Math.floor(Math.random() * 10);
+  }
+  return otp;
+}
+
+function validateOtp(otpNumber, otp) {
+  if (otpNumber == otp) {
+    return true;
+  }
+  return false;
+}
+
+app.post("/forgetPassword", async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.redirect(
+        "/forgetPassword?message=Email is required&type=error"
+      );
+    }
+    const userData = await user.findOne({ email });
+    if (!userData) {
+      return res.redirect("/forgetPassword?message=User not found&type=error");
+    }
+    const otpData = generateOtp();
+
+    await user.findByIdAndUpdate(userData._id, { otp: otpData });
+
+    res.render("layout/OtpVerification", {
+      user: userData,
+      toastMessage: "OTP sent to your email",
+      toastType: "success",
+    });
+  } catch (error) {
+    res.redirect("/forgetPassword?message=Error sending OTP&type=error");
+  }
+});
+
+app.post("/validateOtp", async (req, res) => {
+  try {
+    const { email, otpNumber } = req.body;
+
+    if (!email || !otpNumber) {
+      return res.redirect(
+        "/forgetPassword?message=Missing email or OTP&type=error"
+      );
+    }
+    const userData = await user.findOne({ email });
+    if (!userData) {
+      return res.redirect("/forgetPassword?message=User not found&type=error");
+    }
+
+    let otpData = otpNumber.reduce((val1, val2) => val1 + val2);
+
+    const validate = validateOtp(otpData, userData.otp);
+    if (validate) {
+      await user.findByIdAndUpdate(userData._id, { otp: "" });
+      return res.render("layout/ResetPassword", {
+        user: userData,
+        toastMessage: "Otp Match Successfully",
+        toastType: "info",
+      });
+    } else {
+      return res.redirect("/forgetPassword?message=Invalid OTP&type=error");
+    }
+  } catch (error) {
+    res.redirect("/forgetPassword?message=Error validating OTP&type=error");
+  }
+});
+
+app.post("/resetPassword", async (req, res) => {
+  try {
+    const { email, password, confirmPassword } = req.body;
+
+    if (!email || !password || !confirmPassword) {
+      return res.redirect(
+        "/forgetPassword?message=Missing required fields&type=error"
+      );
+    }
+
+    if (password !== confirmPassword) {
+      return res.redirect(
+        "/forgetPassword?message=Passwords do not match&type=error"
+      );
+    }
+
+    const userExist = await user.findOne({ email });
+
+    if (!userExist) {
+      return res.redirect("/forgetPassword?message=User not found&type=error");
+    }
+
+    const hashPassword = await bcrypt.hash(password, 10);
+    const updateUser = {
+      password: hashPassword,
+    };
+
+    await user.findByIdAndUpdate(userExist._id, updateUser);
+
+    return res.redirect(
+      "/loginPage?message=Password reset successful&type=success"
+    );
+  } catch (error) {
+    res.redirect("/forgetPassword?message=Error resetting password&type=error");
   }
 });
 
 app.get("/logout", isAuthenicated, (req, res) => {
   try {
     res.clearCookie("token");
-    return res.render("layout/Home.ejs", { user: null, isAdmin: false });
+    return res.redirect("/?message=Logout successful&type=success");
   } catch (error) {
     console.log("error", error);
   }
@@ -1151,100 +1417,574 @@ app.get("/download-pdf", (req, res) => {
   }
 });
 
-app.get("/forgetPassword", async (req, res) => {
+app.get("/upgrade", isAuthenicated, isAdminCheck, async (req, res) => {
   try {
-    res.render("layout/ForgetPassword");
-  } catch (error) {}
-});
-
-function generateOtp() {
-  let otp = "";
-  for (let i = 0; i < 6; i++) {
-    otp = otp + Math.floor(Math.random() * 10);
-  }
-  return otp;
-}
-
-function validateOtp(otpNumber,otp) {
-  if (otpNumber == otp) {
-    return true;
-  }
-  return false;
-}
-
-app.post("/forgetPassword", async (req, res) => {
-  try {
-  
-    const { email } = req.body;
-    if (!email) {
-      return res.redirect("/forgetPassword");
-    }
-    const userData = await user.findOne({ email });
+    const userId = req.id;
+    const isAdmin = req.isAdmin;
+    const userData = await user.findById(userId);
     if (!userData) {
-      return res.redirect("/forgetPassword");
+      return res.redirect("/loginPage?message=User not found&type=error");
     }
-    const otpData = generateOtp();
 
-    await user.findByIdAndUpdate(userData._id,{otp:otpData})
-
-    res.render("layout/OtpVerification", { user: userData });
-  } catch (error) {}
+    return res.render("layout/upgrade", { user: userData, isAdmin });
+  } catch (error) {
+    console.error("Error rendering upgrade page:", error);
+    return res.redirect("/loginPage?message=Something went wrong&type=error");
+  }
 });
 
-app.post("/validateOtp", async (req, res) => {
+app.post("/payment/stripe", isAuthenicated, async (req, res) => {
+  const { country, plan } = req.body;
+  const userData = await user.findById(req.id);
+
+  if (!userData) {
+    return res.status(401).json({ message: "Please log in to proceed." });
+  }
+
+  if (!["pro", "premium"].includes(plan)) {
+    return res.status(400).json({ message: "Invalid plan selected." });
+  }
+
+  if (!["national", "international"].includes(country)) {
+    return res.status(400).json({ message: "Invalid country selected." });
+  }
+
   try {
-    const { email, otpNumber } = req.body;
+    const amount =
+      plan === "pro"
+        ? country === "national"
+          ? 9900 * 83
+          : 9900
+        : country === "national"
+        ? 49900 * 83
+        : 49900;
+    const currency = country === "national" ? "inr" : "usd";
 
-    if (!email || !otpNumber) {
-      return res.redirect("/forgetPassword");
-    }
-    const userData = await user.findOne({ email });
-    if (!userData) {
-      return res.redirect("/forgetPassword");
-    }
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency,
+            product_data: {
+              name: `${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan`,
+            },
+            unit_amount: amount,
+            recurring: { interval: "month" },
+          },
+          quantity: 1,
+        },
+      ],
+      mode: "subscription",
+      client_reference_id: userData._id.toString(),
+      success_url: `${req.protocol}://${req.get(
+        "host"
+      )}/success?session_id={CHECKOUT_SESSION_ID}&plan=${plan}`,
+      cancel_url: `${req.protocol}://${req.get(
+        "host"
+      )}/?message=Payment cancelled&type=error`,
+      metadata: { plan },
+    });
 
-    let otpData = otpNumber.reduce((val1, val2) => val1 + val2);
-   
-  
+    await paymentDetail.create({
+      userId: userData._id,
+      gateway: "stripe",
+      country,
+      customerId: userData.stripeCustomerId || null,
+      sessionId: session.id,
+      subscriptionId: null,
+      status: "pending",
+      amountPaid: amount,
+      plan,
+    });
 
-      const validate = validateOtp(otpData, userData.otp);
-      if (validate) {
-      await user.findByIdAndUpdate(userData._id,{otp:''})
-        return res.render("layout/ResetPassword", { user: userData });
-   
-    }
-  } catch (error) {}
+    return res.json({ url: session.url });
+  } catch (error) {
+    console.log("error", error);
+    return res.status(500).json({
+      message: "Error initiating Stripe payment.",
+      error: error.message,
+    });
+  }
 });
 
-app.post("/resetPassword", async (req, res) => {
+app.get("/success", isAuthenicated, async (req, res) => {
+  const { session_id, plan } = req.query;
+  const userData = await user.findById(req.id);
+
+  if (!userData) {
+    return res.redirect("/?message=User not found&type=error");
+  }
+
+  if (!session_id || !plan) {
+    return res.redirect("/?message=Invalid payment data&type=error");
+  }
+
   try {
-    const { email, password, confirmPassword } = req.body;
-
-    if (!email || !password || !confirmPassword) {
-      return res.redirect("/forgetPassword");
+    const session = await stripe.checkout.sessions.retrieve(session_id);
+    if (session.payment_status !== "paid" || session.status !== "complete") {
+      return res.redirect("/?message=Payment not completed&type=error");
     }
 
-    if (password !== confirmPassword) {
-      return res
-        .status(404)
-        .json({ message: "Password and the confirmpassword should be same " });
+    await user.updateOne(
+      { _id: userData._id },
+      { $set: { packageDetails: plan } }
+    );
+
+    await paymentDetail.updateOne(
+      { userId: userData._id, sessionId: session.id },
+      {
+        $set: {
+          subscriptionId: session.subscription || null,
+          customerId: session.customer || userData.stripeCustomerId || null,
+          status: "active",
+          lastPaymentDate: new Date(),
+          nextBillingDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        },
+      }
+    );
+
+    return res.redirect(`/?message=Plan upgraded to ${plan}&type=success`);
+  } catch (error) {
+    return res.redirect("/?message=Error confirming payment&type=error");
+  }
+});
+
+const getPaypalAccessToken = async () => {
+  try {
+    const clientId = process.env.PAYPAL_CLIENT_ID;
+    const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
+    const baseUrl = process.env.Paypal_Base_Url;
+
+    const auth = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
+    const tokenResponse = await axios.post(
+      `${baseUrl}v1/oauth2/token`,
+      "grant_type=client_credentials",
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Authorization: `Basic ${auth}`,
+        },
+      }
+    );
+    const accessToken = tokenResponse.data.access_token;
+
+    return accessToken;
+  } catch (error) {
+    console.error("Error fetching PayPal access token:", error);
+    throw error;
+  }
+};
+
+app.post("/payment/paypal", isAuthenicated, async (req, res) => {
+  const { country, plan } = req.body;
+  const userData = await user.findById(req.id);
+
+  if (!userData) {
+    return res.status(401).json({ message: "Please log in to proceed." });
+  }
+
+  if (!["pro", "premium"].includes(plan)) {
+    return res.status(400).json({ message: "Invalid plan selected." });
+  }
+
+  if (!["national", "international"].includes(country)) {
+    return res.status(400).json({ message: "Invalid country selected." });
+  }
+
+  try {
+    const accessToken = await getPaypalAccessToken();
+    console.log("PayPal access token fetched successfully:", accessToken);
+
+    // Calculate the amount
+    const amountData =
+      plan === "pro"
+        ? country === "national"
+          ? 9900 * 83
+          : 9900
+        : country === "national"
+        ? 49900 * 83
+        : 49900;
+    const currency = country === "national" ? "INR" : "USD";
+    const amountFormatted = parseFloat((amountData / 100).toFixed(2));
+
+    const planData = {
+      name: `${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan`,
+      description: `Monthly subscription for ${plan} plan`,
+      value: amountFormatted,
+      currency: currency,
+      return_url: `${req.protocol}://${req.get(
+        "host"
+      )}/success/paypal?plan=${plan}&gateway=paypal`,
+      cancel_url: `${req.protocol}://${req.get("host")}`,
+    };
+    const baseUrl = process.env.Paypal_Base_Url;
+
+    const orderResponse = await axios.post(
+      `${baseUrl}v2/checkout/orders`,
+      {
+        intent: "CAPTURE",
+        purchase_units: [
+          {
+            items: [
+              {
+                name: planData.name,
+                description: planData.description,
+                quantity: "1",
+                unit_amount: {
+                  currency_code: planData.currency,
+                  value: planData.value,
+                },
+              },
+            ],
+            amount: {
+              currency_code: planData.currency,
+              value: planData.value,
+              breakdown: {
+                item_total: {
+                  currency_code: planData.currency,
+                  value: planData.value,
+                },
+              },
+            },
+          },
+        ],
+        application_context: {
+          return_url: planData.return_url,
+          cancel_url: planData.cancel_url,
+          user_action: "PAY_NOW",
+        },
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    const paypalUrl = orderResponse.data.links.find(
+      (link) => link.rel === "approve"
+    ).href;
+
+    await paymentDetail.create({
+      userId: userData._id,
+      gateway: "paypal",
+      country,
+      customerId: null,
+      sessionId: paypalUrl.split("=").pop(),
+      subscriptionId: null,
+      status: "pending",
+      amountPaid: amountData,
+      plan,
+    });
+
+    return res.json({ url: paypalUrl });
+  } catch (error) {
+    console.error("Error initiating PayPal payment:", error); // More detailed logging of errors
+    return res.status(500).json({
+      message: "Error initiating PayPal payment.",
+      error: error.message,
+    });
+  }
+});
+
+app.get("/success/paypal", isAuthenicated, async (req, res) => {
+  const { token, plan, gateway } = req.query;
+  const userData = await user.findById(req.id);
+
+  if (!userData) {
+    return res.redirect("/?message=User not found&type=error");
+  }
+
+  if (!token || !plan || gateway !== "paypal") {
+    return res.redirect("/?message=Invalid payment data&type=error");
+  }
+
+  try {
+    const accessToken = await getPaypalAccessToken();
+
+    const orderResponse = await axios.get(
+      `${process.env.Paypal_Base_Url}v2/checkout/orders/${token}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    if (orderResponse.data.status !== "APPROVED") {
+      return res.redirect("/?message=Payment not approved&type=error");
     }
 
-    const userExist = await user.findOne({ email });
+    const captureResponse = await axios.post(
+      `${process.env.Paypal_Base_Url}v2/checkout/orders/${token}/capture`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
 
-    if (!userExist) {
-      return res.redirect("/forgetPassword");
+    if (captureResponse.data.status !== "COMPLETED") {
+      return res.redirect("/?message=Payment capture failed&type=error");
     }
 
-    const hashPassword = await bcrypt.hash(password, 10);
-    const updateUser = {
-      password: hashPassword,
+    // Update user package details
+    await user.updateOne(
+      { _id: userData._id },
+      { $set: { packageDetails: plan } }
+    );
+
+    await paymentDetail.updateOne(
+      { userId: userData._id, sessionId: token },
+      {
+        $set: {
+          subscriptionId: captureResponse.data.id || null,
+          customerId: captureResponse.data.payer?.payer_id || null,
+          status: "active",
+          lastPaymentDate: new Date(),
+          nextBillingDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        },
+      }
+    );
+
+    return res.redirect(`/?message=Plan upgraded to ${plan}&type=success`);
+  } catch (error) {
+    console.error("Error confirming PayPal payment:", error);
+    return res.redirect("/?message=Error confirming payment&type=error");
+  }
+});
+
+app.post("/payment/phonepe", isAuthenicated, async (req, res) => {
+  const { country, plan } = req.body;
+  const userData = await user.findById(req.id);
+
+  if (!userData) {
+    return res.status(401).json({ message: "Please log in to proceed." });
+  }
+
+  if (!["pro", "premium"].includes(plan)) {
+    return res.status(400).json({ message: "Invalid plan selected." });
+  }
+
+  if (!["national", "international"].includes(country)) {
+    return res.status(400).json({ message: "Invalid country selected." });
+  }
+
+  try {
+    const amountData = plan === "pro" ? 9900 : 49900; // Base amount in paise
+    const amount = country === "national" ? amountData * 100 : amountData; // Convert to paise for national
+    const currency = "INR";
+
+    const paymentPayload = {
+      merchantId: process.env.MERCHANT_ID,
+      merchantUserId: userData._id.toString(),
+      amount: amount,
+      currency: currency,
+      merchantTransactionId: `${userData._id}_${Date.now()}`,
+      redirectUrl: `http://localhost:3000/success/phonepe?plan=${plan}`,
+      redirectMode: "POST",
+      // callbackUrl: `http://localhost:3000/payment/phonepe/callback`,
+      paymentInstrument: {
+        type: "PAY_PAGE",
+      },
     };
 
-    await user.findByIdAndUpdate(userExist._id, updateUser);
+    const payload = Buffer.from(JSON.stringify(paymentPayload)).toString(
+      "base64"
+    );
+    const keyIndex = 1;
+    const string = payload + "/pg/v1/pay" + process.env.MERCHANT_KEY;
+    const sha256Hash = crypto.createHash("sha256").update(string).digest("hex");
+    const checkSum = sha256Hash + "###" + keyIndex;
 
-    return res.redirect("/loginPage");
-  } catch (error) {}
+    const options = {
+      method: "POST",
+      url: `${process.env.MERCHANT_BASE_URL}`,
+      headers: {
+        "Content-Type": "application/json",
+        accept: "application/json",
+        "X-VERIFY": checkSum,
+        "X-MERCHANT-ID": process.env.MERCHANT_ID,
+      },
+      data: {
+        request: payload,
+      },
+    };
+
+    const response = await axios.request(options);
+
+    // Create payment detail record
+    await paymentDetail.create({
+      userId: userData._id,
+      gateway: "phonepe",
+      country,
+      customerId: userData._id.toString(),
+      sessionId: paymentPayload.merchantTransactionId,
+      // merchantTransactionId: paymentPayload.merchantTransactionId,
+      subscriptionId: null,
+      status: "pending",
+      amountPaid: amount,
+      plan,
+    });
+
+    res.json({ url: response.data.data.instrumentResponse.redirectInfo.url });
+  } catch (error) {
+    console.error("Error initiating PhonePe payment:", error);
+    return res.status(500).json({
+      message: "Error initiating PhonePe payment.",
+      error: error.message,
+    });
+  }
+});
+
+app.post("/success/phonepe", async (req, res) => {
+  try {
+    const { plan } = req.query;
+
+    const { transactionId } = req.body;
+
+    const merchantTransactionId = transactionId;
+
+    const string = `/pg/v1/status/${process.env.MERCHANT_ID}/${merchantTransactionId}${process.env.MERCHANT_KEY}`;
+
+    const sha256Hash = crypto.createHash("sha256").update(string).digest("hex");
+    const checksum = sha256Hash + "###1";
+
+    const response = await axios.get(
+      `${process.env.MERCHANT_STATUS_URL}/${process.env.MERCHANT_ID}/${merchantTransactionId}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          accept: "application/json",
+          "X-VERIFY": checksum,
+          "X-MERCHANT-ID": process.env.MERCHANT_ID,
+        },
+      }
+    );
+
+    if (response.data.code === "PAYMENT_SUCCESS") {
+      const paymentDetailData = await paymentDetail.findOneAndUpdate(
+        { sessionId: merchantTransactionId },
+        {
+          $set: {
+            status: "active",
+            subscriptionId: transactionId,
+            lastPaymentDate: new Date(),
+            nextBillingDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+          },
+        }
+      );
+
+      await user.updateOne(
+        { _id: paymentDetailData.userId },
+        { $set: { packageDetails: plan } }
+      );
+    }
+
+    return res.redirect(`/?message=Plan upgraded to ${plan}&type=success`);
+  } catch (err) {
+    console.error("Callback error:", err);
+    return res.sendStatus(500);
+  }
+});
+
+app.post("/payment/razorpay", isAuthenicated, async (req, res) => {
+  const { country, plan } = req.body;
+  const userData = await user.findById(req.id);
+
+  if (!userData) {
+    return res.status(401).json({ message: "Please log in to proceed." });
+  }
+
+  if (!["pro", "premium"].includes(plan)) {
+    return res.status(400).json({ message: "Invalid plan selected." });
+  }
+
+  if (!["national", "international"].includes(country)) {
+    return res.status(400).json({ message: "Invalid country selected." });
+  }
+
+  try {
+    const amountData = plan === "pro" ? 9900 : 49900; // Base amount in paise
+    const amount = country === "national" ? amountData * 100 : amountData; // Convert to paise for national
+    const currency = "INR";
+    const options = {
+      amount: amount,
+      currency: currency,
+      receipt: `receipt_${userData._id}}`,
+    };
+
+    const response = await razorPayInstance.orders.create(options);
+    if (response) {
+      await paymentDetail.create({
+        userId: userData._id,
+        gateway: "razorpay",
+        country,
+        customerId: userData._id.toString(),
+        sessionId: response.id,
+        subscriptionId: null,
+        status: "pending",
+        amountPaid: amount,
+        plan,
+      });
+    }
+    console.log("Razorpay order created:", response);
+    res.json({
+      success: true,
+      orderId: response.id,
+      amount: options.amount,
+      currency: options.currency,
+      key: process.env.RAZORPAY_KEY_ID,
+    });
+    // res.json({ id: response.id });
+  } catch (error) {
+    console.error("Error initiating Razorpay payment:", error);
+    return res.status(500).json({
+      message: "Error initiating Razorpay payment.",
+      error: error.message,
+    });
+  }
+});
+app.post("/success/razorpay", isAuthenicated, async (req, res) => {
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature, plan } =
+    req.body;
+
+  const userData = await user.findById(req.id);
+  if (!userData) return res.status(404).json({ message: "User not found." });
+
+  const hmac = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET);
+  hmac.update(razorpay_order_id + "|" + razorpay_payment_id);
+  const generated_signature = hmac.digest("hex");
+
+  if (generated_signature === razorpay_signature) {
+    await paymentDetail.updateOne(
+      { sessionId: razorpay_order_id },
+      {
+        $set: {
+          subscriptionId: razorpay_payment_id,
+          status: "active",
+          lastPaymentDate: new Date(),
+          nextBillingDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        },
+      }
+    );
+
+    await user.updateOne(
+      { _id: userData._id },
+      { $set: { packageDetails: plan } }
+    );
+
+    return res.json({ success: true });
+  } else {
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid signature" });
+  }
 });
 
 app.listen(port, () => {

@@ -1,0 +1,55 @@
+const pricingPlans = [
+  {
+    id: 'starter',
+    name: 'Starter',
+    description: 'Best option for personal use & for your next project.',
+    price: 0,
+    priceLabel: 'Free',
+    features: [
+      'Individual configuration',
+      'No setup, or hidden fees',
+      'Team size: 1 developer',
+      'Premium support: 6 months',
+      'Free updates: 6 months',
+    ],
+    upgradeUrl: user => user && (user.packageDetails === 'pro' || user.packageDetails === 'premium') ? '/signupPage/starter' : '/upgrade',
+    buttonText: user => user && (user.packageDetails === 'starter' || user.packageDetails === 'pro' || user.packageDetails === 'premium') ? 'Enjoy' : 'Get started',
+    buttonDisabled: user => user && user.packageDetails === 'starter',
+  },
+  {
+    id: 'pro',
+    name: 'Pro',
+    description: 'Relevant for multiple users, extended & premium support.',
+    price: 99,
+    priceLabel: '$99/month',
+    features: [
+      'Individual configuration',
+      'No setup, or hidden fees',
+      'Team size: 10 developers',
+      'Premium support: 24 months',
+      'Free updates: 24 months',
+    ],
+    upgradeUrl: user => user && user.packageDetails === 'starter' ? '/upgrade' : '/signupPage/pro',
+    buttonText: user => user && user.packageDetails === 'starter' ? 'Upgrade' : (user && (user.packageDetails === 'pro' || user.packageDetails === 'premium') ? 'Enjoy' : 'Get started'),
+    buttonDisabled: user => user && user.packageDetails === 'pro',
+  },
+  {
+    id: 'premium',
+    name: 'Premium',
+    description: 'Best for large scale uses and extended redistribution rights.',
+    price: 499,
+    priceLabel: '$499/month',
+    features: [
+      'Individual configuration',
+      'No setup, or hidden fees',
+      'Team size: 100+ developers',
+      'Premium support: 36 months',
+      'Free updates: 36 months',
+    ],
+    upgradeUrl: user => user && (user.packageDetails === 'starter' || user.packageDetails === 'pro') ? '/upgrade' : '/signupPage/premium',
+    buttonText: user => user && (user.packageDetails === 'starter' || user.packageDetails === 'pro') ? 'Upgrade' : (user && user.packageDetails === 'premium' ? 'Enjoy' : 'Get started'),
+    buttonDisabled: user => user && user.packageDetails === 'premium',
+  },
+];
+
+module.exports = pricingPlans;

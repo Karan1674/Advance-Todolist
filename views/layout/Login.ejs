@@ -1,79 +1,149 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <%- include('../partials/header.ejs')%>
-  </head>
-
-  <body class="flex min-h-[100vh] bg-gray-100 justify-center items-center">
-
-    <div class="min-w-lg mx-auto p-5">
-      <form
-        action="/userlogin"
-        method="post"
-        class="flex items-start border border-gray-200 justify-center gap-2 shadow-md rounded-md flex-col p-6 py-8"
-      >
-        <h2 class="text-center w-full my-5 mb-12 font-semibold text-2xl">
-          Advance TodoList
-        </h2>
-
-        <div class="flex w-full justify-center gap-2 flex-col">
-          <label for="email" class="text-medium font-medium tracking-wide"
-            >Email</label
-          >
-          <input
-            type="text"
-            class="w-full p-2 mb-4 border border-gray-300 rounded"
-            name="email"
-            required
-          />
-        </div>
-
-        <div class="flex w-full justify-center gap-2 flex-col">
-          <label for="Password" class="text-medium font-medium tracking-wide"
-            >Password</label
-          >
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advance TodoList - Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <meta name="google-signin-client_id" content="448269010719-d2f4b765kod8vei8o8152r4cuu0ac9uv.apps.googleusercontent.com">
+  <style>
+    .fade-in {
+      animation: fadeIn 0.6s ease-in-out;
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(12px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .hover-scale {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .hover-scale:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    .input-focus {
+      transition: all 0.2s ease;
+    }
+    .input-focus:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    }
+    .btn-hover {
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    .btn-hover:hover {
+      background-color: #1d4ed8;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-gray-50 flex items-center justify-center p-4 sm:p-6">
+  <%- include('../partials/toast.ejs') %>
+  <div class="max-w-md w-full mx-auto p-8 bg-white rounded-2xl shadow-lg hover-scale fade-in">
+    <form action="/userlogin" method="post" class="space-y-5">
+      <h2 class="text-3xl font-extrabold text-center text-gray-900 mb-6">
+        Advance TodoList
+      </h2>
+      <div class="space-y-1.5">
+        <label for="email" class="block text-sm font-medium text-gray-700">
+          Email
+        </label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          class="w-full p-2.5 border border-gray-300 rounded-lg focus:outline-none input-focus"
+          required
+        />
+      </div>
+      <div class="space-y-1.5">
+        <label for="password" class="block text-sm font-medium text-gray-700">
+          Password
+        </label>
+        <div class="relative">
           <input
             type="password"
-            class="w-full p-2 mb-4 border border-gray-300 rounded"
+            id="password"
             name="password"
+            class="w-full p-2.5 border border-gray-300 rounded-lg focus:outline-none input-focus"
             required
           />
-        </div>
-
-        <div class="flex justify-between w-full items-center gap-2">
-          <p class="text-gray-400 tracking-wider">
-            <input type="checkbox" name="rememberMe" />
-            <span>Remember Me</span>
-          </p>
           <button
-            class="text-red-500 font-xl pointer hover:underline"
-            onclick="window.location.href='forgetPassword'"
             type="button"
+            class="absolute inset-y-0 right-3 flex items-center text-gray-500 toggle-btn"
+            onclick="togglePassword('password', this)"
           >
-            Forget Password?
+            <svg class="h-5 w-5 eye" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
           </button>
         </div>
-
-        <button
-          type="submit"
-          class="w-full bg-green-500 p-2 my-2 text-white font-medium"
-        >
-          Login
-        </button>
-
-        <div class="flex justify-center w-full items-center gap-2">
-          <span class="text-gray-400 tracking-wider">
-            Don't Have A Account?
-          </span>
-          <button
-            class="text-blue-500 font-xl pointer hover:underline"
-            onclick="window.location.href='signupPage'"
-            type="button"
+      </div>
+      <div class="flex justify-between items-center text-sm">
+        <label class="flex items-center gap-2 text-gray-600">
+          <input
+            type="checkbox"
+            name="rememberMe"
+            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
           >
-            Sign up
-          </button>
+          <span>Remember Me</span>
+        </label>
+        <a href="/forgetPassword" class="text-red-600 font-medium hover:underline hover:text-red-700 transition">
+          Forgot Password?
+        </a>
+      </div>
+      <button
+        type="submit"
+        class="w-full bg-blue-600 text-white p-3 rounded-lg font-semibold btn-hover focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      >
+        Login
+      </button>
+      <div class="relative my-5">
+        <div class="absolute inset-0 flex items-center">
+          <div class="w-full border-t border-gray-200"></div>
         </div>
-      </form>
-    </div>
-  </body>
+        <div class="relative flex justify-center text-sm">
+          <span class="px-3 bg-white text-gray-600 font-medium">Or login with</span>
+        </div>
+      </div>
+      <div
+        id="g_id_onload"
+                data-client_id="448269010719-d2f4b765kod8vei8o8152r4cuu0ac9uv.apps.googleusercontent.com"
+
+        data-login_uri="/googleSignIn/starter"
+        data-auto_prompt="false"
+      ></div>
+      <div
+        class="g_id_signin flex justify-center"
+        data-type="standard"
+        data-size="large"
+        data-theme="filled_blue"
+        data-text="signin_with"
+        data-shape="rectangular"
+        data-logo_alignment="center"
+      ></div>
+      <div class="flex justify-center items-center gap-3 text-sm">
+        <span class="text-gray-600">Don't have an account?</span>
+        <a href="/signupPage/starter" class="text-blue-600 font-medium hover:underline hover:text-blue-700 transition">
+          Sign Up
+        </a>
+      </div>
+    </form>
+  </div>
+  <script>
+    function togglePassword(inputId, button) {
+      const input = document.getElementById(inputId);
+      const eye = button.querySelector('.eye');
+      if (input.type === 'password') {
+        input.type = 'text';
+        eye.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z M3 3l18 18" />';
+      } else {
+        input.type = 'password';
+        eye.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
+      }
+    }
+  </script>
+</body>
 </html>

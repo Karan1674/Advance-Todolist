@@ -1,192 +1,220 @@
 <!DOCTYPE html>
 <html lang="en">
   <%- include('../partials/header') %>
-
-  <body class="min-h-screen bg-gray-100 flex flex-col">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <body class="min-h-screen bg-gray-50 flex flex-col font-sans">
     <%- include('../partials/navbar') %>
 
-    <div class="flex flex-grow">
+    <div class="flex min-h-screen flex-grow">
       <%- include('../partials/sidebar') %>
-      <div class="mx-auto flex-grow p-6 max-w-5xl w-full">
+      <main class="mx-auto flex-grow mb-12 p-4 sm:p-6 max-w-4xl w-full" data-aos="fade-down" data-aos-duration="800">
         <form
           action="/addtask"
           method="post"
           enctype="multipart/form-data"
-          class="flex justify-center flex-col gap-3 bg-white p-12 rounded shadow-md"
+          class="bg-white p-6 sm:p-8 rounded-xl shadow-lg flex flex-col gap-6"
+          data-aos="fade-up"
+          data-aos-duration="1000"
+          data-aos-delay="200"
         >
-          <h2 class="text-2xl font-bold mb-6 text-center">Add a New Task</h2>
+          <h2 class="text-2xl sm:text-3xl font-semibold text-gray-800 text-center" data-aos="zoom-in" data-aos-duration="800">Add a New Task</h2>
 
-          <div class="flex justify-center gap-4">
-            <div class="flex w-full justify-center gap-2 flex-col">
-              <label class="text-medium font-medium tracking-wide">Title</label>
+          <!-- Title and Image -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" data-aos="fade-up" data-aos-duration="800" data-aos-delay="300">
+            <div class="flex flex-col">
+              <label for="title" class="text-sm font-medium text-gray-700 mb-1">Task Title</label>
               <input
+                id="title"
                 type="text"
                 name="title"
                 required
-                class="w-full p-2 mb-4 border border-gray-300 rounded"
+                placeholder="Enter task title"
+                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
               />
             </div>
-            <div class="flex w-full justify-center gap-2 flex-col">
-              <label class="text-medium font-medium tracking-wide">Image</label>
+            <div class="flex flex-col">
+              <label for="taskImage" class="text-sm font-medium text-gray-700 mb-1">Task Image</label>
               <input
+                id="taskImage"
                 type="file"
                 name="taskImage"
                 accept="image/*"
-                class="w-full p-2 mb-4 border border-gray-300 rounded"
+                class="w-full p-3 border border-gray-300 rounded-lg file:mr-1 file:py-0 file:px-1 file:rounded-md file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition"
               />
             </div>
           </div>
 
-          <div class="flex justify-center gap-2 mb-2 flex-col">
-            <label class="text-medium font-medium tracking-wide"
-              >Discription</label
-            >
-            <!-- <textarea
-              name="discription"
-              cols="5"
-              rows="5"
-              class="w-full p-2 border border-gray-300 rounded"
-            ></textarea> -->
-
+          <!-- Description -->
+          <div class="flex flex-col" data-aos="fade-up" data-aos-duration="800" data-aos-delay="400">
+            <label for="editor" class="text-sm font-medium text-gray-700 mb-1">Description</label>
             <textarea
               id="editor"
-              class="w-full p-2 border border-gray-300 rounded"
               name="discription"
+              rows="5"
+              placeholder="Describe the task..."
+              class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition resize-y"
             ></textarea>
           </div>
 
-          <div class="flex justify-center gap-2">
-            <div class="w-full flex justify-center gap-2 flex-col">
-              <label class="text-medium font-medium tracking-wide"
-                >DeadLine</label
-              >
+          <!-- Deadline and Follow-up -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" data-aos="fade-up" data-aos-duration="800" data-aos-delay="500">
+            <div class="flex flex-col">
+              <label for="deadline" class="text-sm font-medium text-gray-700 mb-1">Deadline</label>
               <input
+                id="deadline"
                 type="date"
                 name="deadline"
-                class="w-full p-2 mb-4 border border-gray-300 rounded"
+                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
               />
             </div>
-
-            <div class="w-full flex justify-center gap-2 flex-col">
-              <label class="text-medium font-medium tracking-wide"
-                >Follow-up</label
-              >
+            <div class="flex flex-col">
+              <label for="followup" class="text-sm font-medium text-gray-700 mb-1">Follow-up Date</label>
               <input
+                id="followup"
                 type="date"
                 name="followup"
-                class="w-full p-2 mb-4 border border-gray-300 rounded"
+                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
               />
             </div>
           </div>
 
-          <div class="flex justify-center gap-2">
-            <div class="w-full flex justify-center gap-2 flex-col">
-              <label class="text-medium font-medium tracking-wide"
-                >Status</label
-              >
+          <!-- Status and Priority -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" data-aos="fade-up" data-aos-duration="800" data-aos-delay="600">
+            <div class="flex flex-col">
+              <label for="status" class="text-sm font-medium text-gray-700 mb-1">Status</label>
               <select
+                id="status"
                 name="status"
-                class="w-full p-2 mb-4 border border-gray-300 rounded"
+                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
               >
-                <option value="pending" selected>pending</option>
+                <option value="pending" selected>Pending</option>
                 <option value="completed">Completed</option>
-                <option value="in-process">In-process</option>
+                <option value="in-process">In Process</option>
               </select>
             </div>
-
-            <div class="w-full flex justify-center gap-2 flex-col">
-              <label class="text-medium font-medium tracking-wide"
-                >Priority</label
-              >
+            <div class="flex flex-col">
+              <label for="priority" class="text-sm font-medium text-gray-700 mb-1">Priority</label>
               <select
+                id="priority"
                 name="priority"
-                class="w-full p-2 mb-4 border border-gray-300 rounded"
+                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
               >
                 <option value="Critical" selected>Critical</option>
                 <option value="High">High</option>
-                <option value="Low">Low</option>
                 <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
               </select>
             </div>
           </div>
 
-          <div class="w-full flex justify-center gap-2 flex-col">
-            <div class="flex items-center justify-between">
-              <label class="text-medium font-medium tracking-wide"
-                >Want to add some sub targets</label
-              >
+          <!-- Subtargets -->
+          <div class="flex flex-col" data-aos="fade-up" data-aos-duration="800" data-aos-delay="700">
+            <div class="flex items-center justify-between mb-3">
+              <label class="text-sm font-medium text-gray-700">Subtargets</label>
               <button
                 type="button"
                 onclick="handleSubTargets()"
-                class="bg-blue-600 px-3 p-1 rounded-md text-white"
+                class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition flex items-center gap-2"
               >
-                <i class="fa-solid fa-plus"></i>
+                <i class="fa-solid fa-plus"></i> Add Subtarget
               </button>
             </div>
-            <div class="grid grid-cols-1 w-full gap-2 mt-1 subtargetsBox">
-              <div class="relative div-1">
-                <!-- <input type="text" name="subtargets[]"
-                                                class="w-full  p-2 mb-4 border border-gray-300 rounded">
-                                            <i onclick="this.parentElement.remove()"
-                                                class="fa-solid fa-minus text-red-600  text-xl absolute right-4 top-3"></i> -->
-              </div>
-            </div>
+            <div class="subtargetsBox grid grid-cols-1 gap-3"></div>
           </div>
 
-          <div class="flex justify-between align-center mt-4">
+          <!-- Buttons -->
+          <div class="flex justify-between gap-4" data-aos="fade-up" data-aos-duration="800" data-aos-delay="800">
             <button
               type="button"
-              class="text-white font-bold bg-[#2f4858] p-2 px-8 rounded-md"
+              class="bg-gray-600 text-white px-6 py-2 rounded-md hover:bg-gray-700 transition flex items-center gap-2"
               onclick="window.location.href='/task'"
             >
-              <i
-                class="fa-solid fa-arrow-left text-center"
-                style="color: #ffffff"
-              ></i>
-              Back
+              <i class="fa-solid fa-arrow-left"></i> Back
             </button>
-
             <button
               type="submit"
-              class="text-white font-bold bg-green-500 p-2 px-8 rounded-md"
+              class="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition flex items-center gap-2"
             >
-              <i class="fa-solid fa-plus" style="color: #ffffff"></i>
-              Add Task
+              <i class="fa-solid fa-plus"></i> Add Task
             </button>
           </div>
         </form>
-      </div>
+      </main>
     </div>
 
-    <%- include('../partials/footer') %> <%- include('../partials/mediaPop') %>
+    <%- include('../partials/footer') %>
+    <%- include('../partials/mediaPop') %>
   </body>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>
-
+    // Initialize AOS
+    document.addEventListener('DOMContentLoaded', () => {
+      AOS.init({
+        duration: 800, // Default duration
+        easing: 'ease-out', // Smooth easing
+        once: true, // Animations happen only once
+        offset: 100, // Trigger animations 100px before element is visible
+      });
+    });
 
     const handleSubTargets = () => {
       const subtargetsBox = document.querySelector(".subtargetsBox");
-      const input = document.createElement("input");
       const div = document.createElement("div");
-      input.className = "w-full p-2 mb-4 border border-gray-300 rounded";
+      div.className = "relative flex items-center gap-2 animate-slideIn";
+      div.setAttribute('data-aos', 'fade-up'); // Add AOS to new subtargets
+      div.setAttribute('data-aos-duration', '600');
+
+      const input = document.createElement("input");
       input.type = "text";
       input.name = "subtargets[]";
-      div.append(input);
+      input.placeholder = "Enter subtarget";
+      input.className =
+        "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition";
 
-      div.classList = "relative";
-      const i = document.createElement("i");
-      i.className =
-        "fa-solid fa-minus text-red-600  text-xl absolute right-4 top-3";
-      i.addEventListener("click", () => handleDeleteSubTargets(div));
-      div.append(i);
+      const removeBtn = document.createElement("button");
+      removeBtn.type = "button";
+      removeBtn.className =
+        "fa-solid fa-minus text-red-500 hover:text-red-600 text-lg p-2";
+      removeBtn.setAttribute("aria-label", "Remove subtarget");
+      removeBtn.addEventListener("click", () => {
+        div.classList.add("animate-slideOut");
+        setTimeout(() => div.remove(), 300);
+      });
+
+      div.append(input, removeBtn);
       subtargetsBox.append(div);
+
+      // Reinitialize AOS for newly added elements
+      AOS.refresh();
     };
-    const handleDeleteSubTargets = (element) => {
-      element.remove();
-    };
-
-
-    
-  
-
   </script>
+  <style>
+    /* Custom animation for subtargets */
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes slideOut {
+      from {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      to {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+    }
+    .animate-slideIn {
+      animation: slideIn 0.3s ease-out;
+    }
+    .animate-slideOut {
+      animation: slideOut 0.3s ease-out;
+    }
+  </style>
 </html>

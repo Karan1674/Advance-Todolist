@@ -1,65 +1,143 @@
 <!DOCTYPE html>
 <html lang="en">
   <%- include('../partials/header.ejs') %>
-  <body class="min-h-screen bg-gray-100 flex flex-col">
-
+  <head>
+    <!-- Add AOS CSS for animations -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+      /* Custom styles for enhanced visuals */
+      .card-hover {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .card-hover:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+      }
+      .btn-hover {
+        transition: background-color 0.3s ease, transform 0.3s ease;
+      }
+      .btn-hover:not(:disabled):hover {
+        background-color: #1e40af;
+        transform: translateY(-2px);
+      }
+      .active-plan {
+        border: 3px solid #3b82f6;
+        background: linear-gradient(to bottom right, #e0f2fe, #bfdbfe);
+        box-shadow: inset 0 0 10px rgba(59, 130, 246, 0.3);
+      }
+      .feature-card {
+        background: linear-gradient(to bottom right, #ffffff, #f3f4f6);
+      }
+      .fade-in {
+        animation: fadeIn 0.6s ease-in-out;
+      }
+      @keyframes fadeIn {
+        0% { opacity: 0; transform: translateY(12px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+      .text-bounce {
+        animation: bounceIn 1s ease-out;
+      }
+      @keyframes bounceIn {
+        0% { transform: scale(0.95); opacity: 0; }
+        60% { transform: scale(1.05); opacity: 1; }
+        100% { transform: scale(1); }
+      }
+    </style>
+  </head>
+  <body class="min-h-screen bg-gray-50 flex flex-col font-sans">
     <%- include('../partials/navbar.ejs') %>
- <div class="flex flex-grow">
-  <% if(user) {%>
-     <%- include('../partials/sidebar') %> 
-<%}%>
-    <main class="flex-grow w-full max-w-6xl mx-auto px-4 py-10">
-        <section class="bg-white min-h-[50vh] shadow-md rounded-md  p-10 text-center">
-    <h1 class="text-5xl my-10 font-bold text-[#2f4858] ">Welcome to Task Manager</h1>
-    <p class="text-lg px-16 text-gray-600 mb-10">
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptate aut unde facilis placeat? Ipsa veritatis perferendis cupiditate. Atque est eum voluptas! Adipisci sunt officiis quae aliquam quisquam rem, vitae similique?
-    </p>
-      <% if (user) { %>
-        <div class="bg-white p-8">
-          
-          
-            <h1 class="text-3xl font-bold text-[#2f4858] mb-2">Welcome, <%= user.firstName %> <%= user.lastName%>!</h1>
-          
-          <% if (isAdmin) { %>
-            <p class="text-green-600 font-semibold">You are logged in as an <strong>Admin</strong>.</p>
+    <div class="flex flex-grow">
+  
+      <% if(user) { %>
+        <%- include('../partials/sidebar.ejs') %>
+      <% } %>
+      <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- Hero Section -->
+        <section class="bg-white rounded-2xl  p-8 sm:p-12 text-center mb-12" data-aos="zoom-in" data-aos-duration="1000">
+          <h1 class="text-4xl sm:text-6xl font-extrabold text-gray-800 mb-6 tracking-tight drop-shadow-lg text-bounce">
+            Welcome to Task Manager
+          </h1>
+          <p class="text-lg sm:text-2xl text-gray-600 max-w-3xl mx-auto mb-8 leading-relaxed drop-shadow-md">
+            Transform your productivity with a sleek, intuitive platform to manage tasks, track progress, and collaborate seamlessly.
+          </p>
+          <% if (user) { %>
+            <div class="mt-8" data-aos="fade-up" data-aos-delay="200">
+              <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 drop-shadow-sm">
+                Welcome, <%= user.firstName %> <%= user.lastName %>!
+              </h2>
+              <% if (isAdmin) { %>
+                <p class="text-green-600 font-semibold text-xl drop-shadow-sm">
+                  You are logged in as an <strong>Admin</strong>.
+                </p>
+              <% } else { %>
+                <p class="text-gray-600 text-xl drop-shadow-sm">
+                  Embark on your productivity journey with Task Manager.
+                </p>
+              <% } %>
+              <a href="/task" class="mt-6 inline-block bg-gradient-to-r from-blue-700 to-blue-500 text-white text-lg px-10 py-4 rounded-full btn-hover shadow-xl">
+                Go to Dashboard
+              </a>
+            </div>
           <% } else { %>
-            <p class="text-gray-700 mt-3">You are logged in as a regular user. Continue Your journey with Task Manager</p>
-          <% } %>
-        </div>
-      <% } else { %>
-        
-    
-          <a href="/loginPage" class="bg-blue-600 text-white text-lg px-6 py-3 rounded hover:bg-blue-700 transition">
-            Log In to Get Started
-          </a>
+            <div class="flex justify-center gap-6 mt-8" data-aos="fade-up" data-aos-delay="200">
+              <a href="/loginPage" class="bg-gradient-to-r from-blue-700 to-blue-500 text-white text-lg px-10 py-4 rounded-full btn-hover shadow-xl">
+                Log In
+              </a>
+              <a href="/signupPage/:starter" class="bg-gradient-to-r from-gray-800 to-gray-600 text-white text-lg px-10 py-4 rounded-full btn-hover shadow-xl">
+                Sign Up
+              </a>
+            </div>
           <% } %>
         </section>
 
- 
-      <section class="mt-12">
-        <h2 class="text-3xl font-bold text-[#2f4858] text-center mb-8">Key Features</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-          <div class="bg-white p-8 rounded-md shadow text-center">
-            <i class="fa-solid fa-check-circle text-blue-500 text-3xl mb-4"></i>
-            <h3 class="text-xl font-semibold mb-4">Task Management</h3>
-            <p class="text-gray-600">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Perferendis, culpa.</p>
+        <!-- Features Section -->
+        <section class="mb-12" data-aos="fade-up" data-aos-duration="800" data-aos-delay="200">
+          <h2 class="text-3xl sm:text-4xl font-bold text-gray-800 text-center mb-10">
+            Key Features
+          </h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="feature-card p-6 rounded-xl shadow-md card-hover">
+              <i class="fa-solid fa-check-circle text-blue-500 text-4xl mb-4"></i>
+              <h3 class="text-xl font-semibold text-gray-800 mb-3">Task Management</h3>
+              <p class="text-gray-600">
+                Organize tasks efficiently with intuitive tools to prioritize and manage your workload.
+              </p>
+            </div>
+            <div class="feature-card p-6 rounded-xl shadow-md card-hover">
+              <i class="fa-solid fa-chart-line text-blue-500 text-4xl mb-4"></i>
+              <h3 class="text-xl font-semibold text-gray-800 mb-3">Progress Tracking</h3>
+              <p class="text-gray-600">
+                Monitor your project milestones and stay on top of your goals with real-time insights.
+              </p>
+            </div>
+            <div class="feature-card p-6 rounded-xl shadow-md card-hover">
+              <i class="fa-solid fa-users text-blue-500 text-4xl mb-4"></i>
+              <h3 class="text-xl font-semibold text-gray-800 mb-3">User Roles</h3>
+              <p class="text-gray-600">
+                Assign roles and permissions to collaborate seamlessly with your team.
+              </p>
+            </div>
           </div>
-          <div class="bg-white p-8 rounded-md shadow text-center">
-            <i class="fa-solid fa-chart-line text-blue-500 text-3xl mb-4"></i>
-            <h3 class="text-xl font-semibold mb-4">Progress Tracking</h3>
-            <p class="text-gray-600">Lorem ipsum dolor sit amet consectetur adipisicing elit. Reprehenderit, facilis.</p>
-          </div>
-          <div class="bg-white p-8 rounded-md shadow text-center">
-            <i class="fa-solid fa-users text-blue-500 text-3xl mb-4"></i>
-            <h3 class="text-xl font-semibold mb-4">User Roles</h3>
-            <p class="text-gray-600">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Totam, quibusdam?</p>
-          </div>
-        </div>
-      </section>
-    </main>
+        </section>
 
+        <!-- Packages Section -->
+        <section class="mb-12" data-aos="fade-up" data-aos-duration="800" data-aos-delay="400">
+          <%- include('../partials/packages.ejs') %>
+        </section>
+      </main>
     </div>
     <%- include('../partials/footer.ejs') %>
+    <%- include('../partials/toast.ejs') %>
 
+    <!-- Add AOS JS for animations -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+      AOS.init({
+        once: true,
+        offset: 100,
+        duration: 800
+      });
+    </script>
   </body>
 </html>

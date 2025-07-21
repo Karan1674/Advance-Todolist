@@ -1,250 +1,244 @@
+
 <!DOCTYPE html>
 <html lang="en">
-  <%- include('../partials/header') %>
+<%- include('../partials/header') %>
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
-  <body class="min-h-screen bg-gray-100 flex flex-col">
-    <%- include('../partials/navbar.ejs') %>
+<body class="min-h-screen bg-gray-100 flex flex-col font-sans">
+  <%- include('../partials/navbar') %>
 
-  <div class="flex flex-grow">
-     <%- include('../partials/sidebar') %>
+  <div class="flex min-h-screen flex-grow">
+    <%- include('../partials/sidebar') %>
+    <div class="flex-grow mb-12 py-8 px-4 sm:px-6">
+      <div class="mx-auto max-w-4xl shadow-lg bg-white rounded-xl p-6 sm:p-8" data-aos="fade-up" data-aos-duration="400">
+        <form action="/assigntask" method="post" enctype="multipart/form-data" class="flex flex-col gap-6">
+          <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-6" data-aos="fade-up" data-aos-duration="400" data-aos-delay="100">
+            Add a New Task
+          </h2>
 
-      <div class="mx-auto flex-grow p-6 max-w-5xl w-full">
-        <form
-          action="/assigntask"
-          method="post"
-          enctype="multipart/form-data"
-          class="flex justify-center flex-col gap-3 bg-white p-12 rounded shadow-md"
-        >
-          <h2 class="text-2xl font-bold mb-6 text-center">Add a New Task</h2>
+          <% if(typeof error !== 'undefined' && error) { %>
+            <p class="text-red-500 text-sm text-center" data-aos="fade-in" data-aos-duration="400"><%= error %></p>
+          <% } %>
 
-          <div class="flex justify-center gap-4">
-            <div class="flex w-full justify-center gap-2 flex-col">
-              <label class="text-medium font-medium tracking-wide">Title</label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" data-aos="fade-up" data-aos-duration="400" data-aos-delay="200">
+            <div class="flex flex-col gap-2">
+              <label for="title" class="text-sm font-semibold text-gray-700">Title</label>
               <input
                 type="text"
+                id="title"
                 name="title"
                 required
-                class="w-full p-2 mb-4 border border-gray-300 rounded"
+                class="w-full p-3 text-sm text-gray-800 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition"
+                placeholder="Enter task title"
+                aria-label="Task title"
               />
             </div>
-            <div class="flex w-full justify-center gap-2 flex-col">
-              <label class="text-medium font-medium tracking-wide">Image</label>
+            <div class="flex flex-col gap-2">
+              <label for="taskImage" class="text-sm font-semibold text-gray-700">Image</label>
               <input
                 type="file"
+                id="taskImage"
                 name="taskImage"
                 accept="image/*"
-                class="w-full p-2 mb-4 border border-gray-300 rounded"
+                class="w-full p-3 text-sm text-gray-700 bg-white border border-gray-200 rounded-lg file:mr-1 file:py-0 file:px-1 file:rounded-md file:border-0 file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 transition"
+                aria-label="Upload task image"
               />
             </div>
           </div>
 
-          <div class="flex justify-center gap-2 flex-col">
-            <label class="text-medium font-medium tracking-wide"
-              >Discription</label
-            >
-              <textarea id="editor"  class="w-full p-2 border border-gray-300 rounded" name="discription"></textarea>
+          <div class="flex flex-col gap-2" data-aos="fade-up" data-aos-duration="400" data-aos-delay="300">
+            <label for="editor" class="text-sm font-semibold text-gray-700">Description</label>
+            <textarea
+              id="editor"
+              name="discription"
+              class="w-full p-3 text-sm text-gray-800 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition resize-y"
+              placeholder="Enter task description"
+              rows="5"
+              aria-label="Task description"
+            ></textarea>
           </div>
 
-          <!-- <div class="flex justify-center gap-2 flex-col">
-            <label for="assignedTo">Assign A Task</label>
-            <input type="text" id="searchInput" placeholder="Search by name or email..."
-                                    class="p-2 border border-gray-300 mt-4 rounded">
-                                <select  id="dropDown" name="assignedTo" class="border border-gray-300 p-2 rounded"
-                                    required>
-                              
-
-
-                                    <% allUsers && allUsers.forEach((user,index)=>{ %>
-                                       
-                                            <option value="<%= user._id %>">
-                                                <%= user.firstName %>
-                                                    <%= user.lastName %> (<%= user.email %>)
-                                            </option>
-                                            <% }) %>
-                                          </select> 
-                                        </div>-->
-
-          <div class="flex justify-center gap-2 flex-col">
-            <label for="assignedTo">Assign A Task</label>
-
+          <div class="flex flex-col gap-2" data-aos="fade-up" data-aos-duration="400" data-aos-delay="400">
+            <label for="searchUser" class="text-sm font-semibold text-gray-700">Assign To</label>
             <input
               type="text"
               id="searchUser"
               placeholder="Search by name or email..."
-              class="p-2 border border-gray-300 mt-2 rounded"
+              class="w-full p-3 text-sm text-gray-800 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition"
+              aria-label="Search users to assign task"
             />
-
             <select
               id="dropDown"
               name="assignedTo"
-              class="hidden border border-gray-300 p-2 rounded"
+              class="w-full p-3 text-sm text-gray-700 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition hidden"
               required
               size="5"
             >
-              <% allUsers && allUsers.forEach((user) => { %>
-              <option
-                value="<%= user._id %>"
-                data-name="<%= (user.firstName + ' ' + user.lastName).toLowerCase() %>"
-                data-email="<%= user.email.toLowerCase() %>"
-                class="border border-b-2 border-gray-200 p-2"
-              >
-                <%= user.firstName %> <%= user.lastName %> (<%= user.email %>)
-
-          
-              </option>
-
-              <% }); %>
+              <% if(allUsers && allUsers.length > 0) { %>
+                <% allUsers.forEach((user) => { %>
+                  <option
+                    value="<%= user._id %>"
+                    data-name="<%= (user.firstName + ' ' + user.lastName).toLowerCase() %>"
+                    data-email="<%= user.email.toLowerCase() %>"
+                    class="p-2 hover:bg-teal-50 transition"
+                  >
+                    <%= user.firstName %> <%= user.lastName %> (<%= user.email %>)
+                  </option>
+                <% }) %>
+              <% } else { %>
+                <option value="" disabled>No users available</option>
+              <% } %>
             </select>
           </div>
 
-          <div class="flex justify-center gap-2">
-            <div class="w-full flex justify-center gap-2 flex-col">
-              <label class="text-medium font-medium tracking-wide"
-                >DeadLine</label
-              >
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" data-aos="fade-up" data-aos-duration="400" data-aos-delay="500">
+            <div class="flex flex-col gap-2">
+              <label for="deadline" class="text-sm font-semibold text-gray-700">Deadline</label>
               <input
                 type="date"
+                id="deadline"
                 name="deadline"
-                class="w-full p-2 mb-4 border border-gray-300 rounded"
+                class="w-full p-3 text-sm text-gray-800 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition"
+                aria-label="Task deadline"
               />
             </div>
-
-            <div class="w-full flex justify-center gap-2 flex-col">
-              <label class="text-medium font-medium tracking-wide"
-                >Follow-up</label
-              >
+            <div class="flex flex-col gap-2">
+              <label for="followup" class="text-sm font-semibold text-gray-700">Follow-up</label>
               <input
                 type="date"
+                id="followup"
                 name="followup"
-                class="w-full p-2 mb-4 border border-gray-300 rounded"
+                class="w-full p-3 text-sm text-gray-800 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition"
+                aria-label="Task follow-up date"
               />
             </div>
           </div>
 
-          <div class="flex justify-center gap-2">
-            <div class="w-full flex justify-center gap-2 flex-col">
-              <label class="text-medium font-medium tracking-wide"
-                >Status</label
-              >
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" data-aos="fade-up" data-aos-duration="400" data-aos-delay="600">
+            <div class="flex flex-col gap-2">
+              <label for="status" class="text-sm font-semibold text-gray-700">Status</label>
               <select
+                id="status"
                 name="status"
-                class="w-full p-2 mb-4 border border-gray-300 rounded"
+                class="w-full p-3 text-sm text-gray-800 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition"
+                aria-label="Task status"
               >
-                <option value="pending" selected>pending</option>
+                <option value="pending" selected>Pending</option>
                 <option value="completed">Completed</option>
                 <option value="in-process">In-process</option>
               </select>
             </div>
-
-            <div class="w-full flex justify-center gap-2 flex-col">
-              <label class="text-medium font-medium tracking-wide"
-                >Priority</label
-              >
+            <div class="flex flex-col gap-2">
+              <label for="priority" class="text-sm font-semibold text-gray-700">Priority</label>
               <select
+                id="priority"
                 name="priority"
-                class="w-full p-2 mb-4 border border-gray-300 rounded"
+                class="w-full p-3 text-sm text-gray-800 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition"
+                aria-label="Task priority"
               >
                 <option value="Critical" selected>Critical</option>
                 <option value="High">High</option>
-                <option value="Low">Low</option>
                 <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
               </select>
             </div>
           </div>
 
-          <div class="w-full flex justify-center gap-2 flex-col">
+          <div class="flex flex-col gap-2" data-aos="fade-up" data-aos-duration="400" data-aos-delay="700">
             <div class="flex items-center justify-between">
-              <label class="text-medium font-medium tracking-wide"
-                >Want to add some sub targets</label
-              >
+              <label class="text-sm font-semibold text-gray-700">Subtargets</label>
               <button
                 type="button"
                 onclick="handleSubTargets()"
-                class="bg-blue-600 px-3 p-1 rounded-md text-white"
+                class="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 focus:ring-2 focus:ring-teal-500 transition flex items-center gap-2"
+                aria-label="Add subtarget"
               >
-                <i class="fa-solid fa-plus"></i>
+                <i class="fa-solid fa-plus"></i> Add
               </button>
             </div>
-            <div class="grid grid-cols-1 w-full gap-2 mt-1 subtargetsBox">
-              <div class="relative div-1">
-                <!-- <input type="text" name="subtargets[]"
-                                                class="w-full  p-2 mb-4 border border-gray-300 rounded">
-                                            <i onclick="this.parentElement.remove()"
-                                                class="fa-solid fa-minus text-red-600  text-xl absolute right-4 top-3"></i> -->
-              </div>
-            </div>
+            <div class="subtargetsBox grid grid-cols-1 gap-3 mt-2"></div>
           </div>
 
-          <div class="flex justify-between align-center mt-4">
+          <div class="flex justify-between gap-4 mt-6" data-aos="fade-up" data-aos-duration="400" data-aos-delay="800">
             <button
               type="button"
-              class="text-white font-bold bg-[#2f4858] p-2 px-8 rounded-md"
+              class="bg-gray-600 text-white px-5 py-2.5 rounded-lg hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 transition flex items-center gap-2 w-full sm:w-auto"
               onclick="window.location.href='/task'"
+              aria-label="Back to task list"
             >
-              <i
-                class="fa-solid fa-arrow-left text-center"
-                style="color: #ffffff"
-              ></i>
-              Back
+              <i class="fa-solid fa-arrow-left"></i> Back
             </button>
-
             <button
               type="submit"
-              class="text-white font-bold bg-green-500 p-2 px-8 rounded-md"
+              class="bg-emerald-600 text-white px-5 py-2.5 rounded-lg hover:bg-emerald-700 focus:ring-2 focus:ring-emerald-500 transition flex items-center gap-2 w-full sm:w-auto"
+              aria-label="Add task"
             >
-              <i class="fa-solid fa-plus" style="color: #ffffff"></i>
-              Add Task
+              <i class="fa-solid fa-plus"></i> Add Task
             </button>
           </div>
         </form>
       </div>
-
+    </div>
   </div>
-      <%- include('../partials/footer') %> <%- include('../partials/mediaPop') %>
 
-  </body>
+  <%- include('../partials/footer') %>
+  <%- include('../partials/mediaPop') %>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>
-
+    // Initialize AOS
+    document.addEventListener('DOMContentLoaded', () => {
+      AOS.init({
+        duration: 800,
+        easing: 'ease-out',
+        once: true,
+        offset: 120,
+      });
+    });
 
     const handleSubTargets = () => {
       const subtargetsBox = document.querySelector(".subtargetsBox");
-      const input = document.createElement("input");
       const div = document.createElement("div");
-      input.className = "w-full p-2 mb-4 border border-gray-300 rounded";
+      div.className = "relative flex items-center gap-2 bg-gray-50 p-3 rounded-lg shadow-sm aos-init";
+      div.setAttribute('data-aos', 'fade-up');
+      div.setAttribute('data-aos-duration', '400');
+
+      const input = document.createElement("input");
+      input.className = "w-full p-2 text-sm text-gray-800 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition";
       input.type = "text";
       input.name = "subtargets[]";
+      input.placeholder = "Enter subtarget";
+      input.setAttribute('aria-label', 'Subtarget');
       div.append(input);
 
-      div.classList = "relative";
-      const i = document.createElement("i");
-      i.className =
-        "fa-solid fa-minus text-red-600  text-xl absolute right-4 top-3";
-      i.addEventListener("click", () => handleDeleteSubTargets(div));
-      div.append(i);
+      const removeBtn = document.createElement("button");
+      removeBtn.type = "button";
+      removeBtn.className = "text-red-600 hover:text-red-700 text-xl focus:ring-2 focus:ring-red-500 transition";
+      removeBtn.innerHTML = '<i class="fa-solid fa-minus"></i>';
+      removeBtn.setAttribute('aria-label', 'Remove subtarget');
+      removeBtn.addEventListener("click", () => {
+        div.remove();
+        AOS.refresh();
+      });
+      div.append(removeBtn);
+
       subtargetsBox.append(div);
-    };
-    const handleDeleteSubTargets = (element) => {
-      element.remove();
+      AOS.refresh();
     };
 
     const searchUser = document.getElementById("searchUser");
     const dropDown = document.getElementById("dropDown");
 
- 
-
-    searchUser.addEventListener("click", function () {
-      dropDown.classList.remove("hidden");
+    searchUser.addEventListener("click", () => {
+      dropDown.classList.toggle("hidden");
     });
 
-    searchUser.addEventListener("input", function () {
-  
-      const filter = this.value.toLowerCase();
+    searchUser.addEventListener("input", () => {
+      const filter = searchUser.value.toLowerCase();
       const options = dropDown.querySelectorAll("option");
       options.forEach((option) => {
-        const name = option.dataset.name.toLowerCase() || "";
-        const email = option.dataset.email.toLowerCase() || "";
-
-        if (name.includes(filter) || email.includes(filter)) {
+        const name = option.dataset.name?.toLowerCase() || "";
+        const email = option.dataset.email?.toLowerCase() || "";
+        if (name.includes(filter) || email.includes(filter) || filter === "") {
           option.classList.remove("hidden");
         } else {
           option.classList.add("hidden");
@@ -252,14 +246,20 @@
       });
     });
 
-    dropDown.addEventListener("input", function () {
-      const selectedOption = this.options[this.selectedIndex];
+    dropDown.addEventListener("change", () => {
+      const selectedOption = dropDown.options[dropDown.selectedIndex];
       if (selectedOption) {
-        const name = selectedOption.dataset.name;
-        const email = selectedOption.dataset.email;
-        searchUser.value = `${name} (${email})`;
-        dropDown.classList.add('hidden')
+        searchUser.value = selectedOption.textContent.trim();
+        dropDown.classList.add("hidden");
+      }
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener("click", (e) => {
+      if (!searchUser.contains(e.target) && !dropDown.contains(e.target)) {
+        dropDown.classList.add("hidden");
       }
     });
   </script>
+</body>
 </html>

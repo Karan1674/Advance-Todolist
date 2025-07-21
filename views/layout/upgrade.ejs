@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('../partials/header') %>
+    <style>
+      .spinner {
+        display: none;
+        border: 4px solid #e5e7eb;
+        border-top: 4px solid #2dd4bf;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        animation: spin 0.8s linear infinite;
+        margin-left: 8px;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body
+    class="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200 font-sans flex flex-col"
+  >
+    <%- include('../partials/navbar.ejs') %>
+    <div class="flex min-h-screen flex-grow">
+      <%- include('../partials/sidebar') %>
+      <main class="flex-grow flex justify-center items-center p-4 sm:p-8">
+        <section
+          class="w-full max-w-lg bg-white rounded-2xl shadow-lg overflow-hidden"
+        >
+          <div class="py-10 px-8">
+            <div class="text-center mb-8">
+              <h2 class="text-3xl font-extrabold text-gray-900">
+                Upgrade Your Plan
+              </h2>
+              <p class="mt-2 text-gray-600">
+                Choose your country, plan, and payment method to unlock premium
+                features.
+              </p>
+            </div>
+
+            <div class="flex flex-col space-y-6">
+              <!-- Country -->
+              <div>
+                <label
+                  for="country"
+                  class="block mb-1.5 text-sm font-semibold text-gray-800"
+                  >Country</label
+                >
+                <div class="relative">
+                  <select
+                    id="country"
+                    name="country"
+                    required
+                    onchange="updateGatewayOptions()"
+                    class="block w-full px-4 py-2 pr-10 bg-gray-100 border-2 border-gray-200 rounded-lg text-sm font-medium text-gray-800 focus:outline-none focus:ring-2 focus:bg-white"
+                  >
+                    <option value="" disabled selected>
+                      Select your country
+                    </option>
+                    <option value="national">India</option>
+                    <option value="international">International</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Plan -->
+              <div>
+                <label
+                  for="plan"
+                  class="block mb-1.5 text-sm font-semibold text-gray-800"
+                  >Plan</label
+                >
+                <div class="relative">
+                  <select
+                    id="plan"
+                    name="plan"
+                    required
+                    class="block w-full px-4 py-2 pr-10 bg-gray-100 border-2 border-gray-200 rounded-lg text-sm font-medium text-gray-800 focus:outline-none focus:ring-2 focus:bg-white"
+                  >
+                    <option value="" disabled selected>Select a plan</option>
+                    <% if(user && user.packageDetails !== 'pro') { %>
+                    <option value="pro">Pro ($99/month)</option>
+                    <% } %> <% if(user && user.packageDetails !== 'premium') {
+                    %>
+                    <option value="premium">Premium ($499/month)</option>
+                    <% } %>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Payment Method -->
+              <div>
+                <label
+                  for="gateway"
+                  class="block mb-1.5 text-sm font-semibold text-gray-800"
+                  >Payment Method</label
+                >
+                <div class="relative">
+                  <select
+                    id="gateway"
+                    name="gateway"
+                    required
+                    disabled
+                    class="block w-full px-4 py-2 pr-10 bg-gray-100 border-2 border-gray-200 rounded-lg text-sm font-medium text-gray-800 focus:outline-none focus:ring-2 focus:bg-white disabled:bg-gray-200 disabled:cursor-not-allowed"
+                  >
+                    <option value="" disabled selected>
+                      Select a payment method
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Submit Button -->
+              <button
+                type="button"
+                id="paymentButton"
+                onclick="handlePayment()"
+                class="w-full border border-gray-400 text-black font-semibold rounded-xl py-3 px-6 mt-2 flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed"
+                disabled
+              >
+                <span id="buttonText">Proceed to Payment</span>
+                <span id="spinner" class="spinner"></span>
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <%- include('../partials/footer') %>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <script>
+      function updateGatewayOptions() {
+        const country = document.getElementById("country").value;
+        const gatewaySelect = document.getElementById("gateway");
+
+        gatewaySelect.innerHTML =
+          '<option value="" disabled selected>Select a payment method</option>';
+        gatewaySelect.disabled = !country;
+
+        if (country === "national") {
+          ["phonepe", "razorpay"].forEach((method) => {
+            const opt = document.createElement("option");
+            opt.value = method;
+            opt.textContent = method.charAt(0).toUpperCase() + method.slice(1);
+            gatewaySelect.appendChild(opt);
+          });
+        } else if (country === "international") {
+          ["paypal", "stripe"].forEach((method) => {
+            const opt = document.createElement("option");
+            opt.value = method;
+            opt.textContent = method.charAt(0).toUpperCase() + method.slice(1);
+            gatewaySelect.appendChild(opt);
+          });
+        }
+
+        updateButtonState();
+      }
+
+      document
+        .getElementById("plan")
+        .addEventListener("change", updateButtonState);
+      document
+        .getElementById("gateway")
+        .addEventListener("change", updateButtonState);
+
+      function updateButtonState() {
+        const country = document.getElementById("country").value;
+        const plan = document.getElementById("plan").value;
+        const gateway = document.getElementById("gateway").value;
+        document.getElementById("paymentButton").disabled = !(
+          country &&
+          plan &&
+          gateway
+        );
+      }
+
+      async function handlePayment() {
+        const country = document.getElementById("country").value;
+        const plan = document.getElementById("plan").value;
+        const gateway = document.getElementById("gateway").value;
+        const button = document.getElementById("paymentButton");
+        const buttonText = document.getElementById("buttonText");
+        const spinner = document.getElementById("spinner");
+
+        if (!country || !plan || !gateway) {
+          alert("Please select country, plan, and payment method.");
+          return;
+        }
+
+        button.disabled = true;
+        buttonText.textContent = "Processing...";
+        spinner.style.display = "inline-block";
+        console.log(
+          `Initiating payment: ${gateway} for ${country} with plan ${plan}`
+        );
+
+        try {
+          if (gateway != "razorpay") {
+            const response = await fetch(`/payment/${gateway}`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ country, plan }),
+            });
+            const data = await response.json();
+            if (data.url) {
+              window.location.href = data.url;
+            } else {
+              alert(data.message || "Error initiating payment.");
+            }
+          } else {
+            const response = await fetch(`/payment/${gateway}`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ country, plan }),
+            });
+            const data = await response.json();
+
+            if (data) {
+              const rzp = new Razorpay({
+                key: data.key,
+                amount: data.amount,
+                currency: data.currency,
+                name: "Your App Name",
+                description: "Upgrade Plan",
+                order_id: data.orderId,
+                handler: async function (response) {
+                  const verify = await fetch("/success/razorpay", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      razorpay_order_id: response.razorpay_order_id,
+                      razorpay_payment_id: response.razorpay_payment_id,
+                      razorpay_signature: response.razorpay_signature,
+                      plan: plan,
+                    }),
+                  });
+
+                  const result = await verify.json();
+                  if (result.success) {
+                    window.location.href = `/?message=Plan upgraded to ${plan}&type=success`;
+                  } else {
+                    alert("Payment verification failed.");
+                  }
+                },
+              });
+              rzp.open();
+            } else {
+              alert(data.message || "Error initiating payment.");
+            }
+          }
+        } catch (err) {
+          console.log(err);
+          alert("Error initiating payment: " + err.message);
+        } finally {
+          button.disabled = false;
+          buttonText.textContent = "Proceed to Payment";
+          spinner.style.display = "none";
+        }
+      }
+    </script>
+  </body>
+</html>

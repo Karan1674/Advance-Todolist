@@ -1,96 +1,153 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <%- include('../partials/header.ejs')%>
-  </head>
-
-  <body class="flex min-h-[100vh] bg-gray-100 justify-center items-center">
-
-    
-     <div class="min-w-lg mx-auto p-5">
-      <form
-        action="/validateOtp"
-        method="post"
-        class="flex items-start border border-gray-200 justify-center gap-5 shadow-md rounded-md flex-col p-6 py-8"
-      >
-        <h2 class="text-center w-full my-5 mb-12 font-semibold text-2xl">
-          Advance TodoList
-        </h2>
-
-        <div class="flex w-full justify-center gap-2 flex-col">
-          <label class="text-medium font-medium tracking-wide"
-            > Your Register Email</label
-          >
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advance TodoList - Validate OTP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .fade-in {
+      animation: fadeIn 0.8s ease-out;
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(8px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .input-focus {
+      transition: all 0.2s ease;
+    }
+    .input-focus:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    .btn-hover {
+      transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn-hover:hover {
+      background-color: #1d4ed8;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .card {
+      transition: box-shadow 0.3s ease;
+    }
+    .card:hover {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+    .otp-input {
+      width: 2.5rem;
+      height: 2.5rem;
+      text-align: center;
+      font-size: 1.125rem;
+    }
+    .otp-input:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-gray-50 flex items-center justify-center p-4 sm:p-6">
+   <%- include('../partials/toast.ejs') %>
+  <div class="max-w-md w-full mx-auto p-6 bg-white rounded-xl shadow-md card fade-in">
+    <form action="/validateOtp" method="post" class="space-y-6">
+      <h2 class="text-2xl font-bold text-center text-gray-900 mb-4">
+        Advance TodoList
+      </h2>
+      <p class="text-center text-sm text-gray-500 mb-6">Enter the OTP sent to your email</p>
+      <div class="space-y-2">
+        <label for="email" class="block text-sm font-medium text-gray-700">
+          Your Registered Email
+        </label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          class="w-full p-3 border border-gray-200 rounded-lg focus:outline-none input-focus bg-gray-100/50"
+          value="<%=user.email %>"
+          readonly
+        />
+      </div>
+      <div class="space-y-2">
+        <label class="block text-sm font-medium text-gray-700">
+          Enter Your OTP
+        </label>
+        <div class="flex items-center justify-between gap-3">
           <input
             type="text"
-            class="w-full p-2 mb-4 border border-gray-300 rounded bg-gray-200"
-            name="email"
+            name="otpNumber[]"
+            maxlength="1"
             required
-            value="<%=user.email %>"
-
+            inputmode="numeric"
+            class="border border-gray-200 rounded-lg otp-input input-focus"
+          />
+          <input
+            type="text"
+            name="otpNumber[]"
+            maxlength="1"
+            required
+            inputmode="numeric"
+            class="border border-gray-200 rounded-lg otp-input input-focus"
+          />
+          <input
+            type="text"
+            name="otpNumber[]"
+            maxlength="1"
+            required
+            inputmode="numeric"
+            class="border border-gray-200 rounded-lg otp-input input-focus"
+          />
+          <input
+            type="text"
+            name="otpNumber[]"
+            maxlength="1"
+            required
+            inputmode="numeric"
+            class="border border-gray-200 rounded-lg otp-input input-focus"
+          />
+          <input
+            type="text"
+            name="otpNumber[]"
+            maxlength="1"
+            required
+            inputmode="numeric"
+            class="border border-gray-200 rounded-lg otp-input input-focus"
+          />
+          <input
+            type="text"
+            name="otpNumber[]"
+            maxlength="1"
+            required
+            inputmode="numeric"
+            class="border border-gray-200 rounded-lg otp-input input-focus"
           />
         </div>
-
-        <div class="flex w-full justify-center gap-2 flex-col">
-          <label class="text-medium font-medium tracking-wide">Enter Your Otp</label>
-          <div class="flex items-center justify-between gap-4">
-            <input
-              type="text"
-              name="otpNumber[]"
-              maxlength="1"
-              required
-              inputmode="numeric"
-              class="border border-gray-300 rounded-md w-[40px] h-[40px] text-center"
-            />
-            <input
-              type="text"
-              name="otpNumber[]"
-              maxlength="1"
-              required
-              inputmode="numeric"
-              class="border border-gray-300 rounded-md w-[40px] h-[40px] text-center"
-            />
-            <input
-              type="text"
-              name="otpNumber[]"
-              maxlength="1"
-              required
-              inputmode="numeric"
-              class="border border-gray-300 rounded-md w-[40px] h-[40px] text-center"
-            />
-            <input
-              type="text"
-              name="otpNumber[]"
-              maxlength="1"
-              required
-              inputmode="numeric"
-              class="border border-gray-300 rounded-md w-[40px] h-[40px] text-center"
-            />
-            <input
-              type="text"
-              name="otpNumber[]"
-              maxlength="1"
-              required
-              inputmode="numeric"
-              class="border border-gray-300 rounded-md w-[40px] h-[40px] text-center"
-            />
-            <input
-              type="text"
-              name="otpNumber[]"
-              maxlength="1"
-              required
-              inputmode="numeric"
-              class="border border-gray-300 rounded-md w-[40px] h-[40px] text-center"
-            />
-          </div>
-        </div>
-        <button
-          type="submit"
-          class="w-full bg-green-500 p-2 my-2 text-white font-medium"
-        >
-          Validate OTP
-        </button>
-      </form>
-    </div>
-  </body>
+      </div>
+      <button
+        type="submit"
+        class="w-full bg-blue-600 text-white p-3 rounded-lg font-medium btn-hover focus:ring-2 focus:ring-blue-400 focus:ring-offset-1"
+      >
+        Validate OTP
+      </button>
+      <p class="text-center text-sm text-gray-500 mt-6">
+        Remember your password? <a href="/loginpage" class="text-blue-600 font-medium hover:underline hover:text-blue-700 transition">Log in</a> or 
+        <a href="/signupPage" class="text-blue-600 font-medium hover:underline hover:text-blue-700 transition">Sign Up</a>
+      </p>
+    </form>
+  </div>
+  <script>
+    const otpInputs = document.querySelectorAll('.otp-input');
+    otpInputs.forEach((input, index) => {
+      input.addEventListener('input', () => {
+        if (input.value.length === 1 && index < otpInputs.length - 1) {
+          otpInputs[index + 1].focus();
+        }
+      });
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && input.value === '' && index > 0) {
+          otpInputs[index - 1].focus();
+        }
+      });
+    });
+  </script>
+</body>
 </html>
