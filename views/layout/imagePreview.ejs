@@ -1,212 +1,268 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <%- include('../partials/header.ejs') %>
-  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
-  <style>
-    .spinner {
-      display: none;
-      border: 4px solid #e5e7eb;
-      border-top: 4px solid #059669;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      animation: spin 0.7s linear infinite;
-      margin-left: 8px;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    /* Ensure AOS animations aren't blocked */
-    [data-aos] {
-      visibility: visible !important;
-    }
-    .showMedia:hover {
-      border-color: #059669;
-    }
-  </style>
-</head>
-<body class="min-h-screen bg-gray-100 flex flex-col font-sans">
-  <%- include('../partials/navbar.ejs') %>
-  <div class="flex min-h-screen flex-grow">
-    <%- include('../partials/sidebar') %>
-    <main class="flex-grow">
-      <% if(Library) { %>
-        <div class="w-full my-12 sm:max-w-5xl mx-auto p-6 sm:p-8 rounded-lg shadow-lg relative bg-white" data-aos="fade-up" data-aos-duration="600">
-          <button
-            class="absolute right-4 top-4 text-gray-600 hover:text-gray-800"
-            onclick="window.location.href='/medialibrary'"
-            aria-label="Close media editor"
+  <head>
+    <%- include('../partials/header.ejs') %>
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+    <style>
+      .spinner {
+        display: none;
+        border: 4px solid #e5e7eb;
+        border-top: 4px solid #059669;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        animation: spin 0.7s linear infinite;
+        margin-left: 8px;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      /* Ensure AOS animations aren't blocked */
+      [data-aos] {
+        visibility: visible !important;
+      }
+      .showMedia:hover {
+        border-color: #059669;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen bg-gray-100 flex flex-col font-sans">
+    <%- include('../partials/navbar.ejs') %>
+    <div class="flex min-h-screen flex-grow">
+      <%- include('../partials/sidebar') %>
+      <main class="flex-grow">
+        <div class="min-h-screen">
+          <% if(Library) { %>
+          <div
+            class="w-full my-12 sm:max-w-5xl mx-auto p-6 sm:p-8 rounded-lg shadow-lg relative bg-white"
+            data-aos="fade-up"
+            data-aos-duration="600"
           >
-            <i class="fa-solid fa-xmark text-2xl"></i>
-          </button>
-          <div class="flex max-w-4xl mx-auto items-center justify-center p-4 bg-white">
-            <div class="flex flex-col gap-6">
-              <img src="/<%= Library[0].url %>" alt="Media Image" class="h-96 object-contain rounded-lg" data-aos="fade-up" data-aos-duration="600" data-aos-delay="100" />
-              <div class="flex flex-wrap gap-2 items-center">
-                <% Library[0].tag.split(',').forEach((item) => { %>
-                  <span class="text-white bg-emerald-200 px-3 py-1.5 rounded-lg hover:bg-emerald-300 text-sm font-medium" data-aos="fade-up" data-aos-duration="600" data-aos-delay="200"><%= item.trim() %></span>
-                <% }) %>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div id="editImage" class="w-full my-12 sm:max-w-4xl mx-auto mt-8" data-aos="fade-up" data-aos-duration="600" data-aos-delay="300">
-          <div class="bg-white w-full p-6 sm:p-8 rounded-lg shadow-lg relative text-center">
-            <p id="fileError" class="hidden text-red-500 text-sm text-center mb-6 bg-emerald-50 rounded-md p-2" data-aos="fade-in" data-aos-duration="600" role="alert"></p>
-            <div class="flex flex-col sm:flex-row justify-center mt-5 gap-6">
-              <button
-                id="showMediaData"
-                class="px-6 py-3 w-full sm:w-1/2 text-lg font-medium bg-gray-600 text-white rounded-lg hover:bg-gray-700 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 shadow-sm transition-all active:bg-gray-700"
-                aria-label="Edit media image"
-                data-aos="fade-up" data-aos-duration="600" data-aos-delay="400"
-              >
-                Media Image
-              </button>
-              <button
-                id="showUrlData"
-                class="px-6 py-3 w-full sm:w-1/2 text-lg font-medium bg-gray-600 text-white rounded-lg hover:bg-gray-700 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 shadow-sm transition-all active:bg-gray-700"
-                aria-label="Edit media URL"
-                data-aos="fade-up" data-aos-duration="600" data-aos-delay="450"
-              >
-                URL
-              </button>
-            </div>
-
-            <form
-              action="/EditMedia/<%= Library[0]._id %>"
-              method="post"
-              enctype="multipart/form-data"
-              class="mediaForm mt-6"
+            <button
+              class="absolute right-4 top-4 text-gray-600 hover:text-gray-800"
+              onclick="window.location.href='/medialibrary'"
+              aria-label="Close media editor"
             >
-              <div
-                class="showMedia flex justify-center flex-col items-center w-full h-48 rounded-lg border-2 border-dashed border-gray-500 bg-gray-100 <%= Library[0].type === 'image' ? 'flex' : 'hidden' %>"
-                onclick="document.getElementById('mediaInput').click()"
-                data-aos="fade-in" data-aos-duration="600" data-aos-delay="500"
-              >
-                <label for="mediaInput" class="image-name text-gray-700 text-base font-medium cursor-pointer">Edit an image</label>
-                <input
-                  id="mediaInput"
-                  type="file"
-                  name="mediaImage"
-                  accept="image/*"
-                  class="p-3 w-full hidden text-gray-700"
-                  aria-label="Upload a new image"
-                  aria-describedby="fileError"
+              <i class="fa-solid fa-xmark text-2xl"></i>
+            </button>
+            <div
+              class="flex max-w-4xl mx-auto items-center justify-center p-4 bg-white"
+            >
+              <div class="flex flex-col gap-6">
+                <img
+                  src="/<%= Library[0].url %>"
+                  alt="Media Image"
+                  class="h-96 object-contain rounded-lg"
+                  data-aos="fade-up"
+                  data-aos-duration="600"
+                  data-aos-delay="100"
                 />
-              </div>
-
-              <div
-                class="showurl flex justify-center flex-col w-full <%= Library[0].type === 'url' ? 'flex' : 'hidden' %>"
-                data-aos="fade-in" data-aos-duration="600" data-aos-delay="500"
-              >
-                <input
-                  id="urlInput"
-                  type="text"
-                  name="url"
-                  value="<%= Library[0].url %>"
-                  placeholder="Enter URL"
-                  class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600 shadow-sm text-base"
-                  aria-label="Enter media URL"
-                  aria-describedby="fileError"
-                />
-              </div>
-
-              <div>
-                <input
-                  id="tagInput"
-                  name="tag"
-                  type="text"
-                  value="<%= Library[0].tag %>"
-                  placeholder="Enter tags (comma-separated)"
-                  class="w-full p-3 mt-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600 shadow-sm text-base"
-                  aria-label="Enter tags for the media"
-                  data-aos="fade-up" data-aos-duration="600" data-aos-delay="550"
-                />
-                <div class="w-full flex items-end justify-end">
-                  <button
-                    type="submit"
-                    class="mt-4 px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm transition-all"
-                    aria-label="Submit media changes"
-                    data-aos="fade-up" data-aos-duration="600" data-aos-delay="600"
+                <div class="flex flex-wrap gap-2 items-center">
+                  <% Library[0].tag.split(',').forEach((item) => { %>
+                  <span
+                    class="text-white bg-emerald-200 px-3 py-1.5 rounded-lg hover:bg-emerald-300 text-sm font-medium"
+                    data-aos="fade-up"
+                    data-aos-duration="600"
+                    data-aos-delay="200"
+                    ><%= item.trim() %></span
                   >
-                    Submit
-                  </button>
+                  <% }) %>
                 </div>
               </div>
-            </form>
+            </div>
           </div>
+
+          <div
+            id="editImage"
+            class="w-full my-12 sm:max-w-4xl mx-auto mt-8"
+            data-aos="fade-up"
+            data-aos-duration="600"
+            data-aos-delay="300"
+          >
+            <div
+              class="bg-white w-full p-6 sm:p-8 rounded-lg shadow-lg relative text-center"
+            >
+              <p
+                id="fileError"
+                class="hidden text-red-500 text-sm text-center mb-6 bg-emerald-50 rounded-md p-2"
+                data-aos="fade-in"
+                data-aos-duration="600"
+                role="alert"
+              ></p>
+              <div class="flex flex-col sm:flex-row justify-center mt-5 gap-6">
+                <button
+                  id="showMediaData"
+                  class="px-6 py-3 w-full sm:w-1/2 text-lg font-medium bg-gray-600 text-white rounded-lg hover:bg-gray-700 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 shadow-sm transition-all active:bg-gray-700"
+                  aria-label="Edit media image"
+                  data-aos="fade-up"
+                  data-aos-duration="600"
+                  data-aos-delay="400"
+                >
+                  Media Image
+                </button>
+                <button
+                  id="showUrlData"
+                  class="px-6 py-3 w-full sm:w-1/2 text-lg font-medium bg-gray-600 text-white rounded-lg hover:bg-gray-700 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 shadow-sm transition-all active:bg-gray-700"
+                  aria-label="Edit media URL"
+                  data-aos="fade-up"
+                  data-aos-duration="600"
+                  data-aos-delay="450"
+                >
+                  URL
+                </button>
+              </div>
+
+              <form
+                action="/EditMedia/<%= Library[0]._id %>"
+                method="post"
+                enctype="multipart/form-data"
+                class="mediaForm mt-6"
+              >
+                <div
+                  class="showMedia flex justify-center flex-col items-center w-full h-48 rounded-lg border-2 border-dashed border-gray-500 bg-gray-100 <%= Library[0].type === 'image' ? 'flex' : 'hidden' %>"
+                  onclick="document.getElementById('mediaInput').click()"
+                  data-aos="fade-in"
+                  data-aos-duration="600"
+                  data-aos-delay="500"
+                >
+                  <label
+                    for="mediaInput"
+                    class="image-name text-gray-700 text-base font-medium cursor-pointer"
+                    >Edit an image</label
+                  >
+                  <input
+                    id="mediaInput"
+                    type="file"
+                    name="mediaImage"
+                    accept="image/*"
+                    class="p-3 w-full hidden text-gray-700"
+                    aria-label="Upload a new image"
+                    aria-describedby="fileError"
+                  />
+                </div>
+
+                <div
+                  class="showurl flex justify-center flex-col w-full <%= Library[0].type === 'url' ? 'flex' : 'hidden' %>"
+                  data-aos="fade-in"
+                  data-aos-duration="600"
+                  data-aos-delay="500"
+                >
+                  <input
+                    id="urlInput"
+                    type="text"
+                    name="url"
+                    value="<%= Library[0].url %>"
+                    placeholder="Enter URL"
+                    class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600 shadow-sm text-base"
+                    aria-label="Enter media URL"
+                    aria-describedby="fileError"
+                  />
+                </div>
+
+                <div>
+                  <input
+                    id="tagInput"
+                    name="tag"
+                    type="text"
+                    value="<%= Library[0].tag %>"
+                    placeholder="Enter tags (comma-separated)"
+                    class="w-full p-3 mt-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600 shadow-sm text-base"
+                    aria-label="Enter tags for the media"
+                    data-aos="fade-up"
+                    data-aos-duration="600"
+                    data-aos-delay="550"
+                  />
+                  <div class="w-full flex items-end justify-end">
+                    <button
+                      type="submit"
+                      class="mt-4 px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm transition-all"
+                      aria-label="Submit media changes"
+                      data-aos="fade-up"
+                      data-aos-duration="600"
+                      data-aos-delay="600"
+                    >
+                      Submit
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+          <% } %>
         </div>
-      <% } %>
-      <%- include('../partials/footer.ejs') %>
-    </main>
-  </div>
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script>
-    // Initialize AOS
-    document.addEventListener('DOMContentLoaded', () => {
-      if (typeof AOS === 'undefined') {
-        console.error('AOS library failed to load');
-        return;
-      }
-      AOS.init({
-        duration: 600,
-        easing: 'ease-out',
-        once: true,
-        offset: 100,
-      });
-      console.log('AOS initialized');
-    });
-
-    const showMedia = document.querySelector(".showMedia");
-    const showMediaData = document.querySelector("#showMediaData");
-    const showUrlData = document.querySelector("#showUrlData");
-    const showurl = document.querySelector(".showurl");
-    const mediaInput = document.querySelector("#mediaInput");
-    const urlInput = document.querySelector("#urlInput");
-    const fileError = document.querySelector("#fileError");
-
-    mediaInput.addEventListener('change', function(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const maxSize = 5 * 1024 * 1024; // 5MB
-        if (file.size > maxSize) {
-          fileError.classList.remove("hidden");
-          fileError.textContent = 'File size exceeds 5MB. Please choose a smaller image.';
-          event.target.value = '';
+        <%- include('../partials/footer.ejs') %>
+      </main>
+    </div>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+      // Initialize AOS
+      document.addEventListener("DOMContentLoaded", () => {
+        if (typeof AOS === "undefined") {
+          console.error("AOS library failed to load");
           return;
         }
-        const label = document.querySelector(".showMedia label");
-        label.textContent = `Selected: ${file.name}`;
+        AOS.init({
+          duration: 600,
+          easing: "ease-out",
+          once: true,
+          offset: 100,
+        });
+        console.log("AOS initialized");
+      });
+
+      const showMedia = document.querySelector(".showMedia");
+      const showMediaData = document.querySelector("#showMediaData");
+      const showUrlData = document.querySelector("#showUrlData");
+      const showurl = document.querySelector(".showurl");
+      const mediaInput = document.querySelector("#mediaInput");
+      const urlInput = document.querySelector("#urlInput");
+      const fileError = document.querySelector("#fileError");
+
+      mediaInput.addEventListener("change", function (event) {
+        const file = event.target.files[0];
+        if (file) {
+          const maxSize = 5 * 1024 * 1024; // 5MB
+          if (file.size > maxSize) {
+            fileError.classList.remove("hidden");
+            fileError.textContent =
+              "File size exceeds 5MB. Please choose a smaller image.";
+            event.target.value = "";
+            return;
+          }
+          const label = document.querySelector(".showMedia label");
+          label.textContent = `Selected: ${file.name}`;
+          urlInput.value = "";
+        }
+      });
+
+      showMediaData.addEventListener("click", () => {
+        showMedia.classList.remove("hidden");
+        showurl.classList.add("hidden");
+        showMediaData.classList.add("bg-gray-700");
+        showUrlData.classList.remove("bg-gray-700");
+      });
+
+      showUrlData.addEventListener("click", () => {
+        showMedia.classList.add("hidden");
+        showurl.classList.remove("hidden");
+        showUrlData.classList.add("bg-gray-700");
+        showMediaData.classList.remove("bg-gray-700");
+      });
+
+      mediaInput.addEventListener("input", () => {
         urlInput.value = "";
-      }
-    });
+        fileError.classList.add("hidden");
+      });
 
-    showMediaData.addEventListener("click", () => {
-      showMedia.classList.remove("hidden");
-      showurl.classList.add("hidden");
-      showMediaData.classList.add("bg-gray-700");
-      showUrlData.classList.remove("bg-gray-700");
-    });
-
-    showUrlData.addEventListener("click", () => {
-      showMedia.classList.add("hidden");
-      showurl.classList.remove("hidden");
-      showUrlData.classList.add("bg-gray-700");
-      showMediaData.classList.remove("bg-gray-700");
-    });
-
-    mediaInput.addEventListener('input', () => {
-      urlInput.value = "";
-      fileError.classList.add("hidden");
-    });
-
-    urlInput.addEventListener('input', () => {
-      mediaInput.value = "";
-      fileError.classList.add("hidden");
-    });
-  </script>
-</body>
+      urlInput.addEventListener("input", () => {
+        mediaInput.value = "";
+        fileError.classList.add("hidden");
+      });
+    </script>
+  </body>
 </html>

@@ -3,7 +3,7 @@
 
 >
   <a
-    class="flex gap-3 items-center text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg p-3 transition-all"
+    class="flex cursor-pointer gap-3 items-center text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg p-3 transition-all"
     href="/task"
     aria-label="View tasks"
     data-aos="fade-in"
@@ -14,7 +14,7 @@
     <span class="text-base font-medium">Tasks</span>
   </a>
   <a
-    class="flex gap-3 items-center text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg p-3 transition-all"
+    class="flex cursor-pointer gap-3 items-center text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg p-3 transition-all"
     href="/addtask"
     aria-label="Add a new task"
     data-aos="fade-in"
@@ -25,7 +25,7 @@
     <span class="text-base font-medium">Add Task</span>
   </a>
   <a
-    class="flex gap-3 items-center text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg p-3 transition-all"
+    class="flex cursor-pointer gap-3 items-center text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg p-3 transition-all"
     href="/medialibrary"
     aria-label="View media library"
     data-aos="fade-in"
@@ -38,7 +38,7 @@
 
    <a
       href="/invoices"
-      class="flex items-center px-4 py-3 text-sm sm:text-base font-medium text-gray-700 rounded-md hover:bg-emerald-50 hover:text-emerald-600 focus:outline-none "
+      class="flex cursor-pointer items-center px-4 py-3 text-sm sm:text-base font-medium text-gray-700 rounded-md hover:bg-emerald-50 hover:text-emerald-600 focus:outline-none "
     aria-label="View invoices"
       data-aos="fade-in"
       data-aos-duration="600"
@@ -49,7 +49,7 @@
     </a>
   <% if (isAdmin) { %>
   <a
-    class="flex gap-3 items-center text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg p-3 transition-all"
+    class="flex cursor-pointer gap-3 items-center text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg p-3 transition-all"
     href="/assigntask"
     aria-label="Assign tasks"
     data-aos="fade-in"
@@ -60,7 +60,7 @@
     <span class="text-base font-medium">Assign Tasks</span>
   </a>
   <a
-    class="flex gap-3 items-center text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg p-3 transition-all"
+    class="flex cursor-pointer gap-3 items-center text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg p-3 transition-all"
     href="/assignedtask"
     aria-label="View assigned tasks"
     data-aos="fade-in"
@@ -72,7 +72,7 @@
   </a>
   <% } else { %>
   <a
-    class="flex gap-3 items-center text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg p-3 transition-all"
+    class="flex cursor-pointer gap-3 items-center text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg p-3 transition-all"
     href="/Admintask"
     aria-label="View admin tasks"
     data-aos="fade-in"
@@ -84,7 +84,7 @@
   </a>
   <% } %>
   <a
-    class="flex gap-3 items-center text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg p-3 transition-all"
+    class="flex cursor-pointer gap-3 items-center text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg p-3 transition-all"
     href="/profile"
     aria-label="View profile"
     data-aos="fade-in"
@@ -95,7 +95,7 @@
     <span class="text-base font-medium">Profile</span>
   </a>
   <a
-    class="flex gap-3 items-center text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg p-3 transition-all"
+    class="flex cursor-pointer gap-3 items-center text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg p-3 transition-all"
     href="/downloadTask"
     aria-label="Download tasks"
     data-aos="fade-in"
@@ -107,7 +107,7 @@
   </a>
   <% if (user) { %>
   <a
-    class="flex gap-3 items-center text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg p-3 transition-all"
+    class="flex cursor-pointer gap-3 items-center text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg p-3 transition-all"
     href="/logout"
     aria-label="Log out"
     data-aos="fade-in"

@@ -1,146 +1,167 @@
-
-<!-- Modal toggle -->
 <button
   data-modal-target="default-modal"
   id="toggleBtn"
   data-modal-toggle="default-modal"
-  class="hidden text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition"
+  class="hidden text-white bg-emerald-600 hover:bg-emerald-700 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-semibold rounded-lg text-sm px-5 py-2.5 text-center transition-all duration-300"
   type="button"
+  aria-label="Open media library modal"
 >
   Toggle modal
 </button>
 
-<!-- Main modal -->
 <div
   id="default-modal"
   tabindex="-1"
   aria-hidden="true"
-  class="hidden fixed inset-0 z-50 flex justify-center items-center w-full h-full bg-black bg-opacity-50 transition-opacity duration-300"
+  class="hidden fixed inset-0 z-50 flex justify-center items-center w-full h-full bg-black bg-opacity-60 transition-opacity duration-300"
 >
-  <div class="relative p-4 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-    <!-- Modal content -->
-    <div class="relative bg-white rounded-xl shadow-lg dark:bg-gray-800">
-      <!-- Modal header -->
-      <div class="flex items-center justify-between p-5 border-b border-gray-200 dark:border-gray-700">
-        <div class="flex w-full justify-center gap-4">
-          <button
-            id="showMediaData"
-            class="w-1/2 py-2.5 px-4 text-sm font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-          >
-            Media Image
-          </button>
-          <button
-            id="showUrlData"
-            class="w-1/2 py-2.5 px-4 text-sm font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-          >
-            URL
-          </button>
-        </div>
+  <div class="relative p-6 w-full max-w-3xl max-h-[85vh] overflow-y-auto bg-white rounded-2xl shadow-xl" data-aos="fade-up" data-aos-duration="600">
+    <div class="flex items-center justify-between p-5 border-b border-gray-200">
+      <h3 class="text-xl font-bold text-gray-900">Media Library</h3>
+      <button
+        data-modal-hide="default-modal"
+        type="button"
+        class="text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300 rounded-lg transition-all duration-200"
+        aria-label="Close modal"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="p-6 space-y-6">
+      <div class="flex items-center justify-center gap-4">
         <button
-          type="button"
-          data-modal-hide="default-modal"
-          class="text-gray-400 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+          id="showMediaData"
+          class="w-1/2 py-3 px-5 text-sm font-semibold text-gray-900 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all duration-200"
+          aria-label="Show media library images"
         >
-          <svg
-            class="w-4 h-4"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 14 14"
-          >
-            <path
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-            />
+          Media Images
+        </button>
+        <button
+          id="showUrlData"
+          class="w-1/2 py-3 px-5 text-sm font-semibold text-gray-900 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all duration-200"
+        >
+          URL Input
+        </button>
+      </div>
+
+      <div class="searchDiv flex items-center gap-4">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search media by tag..."
+          class="flex-grow p-3 text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200"
+          aria-describedby="search-help"
+        />
+        <button
+          class="bg-emerald-600 text-white px-5 py-3 rounded-lg hover:bg-emerald-700 focus:ring-2 focus:ring-emerald-500 transition-all duration-200 flex items-center gap-2"
+          onclick="window.location.href='/medialibrary'"
+          aria-label="Add new media"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
-          <span class="sr-only">Close modal</span>
+          Add
         </button>
       </div>
-      <!-- Modal body -->
-      <div class="p-5 space-y-4">
-        <div class="searchDiv flex items-center gap-3">
-          <input
-            type="text"
-            id="searchInput"
-            placeholder="Search media by tag..."
-            class="flex-grow p-3 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-          />
-          <button
-            class="bg-green-600 text-white px-4 py-2.5 rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 transition"
-            onclick="window.location.href='/medialibrary'"
-          >
-            <i class="fa-solid fa-plus"></i> Add
-          </button>
-        </div>
+      <p id="search-help" class="text-xs text-gray-500 mt-1">Search by tags to filter media items.</p>
 
-        <div class="showMedia flex flex-wrap gap-4 justify-center">
-          <% if(media) { %>
-            <% media.medialibrary.forEach((item, index) => { %>
-              <div
-                class="mediaDataCard relative h-32 w-32 cursor-pointer rounded-lg overflow-hidden transition-transform hover:scale-105"
-                data-tags="<%= item.tag %>"
-                onclick="handleImage('<%= item.url %>', this)"
-              >
-                <img
-                  src="../../<%= item.url %>"
-                  class="object-cover h-full w-full"
-                  alt="Media item"
-                />
-                <div class="absolute inset-0 bg-black opacity-0 hover:opacity-20 transition-opacity"></div>
-              </div>
-            <% }) %>
-          <% } else { %>
-            <p class="w-full text-center text-gray-500 dark:text-gray-400">No media available</p>
-          <% } %>
-        </div>
-
-        <div class="showurl hidden flex flex-col gap-3">
-          <input
-            id="urlInput"
-            type="text"
-            name="url"
-            placeholder="Enter image URL..."
-            class="w-full p-3 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-          />
-        </div>
-
-        <div class="pagination flex items-center justify-center gap-4">
-          <button class="prebtn px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 transition">
-            Previous
-          </button>
-          <span class="pages px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg"></span>
-          <button class="nextbtn px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 transition">
-            Next
-          </button>
-        </div>
+      <div class="showMedia flex flex-wrap gap-4 justify-center">
+        <% if(media) { %>
+          <% media.medialibrary.forEach((item, index) => { %>
+            <div
+              class="mediaDataCard relative h-36 w-36 cursor-pointer rounded-lg overflow-hidden transition-transform duration-200 hover:scale-105 hover:shadow-lg"
+              data-tags="<%= item.tag %>"
+              onclick="handleImage('<%= item.url %>', this)"
+              data-aos="fade-in"
+              data-aos-duration="600"
+              data-aos-delay="<%= index * 50 %>"
+            >
+              <img
+                src="/<%= item.url %>"
+                class="object-cover h-full w-full"
+                alt="Media item with tags <%= item.tag %>"
+              />
+              <div class="absolute inset-0 bg-black opacity-0 hover:opacity-30 transition-opacity duration-200"></div>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <p class="w-full text-center text-gray-600">No media available</p>
+        <% } %>
       </div>
 
-      <!-- Modal footer -->
-      <div class="flex items-center justify-end p-5 border-t border-gray-200 dark:border-gray-700 gap-3">
+      <div class="showurl hidden flex flex-col gap-4">
+        <input
+          id="urlInput"
+          type="text"
+          name="url"
+          placeholder="Enter image URL (e.g., https://example.com/image.jpg)"
+          class="w-full p-3 text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200"
+          aria-describedby="url-help"
+        />
+        <p id="url-help" class="text-xs text-gray-500">Enter a valid image URL to insert.</p>
+      </div>
+
+      <div class="pagination flex items-center justify-center gap-4">
         <button
-          data-modal-hide="default-modal"
-          type="button"
-          onclick="handleDiscriptionImage()"
-          class="bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 transition"
+          class="prebtn px-5 py-2 text-sm font-semibold text-gray-900 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+          aria-label="Previous page"
         >
-          Upload
+          Previous
         </button>
+        <span class="pages px-5 py-2 text-sm font-semibold text-gray-900 bg-gray-100 rounded-lg"></span>
         <button
-          data-modal-hide="default-modal"
-          type="button"
-          class="bg-white text-gray-700 px-5 py-2.5 border border-gray-200 rounded-lg hover:bg-gray-100 focus:ring-2 focus:ring-gray-100 transition"
+          class="nextbtn px-5 py-2 text-sm font-semibold text-gray-900 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+          aria-label="Next page"
         >
-          Cancel
+          Next
         </button>
       </div>
+    </div>
+
+    <div class="flex items-center justify-end p-5 border-t border-gray-200 gap-4">
+      <button
+        data-modal-hide="default-modal"
+        type="button"
+        onclick="handleDiscriptionImage()"
+        class="bg-emerald-600 text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-emerald-700 focus:ring-2 focus:ring-emerald-500 transition-all duration-200 flex items-center gap-2"
+        aria-label="Insert selected image"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg>
+        Insert
+      </button>
+      <button
+        data-modal-hide="default-modal"
+        type="button"
+        class="bg-white text-gray-900 px-5 py-2.5 border border-gray-200 rounded-lg font-semibold hover:bg-gray-100 focus:ring-2 focus:ring-gray-300 transition-all duration-200 flex items-center gap-2"
+        aria-label="Cancel and close modal"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        Cancel
+      </button>
     </div>
   </div>
 </div>
 
 <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof AOS === 'undefined') {
+      console.error('AOS library failed to load');
+      return;
+    }
+    AOS.init({
+      once: true,
+      duration: 600,
+      easing: 'ease-out',
+    });
+  });
+
   const editor = new Jodit("#editor", {
     height: 400,
     toolbarAdaptive: false,
@@ -151,10 +172,9 @@
     controls: {
       imageData: {
         name: "imageData",
-        iconURL: "../../public/assets/Picture_icon_BLACK.svg",
+        iconURL: "/public/assets/Picture_icon_BLACK.svg",
         exec: (editor) => {
-          const toggleBtn = document.querySelector("#toggleBtn");
-          toggleBtn.click();
+          document.querySelector("#toggleBtn").click();
         },
       },
     },
@@ -182,8 +202,8 @@
     showurl.classList.add("hidden");
     document.querySelector(".pagination").classList.remove("hidden");
     document.querySelector(".searchDiv").classList.remove("hidden");
-    showMediaData.classList.add("bg-blue-100", "text-blue-700");
-    showUrlData.classList.remove("bg-blue-100", "text-blue-700");
+    showMediaData.classList.add("bg-emerald-100", "text-emerald-700");
+    showUrlData.classList.remove("bg-emerald-100", "text-emerald-700");
   });
 
   showUrlData.addEventListener("click", () => {
@@ -191,12 +211,12 @@
     showurl.classList.remove("hidden");
     document.querySelector(".pagination").classList.add("hidden");
     document.querySelector(".searchDiv").classList.add("hidden");
-    showUrlData.classList.add("bg-blue-100", "text-blue-700");
-    showMediaData.classList.remove("bg-blue-100", "text-blue-700");
+    showUrlData.classList.add("bg-emerald-100", "text-emerald-700");
+    showMediaData.classList.remove("bg-emerald-100", "text-emerald-700");
   });
 
   const cards = document.querySelectorAll(".mediaDataCard");
-  const items = 6; // Increased for better layout
+  const items = 8;
   const pageNumber = Math.ceil(cards.length / items);
   let currentPage = 1;
   const nextbtn = document.querySelector(".nextbtn");
@@ -246,9 +266,9 @@
   const handleImage = (url, element) => {
     imageUrl = "/" + url;
     if (lastSelected) {
-      lastSelected.classList.remove("border-4", "border-blue-500", "shadow-lg");
+      lastSelected.classList.remove("border-4", "border-emerald-500", "shadow-lg");
     }
-    element.classList.add("border-4", "border-blue-500", "shadow-lg");
+    element.classList.add("border-4", "border-emerald-500", "shadow-lg");
     lastSelected = element;
   };
 
@@ -262,7 +282,6 @@
     }
   };
 
-  // Modal open/close animation
   const modal = document.getElementById("default-modal");
   const toggleModal = () => {
     if (modal.classList.contains("hidden")) {
