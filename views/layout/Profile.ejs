@@ -1,144 +1,175 @@
 <!DOCTYPE html>
 <html lang="en">
-  <%- include('../partials/header')%>
-  <body class="min-h-screen bg-gray-100 flex flex-col">
-    <%- include('../partials/navbar.ejs') %>
+<%- include('../partials/header') %>
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
-    <div class="flex min-h-screen ">
-      <%- include('../partials/sidebar') %>
+<body class="min-h-screen bg-gray-100 flex flex-col font-sans">
+  <%- include('../partials/navbar') %>
 
-      <div
-        class="max-w-3xl relative w-full  mx-auto mt-10 mb-8 bg-white p-8 rounded-lg shadow-md"
-      >
-        <div class="flex  items-center space-x-6">
-          <div class="relative">
-            <img
-              class="h-32 w-32 rounded-full object-cover border-4 border-gray-100"
-              src="../../uploads/<%= user.profilePic %>"
-              alt="Profile Picture"
-            />
-            <div
-              class="h-32 w-32 rounded-full absolute opacity-40 inset-0 bg-black"
-            ></div>
+  <div class="flex min-h-screen flex-grow">
+    <%- include('../partials/sidebar') %>
+    <div class="flex-grow   min-h-screen">
+    <div class="min-h-screen">
+        <% if (user && todolist) { %>
+        <div class="max-w-3xl my-12 mx-auto bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-200 relative" data-aos="fade-up" data-aos-duration="400">
+          <% if(typeof error !== 'undefined' && error) { %>
+            <p class="text-red-500 text-sm text-center mb-6" data-aos="fade-in" data-aos-duration="400"><%= error %></p>
+          <% } %>
+
+          <div class="flex items-center space-x-6" data-aos="fade-up" data-aos-duration="400" data-aos-delay="100">
+            <div class="relative group">
+              <img
+                class="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-gray-100 transition-transform duration-300 group-hover:scale-105"
+                src="/Uploads/<%= user.profilePic || 'placeholder.jpg' %>"
+                alt="Profile picture for <%= user.firstName %> <%= user.lastName %>"
+                onerror="this.src='/public/assets/placeholder.jpg';"
+              />
+              <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full absolute inset-0 bg-gray-900/30 opacity-40 group-hover:opacity-20 transition-opacity"></div>
+            </div>
+            <div class="flex-1">
+              <h1 class="text-2xl sm:text-3xl font-bold text-gray-900"><%= user.firstName %> <%= user.lastName %></h1>
+              <p class="text-gray-600 mt-2"><strong>Email:</strong> <%= user.email %></p>
+              <p class="absolute right-4 top-4">
+                <% if (isAdmin) { %>
+                  <span class="inline-block bg-emerald-100 text-emerald-800 text-xs font-semibold px-4 py-1.5 rounded-full">Admin</span>
+                <% } else { %>
+                  <span class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-4 py-1.5 rounded-full">User</span>
+                <% } %>
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 class="text-3xl font-bold text-gray-900">
-              <%= user.firstName %> <%= user.lastName %>
-            </h1>
 
-            <p class="text-gray-600 mt-3">
-              <strong>Email:</strong> <%= user.email %>
-            </p>
-            <p class="absolute right-1 top-1">
-              <% if (isAdmin) { %>
-              <span
-                class="mt-3 inline-block bg-green-100 text-green-800 text-xs font-semibold px-4 py-2 rounded-full"
+          <div class="my-8" data-aos="fade-up" data-aos-duration="400" data-aos-delay="200">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Task Overview</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div
+                class="bg-blue-100 rounded-lg p-5 shadow-sm hover:shadow-md transition flex items-center justify-between"
+                data-aos="fade-up"
+                data-aos-duration="400"
+                data-aos-delay="300"
+                aria-label="Total tasks"
               >
-                Admin
-              </span>
-              <% } else { %>
-              <span
-                class="mt-3 inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full"
+                <div>
+                  <h3 class="text-lg font-semibold text-blue-800">Tasks</h3>
+                  <p class="text-2xl font-bold text-blue-900 mt-1"><%= todolist.length %></p>
+                </div>
+                <i class="fa-solid fa-list-check text-blue-700 text-2xl"></i>
+              </div>
+              <div
+                class="bg-yellow-100 rounded-lg p-5 shadow-sm hover:shadow-md transition flex items-center justify-between"
+                data-aos="fade-up"
+                data-aos-duration="400"
+                data-aos-delay="400"
+                aria-label="Assigned tasks"
               >
-                User
-              </span>
-              <% } %>
-            </p>
+                <div>
+                  <h3 class="text-lg font-semibold text-yellow-800">Assigned</h3>
+                  <p class="text-2xl font-bold text-yellow-900 mt-1">
+                    <% if(isAdmin) { %>
+                      <%= adminAssignedtask %>
+                    <% } else { %>
+                      <%= todolist.filter(t => t.assignedBy === "admin").length %>
+                    <% } %>
+                  </p>
+                </div>
+                <i class="fa-solid fa-tasks text-yellow-700 text-2xl"></i>
+              </div>
+              <div
+                class="bg-green-100 rounded-lg p-5 shadow-sm hover:shadow-md transition flex items-center justify-between"
+                data-aos="fade-up"
+                data-aos-duration="400"
+                data-aos-delay="500"
+                aria-label="Completed tasks"
+              >
+                <div>
+                  <h3 class="text-lg font-semibold text-green-800">Completed</h3>
+                  <p class="text-2xl font-bold text-green-900 mt-1">
+                    <%= todolist.filter(t => t.status === "completed").length %>
+                  </p>
+                </div>
+                <i class="fa-solid fa-check-circle text-green-700 text-2xl"></i>
+              </div>
+              <div
+                class="bg-red-100 rounded-lg p-5 shadow-sm hover:shadow-md transition flex items-center justify-between"
+                data-aos="fade-up"
+                data-aos-duration="400"
+                data-aos-delay="600"
+                aria-label="Pending tasks"
+              >
+                <div>
+                  <h3 class="text-lg font-semibold text-red-800">Pending</h3>
+                  <p class="text-2xl font-bold text-red-900 mt-1">
+                    <%= todolist.filter(t => t.status === "pending").length %>
+                  </p>
+                </div>
+                <i class="fa-solid fa-hourglass-half  text-red-700 text-2xl"></i>
+              </div>
+              <div
+                class="bg-indigo-100 rounded-lg p-5 shadow-sm hover:shadow-md transition flex items-center justify-between"
+                data-aos="fade-up"
+                data-aos-duration="400"
+                data-aos-delay="700"
+                aria-label="In-process tasks"
+              >
+                <div>
+                  <h3 class="text-lg font-semibold text-indigo-800">In Process</h3>
+                  <p class="text-2xl font-bold text-indigo-900 mt-1">
+                    <%= todolist.filter(t => t.status === "in-process").length %>
+                  </p>
+                </div>
+                <i class="fa-solid fa-spinner animate-spin text-indigo-700 text-2xl"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-between gap-4 mt-8" data-aos="fade-up" data-aos-duration="400" data-aos-delay="800">
+            <a
+              href="#"
+              onclick="window.history.back(); return false;"
+              class="bg-gray-600 text-white px-5 py-2.5 rounded-lg hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 transition flex items-center gap-2 w-full sm:w-auto"
+              aria-label="Back to previous page"
+            >
+              <i class="fa-solid fa-arrow-left"></i> Back
+            </a>
+            <a
+              href="/edit-profilePage"
+              class="bg-emerald-600 text-white px-5 py-2.5 rounded-lg hover:bg-emerald-700 focus:ring-2 focus:ring-emerald-500 transition flex items-center gap-2 w-full sm:w-auto"
+              aria-label="Edit profile"
+            >
+              <i class="fa-solid fa-edit"></i> Edit Profile
+            </a>
           </div>
         </div>
-
-        <div class="my-8">
-          <h2 class="text-xl font-semibold text-gray-800 mb-4">
-            Task Overview
-          </h2>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div
-              class="bg-blue-100 rounded-lg p-5 shadow-md flex items-center justify-between"
-            >
-              <div>
-                <h3 class="text-lg font-medium text-blue-800">Tasks</h3>
-                <p class="text-2xl font-bold text-blue-900 mt-1">
-                  <%= todolist.length %>
-                </p>
-              </div>
-              <i class="fa-solid fa-list-check text-blue-700 text-3xl"></i>
-            </div>
-
-            <div
-              class="bg-yellow-100 rounded-lg p-5 shadow-md flex items-center justify-between"
-            >
-              <div>
-                <h3 class="text-lg font-medium text-yellow-800">Assigned</h3>
-                <% if(isAdmin) {%>
-                <p class="text-2xl font-bold text-yellow-900 mt-1">
-                  <%= adminAssignedtask %>
-                </p>
-                <% } else{%>
-                <p class="text-2xl font-bold text-yellow-900 mt-1">
-                  <%= todolist.filter(t => t.assignedBy === "admin").length %>
-                  <%}%>
-                </p>
-              </div>
-
-              <i class="fa-solid fa-tasks text-yellow-700 text-3xl"></i>
-            </div>
-
-            <div
-              class="bg-green-100 rounded-lg p-5 shadow-md flex items-center justify-between"
-            >
-              <div>
-                <h3 class="text-lg font-medium text-green-800">Completed</h3>
-                <p class="text-2xl font-bold text-green-900 mt-1">
-                  <%= todolist.filter(t => t.status === "completed").length %>
-                </p>
-              </div>
-              <i class="fa-solid fa-check-circle text-green-700 text-3xl"></i>
-            </div>
-
-            <div
-              class="bg-red-100 rounded-lg p-5 shadow-md flex items-center justify-between"
-            >
-              <div>
-                <h3 class="text-lg font-medium text-red-800">Pending</h3>
-                <p class="text-2xl font-bold text-red-900 mt-1">
-                  <%= todolist.filter(t => t.status === "pending").length %>
-                </p>
-              </div>
-              <i class="fa-solid fa-hourglass-half text-red-700 text-3xl"></i>
-            </div>
-
-            <div
-              class="bg-indigo-100 rounded-lg p-5 shadow-md flex items-center justify-between"
-            >
-              <div>
-                <h3 class="text-lg font-medium text-indigo-800">In Process</h3>
-                <p class="text-2xl font-bold text-indigo-900 mt-1">
-                  <%= todolist.filter(t => t.status === "in-process").length%>
-                </p>
-              </div>
-              <i class="fa-solid fa-spinner text-indigo-700 text-3xl"></i>
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-8 flex items-center justify-between gap-3">
+      <% } else { %>
+        <div class="max-w-3xl mx-auto bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-200 text-center" data-aos="fade-up" data-aos-duration="400">
+          <p class="text-lg font-semibold text-gray-700 mb-4">User profile or task data not available.</p>
           <a
             href="#"
             onclick="window.history.back(); return false;"
-            class="bg-[#2f4858] text-white px-4 py-2 rounded hover:bg-[#1e3342] flex items-center gap-2"
+            class="bg-gray-600 text-white px-5 py-2.5 rounded-lg hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 transition flex items-center gap-2 mx-auto"
+            aria-label="Back to previous page"
           >
             <i class="fa-solid fa-arrow-left"></i> Back
           </a>
-          <a
-            href="/edit-profilePage"
-            class="inline-block px-6 py-2 text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg"
-          >
-            Edit Profile
-          </a>
         </div>
-      </div>
+      <% } %>
     </div>
+    <%- include('../partials/footer') %>
+    </div>
+  </div>
 
-    <%- include('../partials/footer')%>
-  </body>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    // Initialize AOS
+    document.addEventListener('DOMContentLoaded', () => {
+      AOS.init({
+        duration: 400,
+        easing: 'ease-out',
+        once: true,
+        offset: 120,
+      });
+
+    });
+  </script>
+</body>
 </html>

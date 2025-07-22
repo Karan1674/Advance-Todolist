@@ -1,143 +1,265 @@
 <!DOCTYPE html>
 <html lang="en">
-<%- include('../partials/header.ejs')%>
-
-    <body class="min-h-screen bg-gray-100 flex flex-col">
-    <%- include('../partials/navbar.ejs') %>
-
-    <div class="flex flex-grow">
-      <%- include('../partials/sidebar') %>
-
-            <div class=" mx-5 p-6 flex-grow">
-                <% if(task.status!='completed' ) { %>
-
-
-                    <section class=" w-full max-w-5xl mx-auto">
-                        <form action="/editTask/<%= task._id%>" method="post" enctype="multipart/form-data"
-                            class="flex justify-center gap-2 flex-col bg-white p-12 rounded-md shadow-md">
-
-                            <h2 class="text-2xl font-bold mb-6 text-center">
-                                <%= task.assignedBy=='admin' ?  'Admin Assigned Task' : 'Edit Your Task'  %></h2>
-                            <div class="flex align-center justify-center gap-4">
-                                <div class="flex w-full justify-center gap-2 flex-col">
-                                    <label class="text-medium font-medium tracking-wide">Title</label>
-                                    <input type="text" name="title" value="<%=task.title%>"
-                                        class="w-full p-2 mb-4 border border-gray-300 rounded"     <%= (task.assignedBy === 'admin' || !isAdmin) ? 'disabled' : '' %>>
-                                   
-                                </div>
-                                <div class="flex  w-full justify-center gap-2 flex-col">
-                                    <label class="text-medium font-medium tracking-wide">Image</label>
-                                    <input type="file" name="taskImage" accept="image/*" value="<%=task.filename%>"
-                                        class="w-full p-2 mb-4 border border-gray-300 rounded"     <%= (task.assignedBy === 'admin' || !isAdmin) ? 'disabled' : '' %>>
-                                </div>
-                            </div>
-                            <div class="flex  justify-center gap-2 flex-col">
-                                <label class="text-medium font-medium tracking-wide">Discription</label>
-                                <!-- <textarea name="discription" cols="5" rows="5"
-                                    class=" mb-4 border border-gray-300 text-justify p-2 rounded"     <%= (task.assignedBy === 'admin' || !isAdmin) ? 'disabled' : '' %>><%=task.discription %>
-                                </textarea> -->
-
-  <textarea id="editor"  class="w-full p-2 border border-gray-300 rounded" name="discription"   <%= (task.assignedBy === 'admin' ) ?'disabled' : ''  %>
-    
-    >
-                <%- task.discription %>
-              </textarea> 
-
-                            </div>
-
-
-                            <div class="flex mt-2 justify-center gap-2">
-                                <div class="w-full">
-                                    <label class="text-medium font-medium tracking-wide">DeadLine</label>
-                                    <input type="date" name="deadline"
-                                        value="<%=task.deadline.toISOString().split('T')[0] %>"
-                                        class="w-full p-2 mb-4 border border-gray-300 rounded"     <%= (task.assignedBy === 'admin' || !isAdmin) ? 'disabled' : '' %>>
-                                </div>
-
-                                <div class="w-full">
-                                    <label class="text-medium font-medium tracking-wide">Follow-up</label>
-                                    <input type="date" name="followup"
-                                        value="<%= task.followup.toISOString().split('T')[0] %>"
-                                        class="w-full p-2 mb-4 border border-gray-300 rounded">
-                                </div>
-                            </div>
-
-                            <div class="flex  justify-center gap-2">
-                                <div class="w-full">
-                                    <label class="text-medium font-medium tracking-wide">Status</label>
-                                    <select name="status" class="w-full p-2 mb-4 border border-gray-300 rounded">
-                                        <option value="pending" <%=task.status==='pending' ? 'selected' : '' %>
-                                            >Pending
-                                        </option>
-                                        <option value="completed" <%=task.status==='completed' ? 'selected' : '' %>
-                                            >Completed</option>
-                                        <option value="in-process" <%=task.status==='in-process' ? 'selected' : '' %>
-                                            >In-Process</option>
-
-                                    </select>
-                                </div>
-
-                                <div class="w-full">
-                                    <label class="text-medium font-medium tracking-wide">Priority</label>
-                                    <select name="priority"     <%= (task.assignedBy === 'admin' || !isAdmin) ? 'disabled' : '' %> class="w-full p-2 mb-4 border border-gray-300 rounded">
-                                        <option value="Low" <%=task.priority==='Low' ? 'selected' : '' %>
-                                            >Low
-                                        </option>
-                                        <option value="Medium" <%=task.priority==='Medium' ? 'selected' : '' %>
-                                            >Medium
-                                        </option>
-                                        <option value="High" <%=task.priority==='High' ? 'selected' : '' %>
-                                            >High
-                                        </option>
-                                        <option value="Critical" <%=task.priority==='Critical' ? 'selected' : '' %>
-                                            >Critical</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="w-full">
-                                <% if(task.subTargets.length>0){%>
-                                    <div class=" flex items-center justify-between">
-                                        <label class="text-medium font-medium tracking-wide">Sub
-                                            targets</label>
-                                    </div>
-                                    <div class="grid grid-cols-2 w-full gap-2 mt-1   ">
-                                        <% task.subTargets.forEach((item,index)=>{%>
-                                            <div class="relative">
-                                                <input type="text" name="subtargets[]" value="<%= item.value%>"
-                                                    class="w-full p-2 pr-8 mb-4 border border-gray-300 rounded">
-                                                <input type="checkbox" class="absolute right-2 top-3 h-5 w-5"
-                                                    name="completed[]" value="<%= index %>" <% if(item.completed) {%>
-                                                checked <%}%> >
-                                            </div>
-                                            <% })%>
-                                    </div>
-                                    <%}%>
-
-                            </div>
-
-                            <button type="submit" class="text-white font-bold bg-green-600 p-2 px-8  rounded-md">
-                                <i class="fa-solid fa-plus" style="color: #ffffff;"></i>
-                                Edit Task</button>
-
-                        </form>
-                    </section>
-                    <% } %>
-            </div>
-    </div>
-            <%- include('../partials/footer.ejs')%>
-
-
-    </body>
-
-    <script>
-          const editor = new Jodit("#editor", {
-    height: 400,
-    toolbarAdaptive: false,
-    uploader: {
-      insertImageAsBase64URI: true
+<head>
+  <%- include('../partials/header.ejs') %>
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jodit@4.0.12/build/jodit.min.css" />
+  <style>
+    .spinner {
+      display: none;
+      border: 4px solid #e5e7eb;
+      border-top: 4px solid #059669;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 0.7s linear infinite;
+      margin-left: 8px;
     }
-  });
-    </script>
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    [data-aos] { visibility: visible !important; }
+    .jodit-container { border: 1px solid #d1d5db !important; border-radius: 0.5rem !important; }
+    .jodit-container:focus-within { border-color: #059669 !important; box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.5) !important; }
+    input:disabled, select:disabled, textarea:disabled { background-color: #e5e7eb; cursor: not-allowed; }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-100 flex flex-col font-sans">
+  <%- include('../partials/navbar.ejs') %>
+  <div class="flex min-h-screen flex-grow">
+    <%- include('../partials/sidebar') %>
+    <div class=" flex-grow">
+      <% if (task.status !== 'completed') { %>
+        <section class="w-full my-12 sm:max-w-4xl mx-auto" data-aos="fade-up" data-aos-duration="600">
+          <form action="/editTask/<%= task._id %>" method="post" enctype="multipart/form-data" class="flex flex-col gap-6 bg-white p-8 sm:p-10 rounded-lg shadow-lg">
+            <h2 class="text-3xl font-bold text-gray-900 tracking-tight text-center mb-6" data-aos="fade-up" data-aos-duration="600" data-aos-delay="100">
+              <%= task.assignedBy === 'admin' ? 'Admin Assigned Task' : 'Edit Your Task' %>
+            </h2>
+            <p id="formError" class="hidden text-red-500 text-sm text-center bg-emerald-50 rounded-lg p-3" data-aos="fade-in" data-aos-duration="600" role="alert"></p>
 
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" data-aos="fade-up" data-aos-duration="600" data-aos-delay="150">
+              <div class="flex flex-col">
+                <label for="title" class="text-base font-medium text-gray-700 tracking-wide mb-1.5">Title</label>
+                <input
+                  type="text"
+                  id="title"
+                  name="title"
+                  value="<%= task.title %>"
+                  class="w-full p-3 border border-gray-300 rounded-lg shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-emerald-600 <%= (task.assignedBy === 'admin' || !isAdmin) ? 'bg-gray-200 cursor-not-allowed' : '' %>"
+                  <%= (task.assignedBy === 'admin' || !isAdmin) ? 'disabled' : '' %>
+                  aria-label="Edit task title"
+                  aria-describedby="formError"
+                >
+              </div>
+              <div class="flex flex-col">
+                <label for="taskImage" class="text-base font-medium text-gray-700 tracking-wide mb-1.5">Image</label>
+                <input
+                  type="file"
+                  id="taskImage"
+                  name="taskImage"
+                  accept="image/*"
+                  class="w-full p-3 border border-gray-300 rounded-lg shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-emerald-600 <%= (task.assignedBy === 'admin' || !isAdmin) ? 'bg-gray-200 cursor-not-allowed' : '' %>"
+                  <%= (task.assignedBy === 'admin' || !isAdmin) ? 'disabled' : '' %>
+                  aria-label="Upload task image"
+                  aria-describedby="formError"
+                >
+              </div>
+            </div>
+
+            <div class="flex flex-col" data-aos="fade-up" data-aos-duration="600" data-aos-delay="200">
+              <label for="editor" class="text-base font-medium text-gray-700 tracking-wide mb-1.5">Description</label>
+              <textarea
+                id="editor"
+                name="discription"
+                class="w-full p-3 border border-gray-300 rounded-lg shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-emerald-600 <%= (task.assignedBy === 'admin') ? 'bg-gray-200 cursor-not-allowed' : '' %>"
+                <%= (task.assignedBy === 'admin') ? 'disabled' : '' %>
+                aria-label="Edit task description"
+                aria-describedby="formError"
+              ><%- task.discription %></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" data-aos="fade-up" data-aos-duration="600" data-aos-delay="250">
+              <div class="flex flex-col">
+                <label for="deadline" class="text-base font-medium text-gray-700 tracking-wide mb-1.5">Deadline</label>
+                <input
+                  type="date"
+                  id="deadline"
+                  name="deadline"
+                  value="<%= task.deadline.toISOString().split('T')[0] %>"
+                  class="w-full p-3 border border-gray-300 rounded-lg shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-emerald-600 <%= (task.assignedBy === 'admin' || !isAdmin) ? 'bg-gray-200 cursor-not-allowed' : '' %>"
+                  <%= (task.assignedBy === 'admin' || !isAdmin) ? 'disabled' : '' %>
+                  aria-label="Set task deadline"
+                  aria-describedby="formError"
+                >
+              </div>
+              <div class="flex flex-col">
+                <label for="followup" class="text-base font-medium text-gray-700 tracking-wide mb-1.5">Follow-up</label>
+                <input
+                  type="date"
+                  id="followup"
+                  name="followup"
+                  value="<%= task.followup.toISOString().split('T')[0] %>"
+                  class="w-full p-3 border border-gray-300 rounded-lg shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                  aria-label="Set task follow-up date"
+                  aria-describedby="formError"
+                >
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" data-aos="fade-up" data-aos-duration="600" data-aos-delay="300">
+              <div class="flex flex-col">
+                <label for="status" class="text-base font-medium text-gray-700 tracking-wide mb-1.5">Status</label>
+                <select
+                  id="status"
+                  name="status"
+                  class="w-full p-3 border border-gray-300 rounded-lg shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                  aria-label="Select task status"
+                  aria-describedby="formError"
+                >
+                  <option value="pending" <%= task.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                  <option value="completed" <%= task.status === 'completed' ? 'selected' : '' %>>Completed</option>
+                  <option value="in-process" <%= task.status === 'in-process' ? 'selected' : '' %>>In-Process</option>
+                </select>
+              </div>
+              <div class="flex flex-col">
+                <label for="priority" class="text-base font-medium text-gray-700 tracking-wide mb-1.5">Priority</label>
+                <select
+                  id="priority"
+                  name="priority"
+                  class="w-full p-3 border border-gray-300 rounded-lg shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-emerald-600 <%= (task.assignedBy === 'admin' || !isAdmin) ? 'bg-gray-200 cursor-not-allowed' : '' %>"
+                  <%= (task.assignedBy === 'admin' || !isAdmin) ? 'disabled' : '' %>
+                  aria-label="Select task priority"
+                  aria-describedby="formError"
+                >
+                  <option value="Low" <%= task.priority === 'Low' ? 'selected' : '' %>>Low</option>
+                  <option value="Medium" <%= task.priority === 'Medium' ? 'selected' : '' %>>Medium</option>
+                  <option value="High" <%= task.priority === 'High' ? 'selected' : '' %>>High</option>
+                  <option value="Critical" <%= task.priority === 'Critical' ? 'selected' : '' %>>Critical</option>
+                </select>
+              </div>
+            </div>
+
+            <% if (task.subTargets.length > 0) { %>
+              <div class="flex flex-col" data-aos="fade-up" data-aos-duration="600" data-aos-delay="350">
+                <label class="text-base font-medium text-gray-700 tracking-wide mb-1.5">Subtargets</label>
+                <div id="subtargets" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <% task.subTargets.forEach((item, index) => { %>
+                    <div class="relative" data-aos="fade-in" data-aos-duration="600" data-aos-delay="<%= 400 + index * 50 %>">
+                      <input
+                        type="text"
+                        name="subtargets[]"
+                        value="<%= item.value %>"
+                        class="w-full p-3 pr-10 border border-gray-300 rounded-lg shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                        aria-label="Edit subtarget <%= index + 1 %>"
+                      >
+                      <input
+                        type="checkbox"
+                        class="absolute right-3 top-3.5 h-5 w-5 accent-emerald-600"
+                        name="completed[]"
+                        value="<%= index %>"
+                        <%= item.completed ? 'checked' : '' %>
+                        aria-label="Mark subtarget <%= index + 1 %> as completed"
+                      >
+                    </div>
+                  <% }) %>
+                </div>
+                <button
+                  type="button"
+                  id="addSubtarget"
+                  class="mt-4 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 hover:scale-105 shadow-sm transition-all"
+                  aria-label="Add new subtarget"
+                  data-aos="fade-up" data-aos-duration="600" data-aos-delay="450"
+                >Add Subtarget</button>
+              </div>
+            <% } %>
+
+            <div class="flex justify-end" data-aos="fade-up" data-aos-duration="600" data-aos-delay="500">
+              <button
+                type="submit"
+                class="px-6 py-3 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm transition-all flex items-center"
+                aria-label="Submit task changes"
+              >
+                <span>Edit Task</span>
+                <span id="spinner" class="spinner"></span>
+              </button>
+            </div>
+          </form>
+        </section>
+      <% } %>
+      <%- include('../partials/footer.ejs') %>
+    </div>
+  </div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jodit@4.0.12/build/jodit.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof AOS === 'undefined') {
+        console.error('AOS library failed to load');
+        return;
+      }
+      AOS.init({
+        duration: 600,
+        easing: 'ease-out',
+        once: true,
+        offset: 100,
+      });
+      console.log('AOS initialized');
+
+      if (typeof Jodit === 'undefined') {
+        console.error('Jodit library failed to load');
+        return;
+      }
+      const editor = new Jodit('#editor', {
+        height: 400,
+        toolbarAdaptive: false,
+        uploader: { insertImageAsBase64URI: true }
+      });
+
+      const form = document.querySelector('form');
+      const titleInput = document.getElementById('title');
+      const formError = document.getElementById('formError');
+      const submitButton = document.querySelector('button[type="submit"]');
+      const spinner = document.getElementById('spinner');
+
+      form.addEventListener('submit', (e) => {
+        if (!titleInput.value.trim()) {
+          e.preventDefault();
+          formError.classList.remove('hidden');
+          formError.textContent = 'Title is required.';
+          return;
+        }
+        submitButton.disabled = true;
+        spinner.style.display = 'inline-block';
+      });
+
+      const addSubtargetBtn = document.getElementById('addSubtarget');
+      if (addSubtargetBtn) {
+        addSubtargetBtn.addEventListener('click', () => {
+          const subtargetsDiv = document.getElementById('subtargets');
+          const index = subtargetsDiv.querySelectorAll('input[name="subtargets[]"]').length;
+          const div = document.createElement('div');
+          div.className = 'relative';
+          div.innerHTML = `
+            <input
+              type="text"
+              name="subtargets[]"
+              class="w-full p-3 pr-10 border border-gray-300 rounded-lg shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-emerald-600"
+              aria-label="Edit subtarget ${index + 1}"
+            >
+            <input
+              type="checkbox"
+              class="absolute right-3 top-3.5 h-5 w-5 accent-emerald-600"
+              name="completed[]"
+              value="${index}"
+              aria-label="Mark subtarget ${index + 1} as completed"
+            >
+          `;
+          subtargetsDiv.appendChild(div);
+          AOS.refresh();
+        });
+      }
+    });
+  </script>
+</body>
 </html>

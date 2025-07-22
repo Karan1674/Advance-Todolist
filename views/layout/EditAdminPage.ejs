@@ -9,7 +9,8 @@
 
   <div class="flex min-h-screen flex-grow">
     <%- include('../partials/sidebar') %>
-    <div class="flex-grow my-8">
+    <div>
+      <div class="flex-grow my-8">
       <% if(task.status != 'completed') { %>
         <section class="w-full max-w-4xl mx-auto" data-aos="fade-up" data-aos-duration="400">
           <form action="/editAdminTask/<%= task._id %>" method="post" enctype="multipart/form-data" class="flex justify-center gap-2 flex-col bg-white p-12 rounded-md shadow-md border border-gray-200">
@@ -171,9 +172,10 @@
         </div>
       <% } %>
     </div>
+    <%- include("../partials/footer") %>
+    </div>
   </div>
 
-  <%- include("../partials/footer") %>
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>
     // Initialize AOS

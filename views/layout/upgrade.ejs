@@ -2,15 +2,16 @@
 <html lang="en">
   <head>
     <%- include('../partials/header') %>
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
     <style>
       .spinner {
         display: none;
         border: 4px solid #e5e7eb;
-        border-top: 4px solid #2dd4bf;
+        border-top: 4px solid #059669;
         border-radius: 50%;
-        width: 20px;
-        height: 20px;
-        animation: spin 0.8s linear infinite;
+        width: 24px;
+        height: 24px;
+        animation: spin 0.7s linear infinite;
         margin-left: 8px;
       }
       @keyframes spin {
@@ -21,35 +22,70 @@
           transform: rotate(360deg);
         }
       }
+      /* Ensure AOS animations aren't blocked */
+      [data-aos] {
+        visibility: visible !important;
+      }
     </style>
   </head>
-  <body
-    class="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200 font-sans flex flex-col"
-  >
-    <%- include('../partials/navbar.ejs') %>
+  <body class="min-h-screen bg-gray-100 flex flex-col font-sans">
+    <%- include('../partials/navbar') %>
     <div class="flex min-h-screen flex-grow">
       <%- include('../partials/sidebar') %>
-      <main class="flex-grow flex justify-center items-center p-4 sm:p-8">
-        <section
-          class="w-full max-w-lg bg-white rounded-2xl shadow-lg overflow-hidden"
-        >
-          <div class="py-10 px-8">
-            <div class="text-center mb-8">
-              <h2 class="text-3xl font-extrabold text-gray-900">
+      <div class="min-h-screen ">
+        <main class="flex-grow min-h-screen flex justify-center items-center p-4 sm:p-6">
+          <% if (user) { %>
+          <section
+            class="w-full sm:max-w-lg bg-white rounded-xl shadow-lg p-6 sm:p-8"
+            data-aos="fade-up"
+            data-aos-duration="600"
+          >
+            <div
+              class="text-center mb-8"
+              data-aos="fade-up"
+              data-aos-duration="600"
+              data-aos-delay="100"
+            >
+              <h2
+                class="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight"
+              >
                 Upgrade Your Plan
               </h2>
-              <p class="mt-2 text-gray-600">
+              <p class="mt-2 text-gray-600 text-base">
                 Choose your country, plan, and payment method to unlock premium
                 features.
               </p>
             </div>
 
-            <div class="flex flex-col space-y-6">
+            <% if(typeof error !== 'undefined' && error) { %>
+            <p
+              class="text-red-500 text-sm text-center mb-6 bg-emerald-50 rounded-md p-2"
+              data-aos="fade-in"
+              data-aos-duration="600"
+              role="alert"
+              id="error-message"
+            >
+              <%= error %>
+            </p>
+            <% } %>
+            <p
+              id="apiError"
+              class="hidden text-red-500 text-sm text-center mb-6 bg-emerald-50 rounded-md p-2"
+              data-aos="fade-in"
+              data-aos-duration="600"
+              role="alert"
+            ></p>
+
+            <div class="flex flex-col space-y-8">
               <!-- Country -->
-              <div>
+              <div
+                data-aos="fade-up"
+                data-aos-duration="600"
+                data-aos-delay="200"
+              >
                 <label
                   for="country"
-                  class="block mb-1.5 text-sm font-semibold text-gray-800"
+                  class="block mb-1.5 text-base font-medium text-gray-700"
                   >Country</label
                 >
                 <div class="relative">
@@ -58,22 +94,31 @@
                     name="country"
                     required
                     onchange="updateGatewayOptions()"
-                    class="block w-full px-4 py-2 pr-10 bg-gray-100 border-2 border-gray-200 rounded-lg text-sm font-medium text-gray-800 focus:outline-none focus:ring-2 focus:bg-white"
+                    class="appearance-none block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-base text-gray-800 focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 focus:bg-white hover:bg-gray-100 shadow-sm transition-all"
+                    aria-label="Select your country for payment"
+                    aria-describedby="error-message apiError"
                   >
                     <option value="" disabled selected>
                       Select your country
                     </option>
-                    <option value="national">India</option>
-                    <option value="international">International</option>
+                    <option value="India">India</option>
+                    <option value="America">America</option>
                   </select>
+                  <i
+                    class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                  ></i>
                 </div>
               </div>
 
               <!-- Plan -->
-              <div>
+              <div
+                data-aos="fade-up"
+                data-aos-duration="600"
+                data-aos-delay="300"
+              >
                 <label
                   for="plan"
-                  class="block mb-1.5 text-sm font-semibold text-gray-800"
+                  class="block mb-1.5 text-base font-medium text-gray-700"
                   >Plan</label
                 >
                 <div class="relative">
@@ -81,7 +126,9 @@
                     id="plan"
                     name="plan"
                     required
-                    class="block w-full px-4 py-2 pr-10 bg-gray-100 border-2 border-gray-200 rounded-lg text-sm font-medium text-gray-800 focus:outline-none focus:ring-2 focus:bg-white"
+                    class="appearance-none block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-base text-gray-800 focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 focus:bg-white hover:bg-gray-100 shadow-sm transition-all"
+                    aria-label="Select a subscription plan"
+                    aria-describedby="error-message apiError"
                   >
                     <option value="" disabled selected>Select a plan</option>
                     <% if(user && user.packageDetails !== 'pro') { %>
@@ -91,14 +138,21 @@
                     <option value="premium">Premium ($499/month)</option>
                     <% } %>
                   </select>
+                  <i
+                    class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                  ></i>
                 </div>
               </div>
 
               <!-- Payment Method -->
-              <div>
+              <div
+                data-aos="fade-up"
+                data-aos-duration="600"
+                data-aos-delay="400"
+              >
                 <label
                   for="gateway"
-                  class="block mb-1.5 text-sm font-semibold text-gray-800"
+                  class="block mb-1.5 text-base font-medium text-gray-700"
                   >Payment Method</label
                 >
                 <div class="relative">
@@ -107,36 +161,90 @@
                     name="gateway"
                     required
                     disabled
-                    class="block w-full px-4 py-2 pr-10 bg-gray-100 border-2 border-gray-200 rounded-lg text-sm font-medium text-gray-800 focus:outline-none focus:ring-2 focus:bg-white disabled:bg-gray-200 disabled:cursor-not-allowed"
+                    class="appearance-none block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-base text-gray-800 focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 focus:bg-white hover:bg-gray-100 shadow-sm transition-all disabled:bg-gray-200 disabled:cursor-not-allowed"
+                    aria-label="Select a payment method"
+                    aria-describedby="error-message apiError"
                   >
                     <option value="" disabled selected>
                       Select a payment method
                     </option>
                   </select>
+                  <i
+                    class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                  ></i>
                 </div>
               </div>
 
-              <!-- Submit Button -->
-              <button
-                type="button"
-                id="paymentButton"
-                onclick="handlePayment()"
-                class="w-full border border-gray-400 text-black font-semibold rounded-xl py-3 px-6 mt-2 flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed"
-                disabled
+              <!-- Buttons -->
+              <div
+                class="flex flex-col sm:flex-row justify-between gap-4"
+                data-aos="fade-up"
+                data-aos-duration="600"
+                data-aos-delay="500"
               >
-                <span id="buttonText">Proceed to Payment</span>
-                <span id="spinner" class="spinner"></span>
-              </button>
+                <a
+                  href="#"
+                  onclick="window.history.back(); return false;"
+                  class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 hover:scale-105 focus:ring-2 focus:ring-gray-500 focus:outline-none shadow-sm transition-all flex items-center justify-center gap-2 w-full sm:w-auto"
+                  aria-label="Back to previous page"
+                >
+                  <i class="fa-solid fa-arrow-left"></i> Back
+                </a>
+                <button
+                  type="button"
+                  id="paymentButton"
+                  onclick="handlePayment()"
+                  class="bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 hover:scale-105 focus:ring-2 focus:ring-emerald-500 focus:outline-none shadow-sm transition-all flex items-center justify-center w-full sm:w-auto disabled:bg-gray-400 disabled:cursor-not-allowed disabled:scale-100"
+                  disabled
+                  aria-label="Proceed to payment"
+                >
+                  <span id="buttonText">Proceed to Payment</span>
+                  <span id="spinner" class="spinner"></span>
+                </button>
+              </div>
             </div>
-          </div>
-        </section>
-      </main>
+          </section>
+          <% } else { %>
+          <section
+            class="w-full sm:max-w-lg bg-white rounded-xl shadow-lg p-6 sm:p-8 text-center"
+            data-aos="fade-up"
+            data-aos-duration="600"
+          >
+            <p class="text-lg font-semibold text-gray-700 mb-4">
+              User data not available.
+            </p>
+            <a
+              href="#"
+              onclick="window.history.back(); return false;"
+              class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 hover:scale-105 focus:ring-2 focus:ring-gray-500 focus:outline-none shadow-sm transition-all flex items-center justify-center gap-2 mx-auto"
+              aria-label="Back to previous page"
+            >
+              <i class="fa-solid fa-arrow-left"></i> Back
+            </a>
+          </section>
+          <% } %>
+        </main>
+        <%- include('../partials/footer') %>
+      </div>
     </div>
-    <%- include('../partials/footer') %>
-
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
+      // Initialize AOS
+      document.addEventListener("DOMContentLoaded", () => {
+        if (typeof AOS === "undefined") {
+          console.error("AOS library failed to load");
+          return;
+        }
+        AOS.init({
+          duration: 600,
+          easing: "ease-out",
+          once: true,
+          offset: 100,
+        });
+        console.log("AOS initialized");
+      });
+
       function updateGatewayOptions() {
         const country = document.getElementById("country").value;
         const gatewaySelect = document.getElementById("gateway");
@@ -145,14 +253,14 @@
           '<option value="" disabled selected>Select a payment method</option>';
         gatewaySelect.disabled = !country;
 
-        if (country === "national") {
+        if (country === "India") {
           ["phonepe", "razorpay"].forEach((method) => {
             const opt = document.createElement("option");
             opt.value = method;
             opt.textContent = method.charAt(0).toUpperCase() + method.slice(1);
             gatewaySelect.appendChild(opt);
           });
-        } else if (country === "international") {
+        } else if (country === "America") {
           ["paypal", "stripe"].forEach((method) => {
             const opt = document.createElement("option");
             opt.value = method;
@@ -189,9 +297,12 @@
         const button = document.getElementById("paymentButton");
         const buttonText = document.getElementById("buttonText");
         const spinner = document.getElementById("spinner");
+        const apiError = document.getElementById("apiError");
 
         if (!country || !plan || !gateway) {
-          alert("Please select country, plan, and payment method.");
+          apiError.classList.remove("hidden");
+          apiError.textContent =
+            "Please select country, plan, and payment method.";
           return;
         }
 
@@ -203,7 +314,7 @@
         );
 
         try {
-          if (gateway != "razorpay") {
+          if (gateway !== "razorpay") {
             const response = await fetch(`/payment/${gateway}`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -213,7 +324,9 @@
             if (data.url) {
               window.location.href = data.url;
             } else {
-              alert(data.message || "Error initiating payment.");
+              apiError.classList.remove("hidden");
+              apiError.textContent =
+                data.message || "Error initiating payment.";
             }
           } else {
             const response = await fetch(`/payment/${gateway}`, {
@@ -247,18 +360,22 @@
                   if (result.success) {
                     window.location.href = `/?message=Plan upgraded to ${plan}&type=success`;
                   } else {
-                    alert("Payment verification failed.");
+                    apiError.classList.remove("hidden");
+                    apiError.textContent = "Payment verification failed.";
                   }
                 },
               });
               rzp.open();
             } else {
-              alert(data.message || "Error initiating payment.");
+              apiError.classList.remove("hidden");
+              apiError.textContent =
+                data.message || "Error initiating payment.";
             }
           }
         } catch (err) {
-          console.log(err);
-          alert("Error initiating payment: " + err.message);
+          console.error("Payment error:", err);
+          apiError.classList.remove("hidden");
+          apiError.textContent = "Error initiating payment: " + err.message;
         } finally {
           button.disabled = false;
           buttonText.textContent = "Proceed to Payment";

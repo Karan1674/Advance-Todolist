@@ -31,7 +31,9 @@
   <%- include('../partials/navbar') %>
   <div class="flex flex-grow min-h-screen">
     <%- include('../partials/sidebar') %>
-    <div class="flex-grow p-4 sm:p-6 lg:p-8">
+     
+<div class="flex-grow min-h-screen flex flex-col">
+   <div class="flex-grow min-h-screen p-4 sm:p-6 lg:p-8">
       <!-- Search and Add Media -->
       <div class="flex items-center justify-center gap-4 mb-10" data-aos="fade-down" data-aos-duration="800">
         <input
@@ -112,6 +114,8 @@
         <% } %>
       </div>
     </div>
+     <%- include('../partials/footer') %>
+</div>
   </div>
 
   <!-- Media Upload Popup -->
@@ -226,7 +230,7 @@
       </div>
     </div>
   </div>
-  <%- include('../partials/footer') %>
+
 
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>

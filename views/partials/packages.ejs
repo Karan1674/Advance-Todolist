@@ -1,42 +1,49 @@
-<section class="">
-  <div class="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 lg:px-6">
-    <div class="mx-auto max-w-screen-md text-center mb-8 lg:mb-12">
-      <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-800 tracking-tight">
+<section id="packages" class="bg-gray-100" role="region" aria-labelledby="pricing-heading">
+  <div class="py-6 sm:py-8 px-4 sm:px-6 lg:px-8 mx-auto w-full sm:max-w-5xl md:max-w-6xl">
+    <div class="mx-auto max-w-screen-md text-center mb-8" data-aos="fade-up" data-aos-duration="600" data-aos-delay="100">
+      <h2 id="pricing-heading" class="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">
         Designed for Business Teams Like Yours
       </h2>
-      <p class="text-lg text-gray-600 mt-4">
+      <p class="text-base sm:text-lg font-medium text-gray-700 mt-4">
         Choose a plan that fits your needs and scale effortlessly.
       </p>
     </div>
-    <div class="space-y-8 lg:grid lg:grid-cols-3 sm:gap-6 xl:gap-10 lg:space-y-0">
-      <% pricingPlans.forEach(plan => { %>
-        <div class="flex flex-col p-6 mx-auto max-w-lg text-center text-gray-900 bg-white rounded-xl border <% if(user && user.packageDetails === plan.id) { %>active-plan<% } else { %>border-gray-200<% } %> shadow-sm card-hover fade-in">
-          <h3 class="mb-4 text-2xl font-semibold <%= user && user.packageDetails === plan.id ? 'text-gray-900' : 'text-gray-800' %>">
+    <div class="space-y-8 md:grid md:grid-cols-2 lg:grid-cols-3 gap-8 md:space-y-0">
+      <% pricingPlans.forEach((plan, index) => { %>
+        <div
+          class="flex flex-col p-6 sm:p-8 mx-auto max-w-lg text-center text-gray-900 bg-white rounded-lg border shadow-md <% if(user && user.packageDetails === plan.id) { %>border-emerald-600 bg-emerald-50<% } else { %>border-gray-200<% } %>"
+          data-aos="fade-in"
+          data-aos-duration="600"
+          data-aos-delay="<%= 200 + index * 100 %>"
+          <% if(user && user.packageDetails === plan.id) { %>aria-current="true"<% } %>
+        >
+          <h3 class="mb-4 text-xl font-semibold text-gray-900">
             <%= plan.name %>
           </h3>
-          <p class="text-gray-600 sm:text-lg">
+          <p class="text-sm sm:text-base font-medium text-gray-700">
             <%= plan.description %>
           </p>
-          <div class="flex justify-center items-baseline my-8">
-            <span class="mr-2 text-5xl font-extrabold"><%= plan.priceLabel.split('/')[0] %></span>
+          <div class="flex justify-center items-baseline my-6">
+            <span class="mr-2 text-4xl font-bold"><%= plan.priceLabel.split('/')[0] %></span>
             <% if(plan.priceLabel.includes('/')) { %>
-              <span class="text-gray-600">/month</span>
+              <span class="text-base font-medium text-gray-700">/month</span>
             <% } %>
           </div>
           <ul role="list" class="mb-8 space-y-4 text-left">
             <% plan.features.forEach(feature => { %>
               <li class="flex items-center space-x-3">
-                <svg class="flex-shrink-0 w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <svg class="flex-shrink-0 w-5 h-5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                   <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                 </svg>
-                <span><%= feature %></span>
+                <span class="text-sm sm:text-base font-medium text-gray-700"><%= feature %></span>
               </li>
             <% }) %>
           </ul>
           <a
             href="<%= plan.upgradeUrl(user) %>"
-            class="text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center focus:ring-4 focus:ring-blue-200 btn-hover <% if(plan.buttonDisabled(user)) { %>bg-gray-400 cursor-not-allowed<% } else { %>bg-blue-600<% } %>"
+            class="text-white font-semibold text-sm px-5 py-2.5 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all hover:scale-105 <% if(plan.buttonDisabled(user)) { %>bg-gray-500 cursor-not-allowed hover:bg-gray-500<% } else { %>bg-emerald-600 hover:bg-emerald-700<% } %>"
             <% if(plan.buttonDisabled(user)) { %>disabled aria-disabled="true"<% } %>
+            aria-label="<%= plan.buttonText(user) %> for <%= plan.name %> plan"
           >
             <%= plan.buttonText(user) %>
           </a>

@@ -1,232 +1,298 @@
-
 <!DOCTYPE html>
 <html lang="en">
-<%- include('../partials/header') %>
-<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <%- include('../partials/header') %>
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
 
-<body class="min-h-screen bg-gray-100 flex flex-col font-sans">
-  <%- include('../partials/navbar') %>
+  <body class="min-h-screen bg-gray-100 flex flex-col font-sans">
+    <%- include('../partials/navbar') %>
 
-  <div class="flex min-h-screen flex-grow">
-    <%- include('../partials/sidebar') %>
-    <div class="flex flex-col w-full">
-      <% if(typeof task === 'undefined' || !task) { %>
-        <div class="p-4 sm:p-6 w-full flex justify-center items-center min-h-[400px]">
-          <p class="text-xl font-semibold text-gray-800 bg-white px-8 py-4 rounded-xl shadow-lg" data-aos="fade-in" data-aos-duration="400">
-            No task data available. Please try again or contact support.
-          </p>
-        </div>
-      <% } else { %>
-      <main class="p-4 sm:p-6" data-aos="fade-up" data-aos-duration="400">
-        <div class="mx-auto max-w-5xl bg-gradient-to-br from-white to-teal-50 shadow-lg rounded-xl p-6 sm:p-8">
-          <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 flex items-center gap-2" data-aos="fade-up" data-aos-duration="400" data-aos-delay="100">
-            <i class="fa-solid fa-list-check text-teal-600"></i>
-            Task Details
-          </h1>
-          <div class="flex flex-col gap-6">
-            <div class="relative h-84 w-full" data-aos="fade-up" data-aos-duration="400" data-aos-delay="200">
-              <% if(task.filename) { %>
-                <img
-                  src="../../uploads/<%= task.filename %>"
-                  alt="Task image for <%= task.title %>"
-                  class="w-full h-full object-cover rounded-lg "
-                  onerror="this.src='/public/assets/placeholder.jpg';"
-                >
-           
-              <% } else { %>
-                <div class="w-full h-full bg-gradient-to-br from-teal-100 to-teal-200 rounded-lg flex items-center justify-center ">
-                  <i class="fa-solid fa-image text-teal-600 text-4xl opacity-50"></i>
-                </div>
-              <% } %>
-            </div>
-            <div class="space-y-5 text-gray-800" data-aos="fade-up" data-aos-duration="400" data-aos-delay="300">
-              <p class="text-lg font-semibold">
-                <span>Title:</span>
-                <span class="font-normal"><%= task.title %></span>
-              </p>
-              <div class="text-sm text-gray-700">
-                <span class="font-semibold">Description:</span>
-                <div class="mt-2 prose prose-sm max-w-none"><%- task.discription %></div>
-              </div>
-              <div class="flex flex-col sm:flex-row sm:justify-between gap-4">
-                <p>
-                  <span class="font-semibold">Deadline:</span>
-                  <%= task.deadline.toDateString() %>
-                </p>
-                <p>
-                  <span class="font-semibold">Follow-up:</span>
-                  <%= task.followup.toDateString() %>
-                </p>
-              </div>
-              <div class="w-full h-2 bg-gray-200 rounded-full">
-                <div class="h-full rounded-full <%=
-                  task.status === 'completed' ? 'bg-emerald-500 w-full' :
-                  task.status === 'pending' ? 'bg-red-500 w-1/4' : 'bg-amber-500 w-1/2' %>"></div>
-              </div>
-              <p>
-                <span class="font-semibold">Priority:</span>
-                <span class="inline-block px-3 py-1.5 text-xs font-semibold rounded-full bg-teal-600 text-white shadow-sm">
-                  <%= task.priority %>
-                </span>
-              </p>
-              <p class="absolute top-4 right-4 px-3 py-1.5 text-xs font-semibold rounded-full text-white <%=
-                task.status === 'completed' ? 'bg-emerald-600' :
-                task.status === 'pending' ? 'bg-red-600' : 'bg-amber-600' %> shadow-sm">
-                <%= task.status.charAt(0).toUpperCase() + task.status.slice(1) %>
-              </p>
-              <% if(task.subTargets && task.subTargets.length >= 1) { %>
-              <div>
-                <p class="font-semibold mb-3 text-lg">Subtargets:</p>
-                <ul class="space-y-3">
-                  <% task.subTargets.forEach((item, index) => { %>
-                  <li class="flex justify-between items-center bg-gradient-to-br from-gray-50 to-teal-50 p-3 rounded-lg shadow-sm" data-aos="fade-up" data-aos-duration="400" data-aos-delay="<%= 400 + index * 100 %>">
-                    <p class="text-sm w-[70%] line-clamp-2"><%= item.value %></p>
-                    <p class="text-sm flex items-center gap-2">
-                      <span class="font-semibold">Completed:</span>
-                      <span class="text-teal-600"><%= item.completed ? 'Yes' : 'No' %></span>
-                    </p>
-                  </li>
-                  <% }) %>
-                </ul>
-              </div>
-              <% } %>
-            </div>
-            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8" data-aos="fade-up" data-aos-duration="400" data-aos-delay="500">
-              <a
-                href="#"
-                onclick="window.history.back(); return false;"
-                class="bg-gray-600 text-white px-5 py-2.5 rounded-xl hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 transition flex items-center gap-2 w-full sm:w-auto"
-              >
-                <i class="fa-solid fa-arrow-left"></i> Back
-              </a>
-              <div class="flex justify-center gap-3 w-full sm:w-auto">
-                <% if(task.status !== 'completed') { %>
-                <button
-                  type="button"
-                  onclick="window.location.href='/edittaskpage/<%= task._id %>'"
-                  class="bg-emerald-600 text-white px-5 py-2.5 rounded-xl hover:bg-emerald-700 focus:ring-2 focus:ring-emerald-500 transition flex items-center gap-2 w-full sm:w-auto"
-                >
-                  <i class="fa-solid fa-pen-to-square"></i> Edit
-                </button>
-                <% } %>
-                <% if(isShow) { %>
-                <button
-                  type="button"
-                  onclick="handleDelete('<%= task._id %>')"
-                  class="bg-red-600 text-white px-5 py-2.5 rounded-xl hover:bg-red-600/90 focus:ring-2 focus:ring-red-500 transition flex items-center gap-2 w-full sm:w-auto"
-                  aria-label="Delete task <%= task.title %>"
-                >
-                  <i class="fa-solid fa-trash"></i> Delete
-                </button>
-                <% } %>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
-
-      <section class="p-4 sm:p-6" data-aos="fade-up" data-aos-duration="400" data-aos-delay="600">
-        <div class="mx-auto max-w-5xl bg-white shadow-lg rounded-xl p-6 sm:p-8">
-          <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-6 text-center" data-aos="fade-up" data-aos-duration="400" data-aos-delay="700">
-            Comments
-          </h2>
-          <% if(comments && comments.length > 0) { %>
-          <ul class="space-y-3 mb-6">
-            <% comments.forEach((c, index) => { %>
-            <li
-              class="bg-gradient-to-br from-gray-50 to-teal-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
-              data-aos="fade-up"
+    <div class="flex min-h-screen flex-grow">
+      <%- include('../partials/sidebar') %>
+      <div class="min-h-screen">
+        <div class="flex flex-col my-12 w-full">
+          <% if(typeof task === 'undefined' || !task) { %>
+          <div
+            class="p-4 sm:p-6 w-full flex justify-center items-center min-h-[400px]"
+          >
+            <p
+              class="text-xl font-semibold text-gray-800 bg-white px-8 py-4 rounded-xl shadow-lg"
+              data-aos="fade-in"
               data-aos-duration="400"
-              data-aos-delay="<%= 800 + index * 100 %>"
             >
-              <div class="flex flex-col sm:flex-row justify-between gap-2">
-                <p class="text-sm text-gray-700 line-clamp-3"><%= c.comment %></p>
-                <small class="text-xs text-gray-500">
-                  Posted on <%= c.submittedAt.toDateString() %>
-                </small>
-              </div>
-              <% if(c.commentfile) { %>
-              <a
-                href="/commentfileShow/<%= c._id %>"
-                class="text-sm text-teal-600 hover:text-teal-700 underline transition"
-                aria-label="View comment file <%= c.commentfile %>"
-              >
-                <%= c.commentfile %>
-              </a>
-              <% } %>
-            </li>
-            <% }) %>
-          </ul>
+              No task data available. Please try again or contact support.
+            </p>
+          </div>
           <% } else { %>
-          <p class="text-gray-600 mb-6 text-center" data-aos="fade-up" data-aos-duration="400" data-aos-delay="800">
-            No comments yet.
-          </p>
-          <% } %>
-          <form
-            action="/addComment/<%= task._id %>"
-            method="post"
-            enctype="multipart/form-data"
-            class="flex flex-col gap-4"
+          <main class="p-4 sm:p-6" data-aos="fade-up" data-aos-duration="400">
+            <div
+              class="mx-auto max-w-5xl bg-gradient-to-br from-white to-teal-50 shadow-lg rounded-xl p-6 sm:p-8"
+            >
+              <h1
+                class="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 flex items-center gap-2"
+                data-aos="fade-up"
+                data-aos-duration="400"
+                data-aos-delay="100"
+              >
+                <i class="fa-solid fa-list-check text-teal-600"></i>
+                Task Details
+              </h1>
+              <div class="flex flex-col gap-6">
+                <div
+                  class="relative h-84 w-full"
+                  data-aos="fade-up"
+                  data-aos-duration="400"
+                  data-aos-delay="200"
+                >
+                  <% if(task.filename) { %>
+                  <img
+                    src="../../uploads/<%= task.filename %>"
+                    alt="Task image for <%= task.title %>"
+                    class="w-full h-full object-cover rounded-lg"
+                    onerror="this.src='/public/assets/placeholder.jpg';"
+                  />
+
+                  <% } else { %>
+                  <div
+                    class="w-full h-full bg-gradient-to-br from-teal-100 to-teal-200 rounded-lg flex items-center justify-center"
+                  >
+                    <i
+                      class="fa-solid fa-image text-teal-600 text-4xl opacity-50"
+                    ></i>
+                  </div>
+                  <% } %>
+                </div>
+                <div
+                  class="space-y-5 text-gray-800"
+                  data-aos="fade-up"
+                  data-aos-duration="400"
+                  data-aos-delay="300"
+                >
+                  <p class="text-lg font-semibold">
+                    <span>Title:</span>
+                    <span class="font-normal"><%= task.title %></span>
+                  </p>
+                  <div class="text-sm text-gray-700">
+                    <span class="font-semibold">Description:</span>
+                    <div class="mt-2 prose prose-sm max-w-none">
+                      <%- task.discription %>
+                    </div>
+                  </div>
+                  <div
+                    class="flex flex-col sm:flex-row sm:justify-between gap-4"
+                  >
+                    <p>
+                      <span class="font-semibold">Deadline:</span>
+                      <%= task.deadline.toDateString() %>
+                    </p>
+                    <p>
+                      <span class="font-semibold">Follow-up:</span>
+                      <%= task.followup.toDateString() %>
+                    </p>
+                  </div>
+                  <div class="w-full h-2 bg-gray-200 rounded-full">
+                    <div
+                      class="h-full rounded-full <%= task.status === 'completed' ? 'bg-emerald-500 w-full' : task.status === 'pending' ? 'bg-red-500 w-1/4' : 'bg-amber-500 w-1/2' %>"
+                    ></div>
+                  </div>
+                  <p>
+                    <span class="font-semibold">Priority:</span>
+                    <span
+                      class="inline-block px-3 py-1.5 text-xs font-semibold rounded-full bg-teal-600 text-white shadow-sm"
+                    >
+                      <%= task.priority %>
+                    </span>
+                  </p>
+                  <p
+                    class="absolute top-4 right-4 px-3 py-1.5 text-xs font-semibold rounded-full text-white <%= task.status === 'completed' ? 'bg-emerald-600' : task.status === 'pending' ? 'bg-red-600' : 'bg-amber-600' %> shadow-sm"
+                  >
+                    <%= task.status.charAt(0).toUpperCase() +
+                    task.status.slice(1) %>
+                  </p>
+                  <% if(task.subTargets && task.subTargets.length >= 1) { %>
+                  <div>
+                    <p class="font-semibold mb-3 text-lg">Subtargets:</p>
+                    <ul class="space-y-3">
+                      <% task.subTargets.forEach((item, index) => { %>
+                      <li
+                        class="flex justify-between items-center bg-gradient-to-br from-gray-50 to-teal-50 p-3 rounded-lg shadow-sm"
+                        data-aos="fade-up"
+                        data-aos-duration="400"
+                        data-aos-delay="<%= 400 + index * 100 %>"
+                      >
+                        <p class="text-sm w-[70%] line-clamp-2">
+                          <%= item.value %>
+                        </p>
+                        <p class="text-sm flex items-center gap-2">
+                          <span class="font-semibold">Completed:</span>
+                          <span class="text-teal-600"
+                            ><%= item.completed ? 'Yes' : 'No' %></span
+                          >
+                        </p>
+                      </li>
+                      <% }) %>
+                    </ul>
+                  </div>
+                  <% } %>
+                </div>
+                <div
+                  class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8"
+                  data-aos="fade-up"
+                  data-aos-duration="400"
+                  data-aos-delay="500"
+                >
+                  <a
+                    href="#"
+                    onclick="window.history.back(); return false;"
+                    class="bg-gray-600 text-white px-5 py-2.5 rounded-xl hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 transition flex items-center gap-2 w-full sm:w-auto"
+                  >
+                    <i class="fa-solid fa-arrow-left"></i> Back
+                  </a>
+                  <div class="flex justify-center gap-3 w-full sm:w-auto">
+                    <% if(task.status !== 'completed') { %>
+                    <button
+                      type="button"
+                      onclick="window.location.href='/edittaskpage/<%= task._id %>'"
+                      class="bg-emerald-600 text-white px-5 py-2.5 rounded-xl hover:bg-emerald-700 focus:ring-2 focus:ring-emerald-500 transition flex items-center gap-2 w-full sm:w-auto"
+                    >
+                      <i class="fa-solid fa-pen-to-square"></i> Edit
+                    </button>
+                    <% } %> <% if(isShow) { %>
+                    <button
+                      type="button"
+                      onclick="handleDelete('<%= task._id %>')"
+                      class="bg-red-600 text-white px-5 py-2.5 rounded-xl hover:bg-red-600/90 focus:ring-2 focus:ring-red-500 transition flex items-center gap-2 w-full sm:w-auto"
+                      aria-label="Delete task <%= task.title %>"
+                    >
+                      <i class="fa-solid fa-trash"></i> Delete
+                    </button>
+                    <% } %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </main>
+
+          <section
+            class="p-4 sm:p-6"
             data-aos="fade-up"
             data-aos-duration="400"
-            data-aos-delay="900"
+            data-aos-delay="600"
           >
-            <div class="flex flex-col gap-3">
-              <input
-                type="file"
-                name="commentfile"
-                class="w-full p-3 border border-gray-200 rounded-lg text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 transition"
-                aria-label="Upload comment file"
-              />
-              <textarea
-                name="comment"
-                required
-                class="w-full p-3 border border-gray-200 rounded-lg text-sm text-gray-700 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition resize-y"
-                placeholder="Write a comment..."
-                rows="4"
-                aria-label="Comment text"
-              ></textarea>
-            </div>
-            <button
-              type="submit"
-              class="bg-teal-600 text-white px-5 py-2.5 rounded-xl hover:bg-teal-700 focus:ring-2 focus:ring-teal-500 transition flex items-center gap-2 self-end"
+            <div
+              class="mx-auto max-w-5xl bg-white shadow-lg rounded-xl p-6 sm:p-8"
             >
-              <i class="fa-solid fa-plus"></i> Add Comment
-            </button>
-          </form>
+              <h2
+                class="text-xl sm:text-2xl font-bold text-gray-900 mb-6 text-center"
+                data-aos="fade-up"
+                data-aos-duration="400"
+                data-aos-delay="700"
+              >
+                Comments
+              </h2>
+              <% if(comments && comments.length > 0) { %>
+              <ul class="space-y-3 mb-6">
+                <% comments.forEach((c, index) => { %>
+                <li
+                  class="bg-gradient-to-br from-gray-50 to-teal-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                  data-aos="fade-up"
+                  data-aos-duration="400"
+                  data-aos-delay="<%= 800 + index * 100 %>"
+                >
+                  <div class="flex flex-col sm:flex-row justify-between gap-2">
+                    <p class="text-sm text-gray-700 line-clamp-3">
+                      <%= c.comment %>
+                    </p>
+                    <small class="text-xs text-gray-500">
+                      Posted on <%= c.submittedAt.toDateString() %>
+                    </small>
+                  </div>
+                  <% if(c.commentfile) { %>
+                  <a
+                    href="/commentfileShow/<%= c._id %>"
+                    class="text-sm text-teal-600 hover:text-teal-700 underline transition"
+                    aria-label="View comment file <%= c.commentfile %>"
+                  >
+                    <%= c.commentfile %>
+                  </a>
+                  <% } %>
+                </li>
+                <% }) %>
+              </ul>
+              <% } else { %>
+              <p
+                class="text-gray-600 mb-6 text-center"
+                data-aos="fade-up"
+                data-aos-duration="400"
+                data-aos-delay="800"
+              >
+                No comments yet.
+              </p>
+              <% } %>
+              <form
+                action="/addComment/<%= task._id %>"
+                method="post"
+                enctype="multipart/form-data"
+                class="flex flex-col gap-4"
+                data-aos="fade-up"
+                data-aos-duration="400"
+                data-aos-delay="900"
+              >
+                <div class="flex flex-col gap-3">
+                  <input
+                    type="file"
+                    name="commentfile"
+                    class="w-full p-3 border border-gray-200 rounded-lg text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 transition"
+                    aria-label="Upload comment file"
+                  />
+                  <textarea
+                    name="comment"
+                    required
+                    class="w-full p-3 border border-gray-200 rounded-lg text-sm text-gray-700 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition resize-y"
+                    placeholder="Write a comment..."
+                    rows="4"
+                    aria-label="Comment text"
+                  ></textarea>
+                </div>
+                <button
+                  type="submit"
+                  class="bg-teal-600 text-white px-5 py-2.5 rounded-xl hover:bg-teal-700 focus:ring-2 focus:ring-teal-500 transition flex items-center gap-2 self-end"
+                >
+                  <i class="fa-solid fa-plus"></i> Add Comment
+                </button>
+              </form>
+            </div>
+          </section>
+          <% } %>
         </div>
-      </section>
-      <% } %>
+        <%- include('../partials/footer') %>
+      </div>
     </div>
-  </div>
 
-  <%- include('../partials/footer') %>
-  <%- include('../partials/popup') %>
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script>
-    // Initialize AOS
-    document.addEventListener('DOMContentLoaded', () => {
-      AOS.init({
-        duration: 400,
-        easing: 'ease-out',
-        once: true,
-        offset: 120,
+    <%- include('../partials/popup') %>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+      // Initialize AOS
+      document.addEventListener("DOMContentLoaded", () => {
+        AOS.init({
+          duration: 400,
+          easing: "ease-out",
+          once: true,
+          offset: 120,
+        });
+        // Debug: Log task data to console
       });
-      // Debug: Log task data to console
- 
-    });
 
-    function handleDelete(taskId) {
-      if (confirm('Are you sure you want to delete this task?')) {
-        window.location.href = `/deleteTask/${taskId}`;
+      function handleDelete(taskId) {
+        if (confirm("Are you sure you want to delete this task?")) {
+          window.location.href = `/deleteTask/${taskId}`;
+        }
       }
-    }
-  </script>
-  <style>
-    .prose :where(p):not(:where([class~="not-prose"] *)) {
-      margin-top: 0;
-      margin-bottom: 0;
-    }
-  </style>
-</body>
+    </script>
+    <style>
+      .prose :where(p):not(:where([class~="not-prose"] *)) {
+        margin-top: 0;
+        margin-bottom: 0;
+      }
+    </style>
+  </body>
 </html>

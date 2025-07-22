@@ -14,6 +14,7 @@ const userStoragelimit = require("./models/userStoragelimit");
 const puppeteer = require("puppeteer");
 const fs = require("fs");
 const ejs = require("ejs");
+const PDFDocument = require('pdfkit');
 dotenv.config();
 const { OAuth2Client } = require("google-auth-library");
 const stripe = require("stripe")(process.env.Stripe_Secret_key);
@@ -26,6 +27,7 @@ const { type } = require("os");
 const bodyParser = require("body-parser");
 const Razorpay = require("razorpay");
 const { error } = require("console");
+const { default: mongoose } = require("mongoose");
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -67,8 +69,8 @@ app.use(express.urlencoded({ extended: true }));
 const isAuthenicated = async (req, res, next) => {
   try {
     const token = req.cookies.token;
-const toastMessage = req.query.message || "";
-  const toastType = req.query.type || "info"; // success, error, or inf
+    const toastMessage = req.query.message || "";
+    const toastType = req.query.type || "info"; // success, error, or inf
 
     if (!token) {
       return res.render("layout/Home.ejs", {
@@ -166,6 +168,7 @@ app.post("/userSignUp", upload.single("profilePic"), async (req, res) => {
   try {
     const { firstName, lastName, email, password } = req.body;
     const profilePic = req.file;
+    
 
     if (!firstName || !lastName || !email || !password || !profilePic) {
       return res.redirect(
@@ -379,6 +382,7 @@ app.post("/forgetPassword", async (req, res) => {
 
 app.post("/validateOtp", async (req, res) => {
   try {
+    
     const { email, otpNumber } = req.body;
 
     if (!email || !otpNumber) {
@@ -456,7 +460,10 @@ app.get("/logout", isAuthenicated, (req, res) => {
 });
 
 app.get("/task", isAuthenicated, isAdminCheck, async (req, res) => {
+  
   try {
+        const toastMessage = req.query.message || "";
+    const toastType = req.query.type || "info"; // success, error, or inf
     const userId = req.id;
     const isAdmin = req.isAdmin;
     const todo = await task.find({ userId }).sort({ createdAt: -1 });
@@ -468,6 +475,8 @@ app.get("/task", isAuthenicated, isAdminCheck, async (req, res) => {
         user: userData,
         isAdmin,
         isShow: true,
+        toastMessage,
+        toastType
       });
     } else if (userData) {
       return res.render("layout/todolist.ejs", {
@@ -475,6 +484,8 @@ app.get("/task", isAuthenicated, isAdminCheck, async (req, res) => {
         user: userData,
         isAdmin,
         isShow: true,
+        toastMessage,
+        toastType
       });
     } else {
       return res.redirect("/loginPage");
@@ -524,8 +535,7 @@ app.get("/assigntask", isAuthenicated, isAdminCheck, async (req, res) => {
   }
 });
 
-app.post(
-  "/addtask",
+app.post("/addtask",
   isAuthenicated,
   upload.single("taskImage"),
   async (req, res) => {
@@ -591,8 +601,7 @@ app.post(
   }
 );
 
-app.post(
-  "/assigntask",
+app.post("/assigntask",
   isAuthenicated,
   isAdminCheck,
   upload.single("taskImage"),
@@ -664,8 +673,7 @@ app.post(
 //   res.redirect("back");
 // });
 
-app.post(
-  "/deletetask/:taskId",
+app.post("/deletetask/:taskId",
   isAuthenicated,
   isAdminCheck,
   async (req, res) => {
@@ -692,8 +700,7 @@ app.post(
   }
 );
 
-app.get(
-  "/taskDetail/:taskId",
+app.get("/taskDetail/:taskId",
   isAuthenicated,
   isAdminCheck,
   async (req, res) => {
@@ -736,8 +743,7 @@ app.get(
   }
 );
 
-app.get(
-  "/edittaskpage/:taskId",
+app.get("/edittaskpage/:taskId",
   isAuthenicated,
   isAdminCheck,
   async (req, res) => {
@@ -760,8 +766,7 @@ app.get(
   }
 );
 
-app.post(
-  "/editTask/:taskId",
+app.post("/editTask/:taskId",
   isAuthenicated,
   upload.single("taskImage"),
   async (req, res) => {
@@ -821,8 +826,7 @@ app.post(
   }
 );
 
-app.get(
-  "/editAdminpage/:taskId",
+app.get("/editAdminpage/:taskId",
   isAuthenicated,
   isAdminCheck,
   async (req, res) => {
@@ -831,7 +835,7 @@ app.get(
       const isAdmin = req.isAdmin;
       const { taskId } = req.params;
       if (!taskId) {
-        return res.redirect("errorpage");
+        return res.redirect("/errorpage&message=Task ID is required&type=error");
       }
 
       const userData = await user.findById(userId);
@@ -849,8 +853,7 @@ app.get(
   }
 );
 
-app.post(
-  "/editAdminTask/:taskId",
+app.post("/editAdminTask/:taskId",
   isAuthenicated,
   isAdminCheck,
   upload.single("taskImage"),
@@ -910,8 +913,7 @@ app.post(
   }
 );
 
-app.post(
-  "/addComment/:taskId",
+app.post("/addComment/:taskId",
   isAuthenicated,
   upload.single("commentfile"),
   async (req, res) => {
@@ -940,8 +942,7 @@ app.post(
   }
 );
 
-app.get(
-  "/commentfileShow/:commentId",
+app.get("/commentfileShow/:commentId",
   isAuthenicated,
   isAdminCheck,
   async (req, res) => {
@@ -1044,8 +1045,7 @@ app.get("/edit-profilePage", isAuthenicated, isAdminCheck, async (req, res) => {
   } catch (error) {}
 });
 
-app.post(
-  "/editProfile",
+app.post("/editProfile",
   isAuthenicated,
   isAdminCheck,
   upload.single("profilePic"),
@@ -1098,8 +1098,7 @@ app.get("/medialibrary", isAuthenicated, isAdminCheck, async (req, res) => {
   } catch (error) {}
 });
 
-app.post(
-  "/submitMedia",
+app.post("/submitMedia",
   upload.single("mediaImage"),
   isAuthenicated,
   isAdminCheck,
@@ -1182,8 +1181,7 @@ app.post(
   }
 );
 
-app.post(
-  "/EditMedia/:imageId",
+app.post("/EditMedia/:imageId",
   upload.single("mediaImage"),
   isAuthenicated,
   isAdminCheck,
@@ -1305,8 +1303,7 @@ app.post("/deleteImage/:imageId", isAuthenicated, async (req, res) => {
   } catch (error) {}
 });
 
-app.get(
-  "/imagepreview/:imageId",
+app.get("/imagepreview/:imageId",
   isAuthenicated,
   isAdminCheck,
   async (req, res) => {
@@ -1445,21 +1442,14 @@ app.post("/payment/stripe", isAuthenicated, async (req, res) => {
     return res.status(400).json({ message: "Invalid plan selected." });
   }
 
-  if (!["national", "international"].includes(country)) {
-    return res.status(400).json({ message: "Invalid country selected." });
+  if (!country) {
+    return res.status(400).json({ message: "Select country First." });
   }
 
   try {
-    const amount =
-      plan === "pro"
-        ? country === "national"
-          ? 9900 * 83
-          : 9900
-        : country === "national"
-        ? 49900 * 83
-        : 49900;
-    const currency = country === "national" ? "inr" : "usd";
+    const amount = plan === "pro" ? 9900 : 49900;
 
+    const currency = "usd";
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: [
@@ -1588,24 +1578,16 @@ app.post("/payment/paypal", isAuthenicated, async (req, res) => {
     return res.status(400).json({ message: "Invalid plan selected." });
   }
 
-  if (!["national", "international"].includes(country)) {
-    return res.status(400).json({ message: "Invalid country selected." });
+  if (!country) {
+    return res.status(400).json({ message: "Select country First." });
   }
 
   try {
     const accessToken = await getPaypalAccessToken();
-    console.log("PayPal access token fetched successfully:", accessToken);
 
-    // Calculate the amount
-    const amountData =
-      plan === "pro"
-        ? country === "national"
-          ? 9900 * 83
-          : 9900
-        : country === "national"
-        ? 49900 * 83
-        : 49900;
-    const currency = country === "national" ? "INR" : "USD";
+    const amountData = plan === "pro" ? 9900 : 49900;
+
+    const currency = "USD";
     const amountFormatted = parseFloat((amountData / 100).toFixed(2));
 
     const planData = {
@@ -1771,13 +1753,13 @@ app.post("/payment/phonepe", isAuthenicated, async (req, res) => {
     return res.status(400).json({ message: "Invalid plan selected." });
   }
 
-  if (!["national", "international"].includes(country)) {
-    return res.status(400).json({ message: "Invalid country selected." });
+  if (!country) {
+    return res.status(400).json({ message: "Select country First." });
   }
 
   try {
     const amountData = plan === "pro" ? 9900 : 49900; // Base amount in paise
-    const amount = country === "national" ? amountData * 100 : amountData; // Convert to paise for national
+    const amount = amountData * 100;
     const currency = "INR";
 
     const paymentPayload = {
@@ -1905,13 +1887,13 @@ app.post("/payment/razorpay", isAuthenicated, async (req, res) => {
     return res.status(400).json({ message: "Invalid plan selected." });
   }
 
-  if (!["national", "international"].includes(country)) {
-    return res.status(400).json({ message: "Invalid country selected." });
+  if (!country) {
+    return res.status(400).json({ message: "Select country First." });
   }
 
   try {
     const amountData = plan === "pro" ? 9900 : 49900; // Base amount in paise
-    const amount = country === "national" ? amountData * 100 : amountData; // Convert to paise for national
+    const amount = amountData * 100;
     const currency = "INR";
     const options = {
       amount: amount,
@@ -1950,6 +1932,7 @@ app.post("/payment/razorpay", isAuthenicated, async (req, res) => {
     });
   }
 });
+
 app.post("/success/razorpay", isAuthenicated, async (req, res) => {
   const { razorpay_order_id, razorpay_payment_id, razorpay_signature, plan } =
     req.body;
@@ -1984,6 +1967,215 @@ app.post("/success/razorpay", isAuthenicated, async (req, res) => {
     return res
       .status(400)
       .json({ success: false, message: "Invalid signature" });
+  }
+});
+
+
+app.get("/errorpage", isAuthenicated, async(req, res) => {
+
+  const toastMessage = req.query.message || "An error occurred. Please try again later.";
+  const toastType = req.query.type || "error";
+  const userId = req.id;
+  const isAdmin = req.isAdmin;
+
+  if (!userId) {
+    return res.status(401).render("layout/ErrorPage", {
+      toastMessage: "Unauthorized access. Please log in.",
+      toastType: "error",
+      user: null,
+      isAdmin: false,
+    });
+  }
+  const userData = await user.findById(userId);
+  if (!userData) {
+    return res.status(404).render("layout/ErrorPage", {
+      toastMessage: "User not found.",
+      toastType: "error",
+      user: null,
+      isAdmin: false,
+    });
+  }
+  res.render("layout/ErrorPage", {
+   toastMessage: toastMessage,
+    toastType: toastType,
+    user: userData,
+    isAdmin,
+  });
+});
+
+app.get('/invoices', isAuthenicated, async (req, res) => {
+  const userId = req.id;
+  const isAdmin = req.isAdmin;
+  if (!userId) {
+    return res.status(401).redirect('/errorpage?message=Unauthorized access. Please log in.&type=error');
+  }
+  const userData = await user.findById(userId);
+  if (!userData) {
+    return res.status(404).redirect('/errorpage?message=User not found&type=error');  
+  }
+
+  try {
+    const invoices = await paymentDetail.find({ userId });
+    res.render('layout/invoices', { invoices, user: userData, isAdmin });
+  } catch (error) {
+    console.error("Error fetching invoices:", error);
+    res.status(500).redirect('/errorpage?message=Error fetching invoices&type=error');
+  }
+});
+
+
+app.get('/invoice/view/:id', isAuthenicated, async (req, res) => {
+  const userId = req.id;
+  const isAdmin = req.isAdmin;
+  const invoiceId = req.params.id;
+
+  if (!mongoose.isValidObjectId(invoiceId)) {
+    return res.status(400).redirect('/errorpage?message=Invalid invoice ID&type=error');
+  }
+
+  try {
+    const invoice = await paymentDetail.findById(invoiceId);
+    if (!invoice) {
+      return res.status(404).redirect('/errorpage?message=Invoice not found&type=error');
+    }
+
+    if (invoice.userId.toString() !== userId) {
+      return res.status(403).redirect('/errorpage?message=You are not authorized to view this invoice&type=error');
+    }
+
+    const userData = await user.findById(userId).lean();
+    if (!userData) {
+      return res.status(404).redirect('/errorpage?message=User not found&type=error');
+    }
+
+    res.render('layout/invoiceView', {
+      invoice,
+      user: userData,
+      isAdmin,
+      currentPage: 'invoices',
+    });
+  } catch (error) {
+    console.error('Error fetching invoice:', error);
+    res.status(500).redirect('/errorpage?message=Error fetching invoice&type=error');
+  }
+});
+
+app.get('/invoice/:id', isAuthenicated, async (req, res) => {
+ const userId = req.id;
+  const invoiceId = req.params.id;
+
+  if (!mongoose.isValidObjectId(invoiceId)) {
+    return res.status(400).redirect('/errorpage?message=Invalid invoice ID&type=error');
+  }
+
+  try {
+    const invoice = await paymentDetail.findById(invoiceId).populate('userId');
+    if (!invoice) {
+      return res.status(404).redirect('/errorpage?message=Invoice not found&type=error');
+    }
+
+    if (invoice.userId._id.toString() !== userId) {
+      return res.status(403).redirect('/errorpage?message=You are not authorized to view this invoice&type=error');
+    }
+
+
+    const doc = new PDFDocument({ margin: 50, size: 'A4' });
+    res.setHeader('Content-Disposition', `attachment; filename=invoice-${invoiceId}.pdf`);
+    res.setHeader('Content-Type', 'application/pdf');
+    doc.pipe(res);
+
+    const colors = {
+      emerald600: '#10B981',
+      gray900: '#111827',
+      gray700: '#374151',
+      gray500: '#6B7280',
+      gray300: '#D1D5DB',
+      emerald50: '#ECFDF5',
+    };
+
+  
+    doc.registerFont('Roboto', 'Roboto-Regular.ttf'); 
+    doc.registerFont('Roboto-Bold', 'Roboto-Bold.ttf');
+
+
+    const logoPath = path.join(__dirname, '../public/assets/list-check-solid.svg');
+    if (fs.existsSync(logoPath)) {
+      doc.image(logoPath, 50, 50, { width: 100 });
+    } else {
+      doc.font('Helvetica-Bold').fontSize(14).fillColor(colors.gray900).text('Task Manager', 50, 50);
+    }
+    doc.font('Helvetica').fontSize(10).fillColor(colors.gray700)
+      .text('Task Manager Inc.', 400, 50, { align: 'right' })
+      .text('123 Productivity Lane, Tech City, TX 12345', 400, 65, { align: 'right' })
+      .text('support@taskmanager.com', 400, 90, { align: 'right' });
+    doc.moveDown(4);
+
+
+    doc.font('Helvetica-Bold').fontSize(20).fillColor(colors.emerald600)
+      .text('Invoice', 50, 120, { align: 'center' });
+    doc.rect(50, 150, 495, 40).fill(colors.emerald50);
+    doc.font('Helvetica-Bold').fontSize(14).fillColor(colors.gray900)
+      .text(`Invoice`, 60, 160);
+    doc.font('Helvetica').fontSize(12).fillColor(colors.gray700)
+      .text(`Issued: ${invoice.createdAt ? new Date(invoice.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A'}`, 400, 160, { align: 'right' });
+    doc.moveDown(2);
+
+
+    doc.font('Helvetica-Bold').fontSize(14).fillColor(colors.gray900)
+      .text('Billed To', 55, 200);
+    doc.font('Helvetica').fontSize(12).fillColor(colors.gray700)
+      .text(`${invoice.userId.firstName} ${invoice.userId.lastName}`, 55, 220)
+      .text(`${invoice.userId.email}`, 55, 235)
+      .text(`${invoice.country || 'N/A'}`, 55, 250);
+    doc.moveDown(2);
+
+
+    const tableTop = 280;
+    const rowHeight = 30;
+    const colWidths = [150, 150, 150, 150];
+    const headers = ['Plan', 'Gateway', 'Amount Paid', 'Status'];
+    const details = [
+      invoice.plan || 'N/A',
+      invoice.gateway || 'N/A',
+      (() => {
+        const currency = ['stripe', 'paypal'].includes(invoice.gateway?.toLowerCase()) ? '$' :
+                        ['razorpay', 'phonepe'].includes(invoice.gateway?.toLowerCase()) ? '₹' : '';
+        return invoice.amountPaid ? `${currency}${(invoice.amountPaid / 100).toFixed(2)}` : 'N/A';
+      })(),
+      invoice.status || 'Pending',
+    ];
+
+
+    doc.rect(50, tableTop, 495, rowHeight).fill(colors.emerald50);
+    headers.forEach((header, i) => {
+      doc.font('Helvetica-Bold').fontSize(12).fillColor(colors.gray900)
+        .text(header, 50 + (i * colWidths[i]), tableTop + 8, { width: colWidths[i], align: 'left' });
+    });
+
+
+    doc.rect(50, tableTop + rowHeight, 495, rowHeight).fill('white');
+    details.forEach((detail, i) => {
+      doc.font('Helvetica').fontSize(12).fillColor(colors.gray700)
+        .text(detail, 50 + (i * colWidths[i]), tableTop + rowHeight + 8, { width: colWidths[i], align: 'left' });
+    });
+
+
+    doc.font('Helvetica').fontSize(12).fillColor(colors.gray700)
+      .text(`Last Payment: ${invoice.lastPaymentDate ? new Date(invoice.lastPaymentDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A'}`, 50, tableTop + rowHeight * 2 + 10)
+      .text(`Next Billing: ${invoice.nextBillingDate ? new Date(invoice.nextBillingDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A'}`, 350, tableTop + rowHeight * 2 + 10);
+
+    doc.moveTo(50, tableTop + rowHeight * 3 + 20).lineTo(545, tableTop + rowHeight * 3 + 20)
+      .strokeColor(colors.gray300).stroke();
+
+
+    doc.font('Helvetica-Oblique').fontSize(10).fillColor(colors.gray500)
+      .text(`Generated on: ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}`, 50, 720, { align: 'center' })
+      .text('Contact: support@taskmanager.com', 50, 735, { align: 'center' });
+
+    doc.end();
+  } catch (error) {
+    console.error('Error generating invoice PDF:', error);
+    res.status(500).redirect('/errorpage?message=Error generating invoice PDF&type=error');
   }
 });
 

@@ -1,62 +1,88 @@
-<div class="bg-white p-6 top-0">
+<div class="bg-white p-4 sm:p-6 top-0 shadow-md" role="navigation">
   <div class="flex items-center justify-between max-w-7xl mx-auto">
     <!-- Logo -->
     <h2
-      class="text-2xl sm:text-3xl font-extrabold text-gray-800 tracking-tight cursor-pointer flex items-center gap-3"
+      class="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight cursor-pointer flex items-center gap-3"
       onclick="window.location.href='/'"
-      data-aos="fade-right"
-      data-aos-duration="800"
+  
+      aria-label="Go to homepage"
     >
-      <i class="fa-solid fa-list-check text-teal-600 text-2xl"></i> Task Manager
+      <i class="fa-solid fa-list-check text-emerald-600 text-xl"></i> Task Manager
     </h2>
 
     <!-- Desktop Menu -->
-    <div class="hidden lg:flex items-center gap-8">
+    <div class="hidden lg:flex items-center gap-6">
       <% if (user) { %>
-      <div class="flex items-center gap-8">
+      <div class="flex items-center gap-6">
         <a
-          class="font-semibold text-lg text-gray-700 hover:text-blue-600 transition-colors"
+          class="text-base font-medium text-gray-700 hover:text-emerald-600 transition-colors"
           href="/task"
-          >Tasks</a
-        >
+          aria-label="View tasks"
+          data-aos="fade-in"
+          data-aos-duration="600"
+          data-aos-delay="100"
+        >Tasks</a>
         <% if (isAdmin) { %>
         <a
-          class="font-semibold text-lg text-gray-700 hover:text-blue-600 transition-colors"
+          class="text-base font-medium text-gray-700 hover:text-emerald-600 transition-colors"
           href="/assigntask"
-          >Assign Task</a
-        >
+          aria-label="Assign a task"
+          data-aos="fade-in"
+          data-aos-duration="600"
+          data-aos-delay="150"
+        >Assign Task</a>
         <% } else { %>
         <a
-          class="font-semibold text-lg text-gray-700 hover:text-blue-600 transition-colors"
+          class="text-base font-medium text-gray-700 hover:text-emerald-600 transition-colors"
           href="/Admintask"
-          >Admin Task</a
-        >
+          aria-label="View admin tasks"
+          data-aos="fade-in"
+          data-aos-duration="600"
+          data-aos-delay="150"
+        >Admin Task</a>
         <% } %>
         <a
-          class="font-semibold text-lg text-gray-700 hover:text-blue-600 transition-colors"
+          class="text-base font-medium text-gray-700 hover:text-emerald-600 transition-colors"
           href="/profile"
-          >Profile</a
-        >
+          aria-label="View profile"
+          data-aos="fade-in"
+          data-aos-duration="600"
+          data-aos-delay="200"
+        >Profile</a>
       </div>
       <button
-        class="bg-gradient-to-r from-red-600 to-red-400 text-white px-4 py-2 rounded-full shadow-md hover:from-red-700 hover:to-red-500 transition-all transform hover:scale-105"
+        class="bg-red-600 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all hover:scale-105"
         onclick="window.location.href='/logout'"
+        aria-label="Log out"
+        data-aos="fade-in"
+        data-aos-duration="600"
+        data-aos-delay="250"
       >
         Logout
       </button>
       <% } else { %>
-      <button
-        class="bg-gradient-to-r from-blue-600 to-blue-400 text-white px-4 py-2 rounded-full shadow-md hover:from-blue-700 hover:to-blue-500 transition-all transform hover:scale-105"
-        onclick="window.location.href='/loginPage'"
-      >
-        Log In
-      </button>
-      <button
-        class="bg-gradient-to-r from-gray-800 to-gray-600 text-white px-4 py-2 rounded-full shadow-md hover:from-gray-900 hover:to-gray-700 transition-all transform hover:scale-105"
-        onclick="window.location.href='/signuppage/starter'"
-      >
-        Sign Up
-      </button>
+      <div class="flex flex-col sm:flex-row gap-4">
+        <button
+          class="bg-emerald-600 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all hover:scale-105"
+          onclick="window.location.href='/loginPage'"
+          aria-label="Log in"
+          data-aos="fade-in"
+          data-aos-duration="600"
+          data-aos-delay="100"
+        >
+          Log In
+        </button>
+        <button
+          class="bg-gray-600 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all hover:scale-105"
+          onclick="window.location.href='/signuppage/starter'"
+          aria-label="Sign up"
+          data-aos="fade-in"
+          data-aos-duration="600"
+          data-aos-delay="150"
+        >
+          Sign Up
+        </button>
+      </div>
       <% } %>
     </div>
 
@@ -66,47 +92,44 @@
       class="hamburger-icon lg:hidden mr-2 flex flex-col justify-center gap-1.5 cursor-pointer"
       onkeypress="handleHamburger()"
       role="button"
-      aria-label="Toggle menu"
+      aria-label="Toggle navigation menu"
       tabindex="0"
     >
-      <div class="bg-blue-600 h-1 w-8 rounded"></div>
-      <div class="bg-blue-600 h-1 w-8 rounded"></div>
-      <div class="bg-blue-600 h-1 w-8 rounded"></div>
+      <div class="bg-emerald-600 h-0.5 w-7 rounded"></div>
+      <div class="bg-emerald-600 h-0.5 w-7 rounded"></div>
+      <div class="bg-emerald-600 h-0.5 w-7 rounded"></div>
     </div>
 
     <!-- Mobile Menu -->
     <div
-      class="menu transform translate-x-full transition-transform duration-300 ease-in-out fixed top-[80px] right-0 w-[80%] sm:w-[50%] h-full bg-white shadow-2xl z-50 border-l border-gray-200"
+      class="menu transform translate-x-full transition-transform duration-300 ease-in-out fixed top-[64px] sm:top-[80px] right-0 w-[90%] sm:w-[60%] h-full bg-gray-50 shadow-lg rounded-l-lg z-50 border-l border-gray-200"
       data-aos="fade-left"
-      data-aos-duration="500"
+      data-aos-duration="600"
     >
       <div class="flex flex-col items-center mt-8 space-y-4 px-6">
         <% if (user) { %>
         <div
-          class="w-24 h-24 rounded-full border-2 border-blue-600 overflow-hidden relative"
+          class="w-20 h-20 rounded-full border-2 border-emerald-600 overflow-hidden relative shadow-sm"
+          data-aos="fade-in"
+          data-aos-duration="600"
+          data-aos-delay="100"
         >
           <div
             class="w-full h-full bg-center bg-cover"
-            style="
-              background-image: url('../../Uploads/<%= user.profilePic %>');
-            "
+            style="background-image: url('/Uploads/<%= user.profilePic %>');"
           ></div>
           <div
-            class="absolute inset-0 bg-blue-600 opacity-10 rounded-full"
+            class="absolute inset-0 bg-emerald-600 opacity-10 rounded-full"
           ></div>
         </div>
         <a
-          href="/profile"
-          onclick="handleHamburger()"
-          class="w-full text-center py-3 font-semibold text-gray-800 hover:bg-blue-50 rounded-lg transition-colors"
-        >
-          Profile
-        </a>
-        <hr class="bg-gray-200 w-full h-px" />
-        <a
           href="/task"
           onclick="handleHamburger()"
-          class="w-full text-center py-3 font-semibold text-gray-800 hover:bg-blue-50 rounded-lg transition-colors"
+          class="w-full text-center py-3 text-base font-medium text-gray-800 hover:bg-emerald-50 rounded-lg transition-colors"
+          aria-label="View tasks"
+          data-aos="fade-in"
+          data-aos-duration="600"
+          data-aos-delay="150"
         >
           Tasks
         </a>
@@ -115,7 +138,11 @@
         <a
           href="/assigntask"
           onclick="handleHamburger()"
-          class="w-full text-center py-3 font-semibold text-gray-800 hover:bg-blue-50 rounded-lg transition-colors"
+          class="w-full text-center py-3 text-base font-medium text-gray-800 hover:bg-emerald-50 rounded-lg transition-colors"
+          aria-label="Assign a task"
+          data-aos="fade-in"
+          data-aos-duration="600"
+          data-aos-delay="200"
         >
           Assign Task
         </a>
@@ -123,7 +150,11 @@
         <a
           href="/assignedtask"
           onclick="handleHamburger()"
-          class="w-full text-center py-3 font-semibold text-gray-800 hover:bg-blue-50 rounded-lg transition-colors"
+          class="w-full text-center py-3 text-base font-medium text-gray-800 hover:bg-emerald-50 rounded-lg transition-colors"
+          aria-label="View assigned tasks"
+          data-aos="fade-in"
+          data-aos-duration="600"
+          data-aos-delay="250"
         >
           Assigned Task
         </a>
@@ -132,54 +163,93 @@
         <a
           href="/Admintask"
           onclick="handleHamburger()"
-          class="w-full text-center py-3 font-semibold text-gray-800 hover:bg-blue-50 rounded-lg transition-colors"
+          class="w-full text-center py-3 text-base font-medium text-gray-800 hover:bg-emerald-50 rounded-lg transition-colors"
+          aria-label="View admin tasks"
+          data-aos="fade-in"
+          data-aos-duration="600"
+          data-aos-delay="200"
         >
           Admin Task
         </a>
         <hr class="bg-gray-200 w-full h-px" />
         <% } %>
-
         <a
-          class="w-full text-center py-3 font-semibold text-gray-800 hover:bg-blue-50 rounded-lg transition-colors"
           href="/profile"
+          onclick="handleHamburger()"
+          class="w-full text-center py-3 text-base font-medium text-gray-800 hover:bg-emerald-50 rounded-lg transition-colors"
+          aria-label="View profile"
+          data-aos="fade-in"
+          data-aos-duration="600"
+          data-aos-delay="300"
         >
           Profile
         </a>
         <hr class="bg-gray-200 w-full h-px" />
-
         <a
-          class="w-full text-center py-3 font-semibold text-gray-800 hover:bg-blue-50 rounded-lg transition-colors"
           href="/medialibrary"
+          onclick="handleHamburger()"
+          class="w-full text-center py-3 text-base font-medium text-gray-800 hover:bg-emerald-50 rounded-lg transition-colors"
+          aria-label="View media library"
+          data-aos="fade-in"
+          data-aos-duration="600"
+          data-aos-delay="350"
         >
           Media Library
         </a>
+        <hr class="bg-gray-200 w-full h-px" />
 
-                <hr class="bg-gray-200 w-full h-px" />
-
+                <a
+          href="/invoices"
+          onclick="handleHamburger()"
+          class="w-full text-center py-3 text-base font-medium text-gray-800 hover:bg-emerald-50 rounded-lg transition-colors"
+          aria-label="View invoices"
+          data-aos="fade-in"
+          data-aos-duration="600"
+          data-aos-delay="350"
+        >
+          Invoices
+        </a>
+        <hr class="bg-gray-200 w-full h-px" />
         <a
-          class="w-full text-center py-3 font-semibold text-gray-800 hover:bg-blue-50 rounded-lg transition-colors"
           href="/downloadTask"
+          onclick="handleHamburger()"
+          class="w-full text-center py-3 text-base font-medium text-gray-800 hover:bg-emerald-50 rounded-lg transition-colors"
+          aria-label="Download tasks"
+          data-aos="fade-in"
+          data-aos-duration="600"
+          data-aos-delay="400"
         >
           Download
         </a>
         <hr class="bg-gray-200 w-full h-px" />
-
         <button
           onclick="window.location.href='/logout'; handleHamburger()"
-          class="w-full py-3 text-red-600 font-bold hover:bg-red-50 rounded-lg transition-colors"
+          class="w-full py-3 text-red-600 font-semibold hover:bg-red-50 rounded-lg transition-colors"
+          aria-label="Log out"
+          data-aos="fade-in"
+          data-aos-duration="600"
+          data-aos-delay="450"
         >
           Logout
         </button>
         <% } else { %>
         <button
           onclick="window.location.href='/signuppage/starter'; handleHamburger()"
-          class="w-full py-3 text-blue-600 font-bold hover:bg-blue-50 rounded-lg transition-colors"
+          class="w-full py-3 text-emerald-600 font-semibold hover:bg-emerald-50 rounded-lg transition-colors"
+          aria-label="Sign up"
+          data-aos="fade-in"
+          data-aos-duration="600"
+          data-aos-delay="100"
         >
           Sign Up
         </button>
         <button
           onclick="window.location.href='/loginPage'; handleHamburger()"
-          class="w-full py-3 text-blue-600 font-bold hover:bg-blue-50 rounded-lg transition-colors"
+          class="w-full py-3 text-emerald-600 font-semibold hover:bg-emerald-50 rounded-lg transition-colors"
+          aria-label="Log in"
+          data-aos="fade-in"
+          data-aos-duration="600"
+          data-aos-delay="150"
         >
           Log In
         </button>

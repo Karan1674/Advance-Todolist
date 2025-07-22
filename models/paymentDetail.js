@@ -13,8 +13,6 @@ const paymentSchema = new mongoose.Schema({
   },
   country: {
     type: String,
-    enum: ['national', 'international', null],
-    default: null,
   },
   subscriptionId: {
     type: String,

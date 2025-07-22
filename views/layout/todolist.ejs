@@ -7,9 +7,10 @@
 <body class="min-h-screen bg-gray-100 flex flex-col font-sans">
   <%- include('../partials/navbar') %>
 
-  <div class="flex flex-grow">
+  <div class="flex min-h-screen flex-grow">
     <%- include('../partials/sidebar') %>
-    <div class="flex-grow py-8 px-4 sm:px-6">
+  <div class="min-h-screen">
+      <div class="flex-grow min-h-screen py-8 px-4 sm:px-6">
       <div class="flex items-center justify-center gap-4 mb-10" data-aos="fade-down" data-aos-duration="400">
         <input
           type="text"
@@ -107,7 +108,7 @@
           data-aos="fade-in"
           data-aos-duration="400"
         >
-          <p class="text-xl font-semibold text-gray-800 bg-white px-8 py-4 rounded-xl shadow-lg">No Tasks Available</p>
+          <p class="text-xl font-semibold text-gray-800  ">No Tasks Available</p>
         </div>
         <% } %>
       </div>
@@ -132,9 +133,10 @@
         </button>
       </div>
     </div>
+    <%- include('../partials/footer') %>
+  </div>
   </div>
 
-  <%- include('../partials/footer') %>
   <%- include('../partials/popup') %>
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script src="../../public/delete.js"></script>

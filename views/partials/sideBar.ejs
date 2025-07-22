@@ -1,74 +1,138 @@
 <div
-  class="w-64 bg-white py-12 border-r border-gray-200 p-6 flex flex-col gap-6 lg:flex hidden"
-  data-aos="fade-right"
-  data-aos-duration="800"
+  class="w-60 bg-white p-4 sm:p-6 border-r border-gray-200 flex flex-col space-y-4 lg:flex hidden shadow-md "
+
 >
   <a
-    class="flex gap-3 items-center text-gray-800 hover:text-blue-600 transition-colors"
+    class="flex gap-3 items-center text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg p-3 transition-all"
     href="/task"
+    aria-label="View tasks"
+    data-aos="fade-in"
+    data-aos-duration="600"
+    data-aos-delay="100"
   >
-    <i class="fa-solid fa-list-check text-blue-600 text-xl"></i>
-    <span class="font-semibold text-lg">Tasks</span>
+    <i class="fa-solid fa-list-check text-emerald-600 text-lg"></i>
+    <span class="text-base font-medium">Tasks</span>
   </a>
   <a
-    class="flex gap-3 items-center text-gray-800 hover:text-blue-600 transition-colors"
+    class="flex gap-3 items-center text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg p-3 transition-all"
     href="/addtask"
+    aria-label="Add a new task"
+    data-aos="fade-in"
+    data-aos-duration="600"
+    data-aos-delay="150"
   >
-    <i class="fa-solid fa-plus text-blue-600 text-xl"></i>
-    <span class="font-semibold text-lg">Add Task</span>
+    <i class="fa-solid fa-plus text-emerald-600 text-lg"></i>
+    <span class="text-base font-medium">Add Task</span>
   </a>
   <a
-    class="flex gap-3 items-center text-gray-800 hover:text-blue-600 transition-colors"
+    class="flex gap-3 items-center text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg p-3 transition-all"
     href="/medialibrary"
+    aria-label="View media library"
+    data-aos="fade-in"
+    data-aos-duration="600"
+    data-aos-delay="200"
   >
-    <i class="fa-solid fa-photo-film text-blue-600 text-xl"></i>
-    <span class="font-semibold text-lg">Media Library</span>
+    <i class="fa-solid fa-photo-film text-emerald-600 text-lg"></i>
+    <span class="text-base font-medium">Media Library</span>
   </a>
+
+   <a
+      href="/invoices"
+      class="flex items-center px-4 py-3 text-sm sm:text-base font-medium text-gray-700 rounded-md hover:bg-emerald-50 hover:text-emerald-600 focus:outline-none "
+    aria-label="View invoices"
+      data-aos="fade-in"
+      data-aos-duration="600"
+      data-aos-delay="250"
+    >
+      <i class="fa-solid fa-file-invoice w-5 h-5 mr-3 text-emerald-600"></i>
+      Invoices
+    </a>
   <% if (isAdmin) { %>
   <a
-    class="flex gap-3 items-center text-gray-800 hover:text-blue-600 transition-colors"
+    class="flex gap-3 items-center text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg p-3 transition-all"
     href="/assigntask"
+    aria-label="Assign tasks"
+    data-aos="fade-in"
+    data-aos-duration="600"
+    data-aos-delay="250"
   >
-    <i class="fa-solid fa-tasks text-blue-600 text-xl"></i>
-    <span class="font-semibold text-lg">Assign Tasks</span>
+    <i class="fa-solid fa-tasks text-emerald-600 text-lg"></i>
+    <span class="text-base font-medium">Assign Tasks</span>
   </a>
   <a
-    class="flex gap-3 items-center text-gray-800 hover:text-blue-600 transition-colors"
+    class="flex gap-3 items-center text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg p-3 transition-all"
     href="/assignedtask"
+    aria-label="View assigned tasks"
+    data-aos="fade-in"
+    data-aos-duration="600"
+    data-aos-delay="300"
   >
-    <i class="fa-solid fa-tasks text-blue-600 text-xl"></i>
-    <span class="font-semibold text-lg">Assigned Tasks</span>
+    <i class="fa-solid fa-tasks text-emerald-600 text-lg"></i>
+    <span class="text-base font-medium">Assigned Tasks</span>
   </a>
   <% } else { %>
   <a
-    class="flex gap-3 items-center text-gray-800 hover:text-blue-600 transition-colors"
+    class="flex gap-3 items-center text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg p-3 transition-all"
     href="/Admintask"
+    aria-label="View admin tasks"
+    data-aos="fade-in"
+    data-aos-duration="600"
+    data-aos-delay="250"
   >
-    <i class="fa-solid fa-tasks text-blue-600 text-xl"></i>
-    <span class="font-semibold text-lg">Admin Tasks</span>
+    <i class="fa-solid fa-tasks text-emerald-600 text-lg"></i>
+    <span class="text-base font-medium">Admin Tasks</span>
   </a>
   <% } %>
   <a
-    class="flex gap-3 items-center text-gray-800 hover:text-blue-600 transition-colors"
+    class="flex gap-3 items-center text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg p-3 transition-all"
     href="/profile"
+    aria-label="View profile"
+    data-aos="fade-in"
+    data-aos-duration="600"
+    data-aos-delay="350"
   >
-    <i class="fa-solid fa-user text-blue-600 text-xl"></i>
-    <span class="font-semibold text-lg">Profile</span>
+    <i class="fa-solid fa-user text-emerald-600 text-lg"></i>
+    <span class="text-base font-medium">Profile</span>
   </a>
   <a
-    class="flex gap-3 items-center text-gray-800 hover:text-blue-600 transition-colors"
+    class="flex gap-3 items-center text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg p-3 transition-all"
     href="/downloadTask"
+    aria-label="Download tasks"
+    data-aos="fade-in"
+    data-aos-duration="600"
+    data-aos-delay="400"
   >
-    <i class="fa-solid fa-download text-blue-600 text-xl"></i>
-    <span class="font-semibold text-lg">Download</span>
+    <i class="fa-solid fa-download text-emerald-600 text-lg"></i>
+    <span class="text-base font-medium">Download</span>
   </a>
   <% if (user) { %>
   <a
-    class="flex gap-3 items-center text-red-600 hover:text-red-700 transition-colors"
+    class="flex gap-3 items-center text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg p-3 transition-all"
     href="/logout"
+    aria-label="Log out"
+    data-aos="fade-in"
+    data-aos-duration="600"
+    data-aos-delay="450"
   >
-    <i class="fa-solid fa-right-from-bracket text-red-600 text-xl"></i>
-    <span class="font-semibold text-lg">Logout</span>
+    <i class="fa-solid fa-right-from-bracket text-red-600 text-lg"></i>
+    <span class="text-base font-medium">Logout</span>
   </a>
   <% } %>
 </div>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof AOS === 'undefined') {
+      console.error('AOS library failed to load');
+      return;
+    }
+    AOS.init({
+      duration: 600,
+      easing: 'ease-out',
+      once: true,
+      offset: 100,
+    });
+    console.log('AOS initialized for sidebar');
+  });
+</script>

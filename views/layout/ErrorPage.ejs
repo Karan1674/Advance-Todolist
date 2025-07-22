@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/header.ejs') %>
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <style>
+    .btn-hover {
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    .btn-hover:hover {
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-100 flex items-center justify-center p-4 sm:p-6 font-sans">
+  <div
+    class="w-full max-w-md mx-auto p-6 sm:p-8 bg-white rounded-lg shadow-md"
+    role="alert"
+    aria-live="assertive"
+    data-aos="fade-up"
+    data-aos-duration="600"
+    data-aos-delay="100"
+  >
+    <div class="text-center">
+      <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
+        <%= toastType === 'error' ? 'Oops! Something Went Wrong' : 'Warning' %>
+      </h2>
+      <p
+        id="error-message"
+        class="text-base sm:text-lg font-medium text-gray-700 mb-6 <%= toastType === 'error' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700' %> rounded-md p-4"
+        data-aos="fade-in"
+        data-aos-duration="600"
+        data-aos-delay="150"
+      >
+        <%= toastMessage %>
+      </p>
+      <a
+        href="#"
+                onclick="window.history.back(); return false;"
+        class="inline-block bg-emerald-600 text-white px-6 py-2.5 rounded-md font-semibold shadow-sm btn-hover focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all"
+        aria-label="Return to <%= user ? 'Home' : 'login page' %>"
+        data-aos="fade-in"
+        data-aos-duration="600"
+        data-aos-delay="200"
+      >
+       Back
+      </a>
+    </div>
+  </div>
+  <%- include('../partials/toast.ejs') %>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof AOS === 'undefined') {
+        console.error('AOS library failed to load');
+        return;
+      }
+      AOS.init({
+        once: true,
+        offset: 100,
+        duration: 600,
+        easing: 'ease-out',
+      });
+      console.log('AOS initialized for error page');
+    });
+  </script>
+</body>
+</html>

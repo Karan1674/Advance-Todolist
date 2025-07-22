@@ -1,71 +1,108 @@
-
 <!DOCTYPE html>
 <html lang="en">
-<%- include('../partials/header') %>
-<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <%- include('../partials/header') %>
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
 
-<body class="min-h-screen bg-gray-100 flex flex-col font-sans">
-  <%- include('../partials/navbar') %>
+  <body class="min-h-screen bg-gray-100 flex flex-col font-sans">
+    <%- include('../partials/navbar') %>
 
-  <div class="flex min-h-screen flex-grow">
-    <%- include('../partials/sidebar') %>
-    <div class="flex-grow py-10 px-4 sm:px-6">
-      <% if (user) { %>
-        <div class="max-w-2xl mx-auto" data-aos="fade-up" data-aos-duration="400">
-          <form
-            action="/editProfile"
-            method="post"
-            enctype="multipart/form-data"
-            class="flex flex-col gap-6 bg-white p-6 sm:p-8 rounded-lg shadow-md border border-gray-200"
+    <div class="flex min-h-screen flex-grow">
+      <%- include('../partials/sidebar') %>
+      <div>
+        <div class="flex-grow min-h-screen py-10 px-4 sm:px-6">
+          <% if (user) { %>
+          <div
+            class="max-w-2xl mx-auto"
+            data-aos="fade-up"
+            data-aos-duration="400"
           >
-            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-6" data-aos="fade-up" data-aos-duration="400" data-aos-delay="100">
-              Update Your Profile
-            </h2>
+            <form
+              action="/editProfile"
+              method="post"
+              enctype="multipart/form-data"
+              class="flex flex-col gap-6 bg-white p-6 sm:p-8 rounded-lg shadow-md border border-gray-200"
+            >
+              <h2
+                class="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-6"
+                data-aos="fade-up"
+                data-aos-duration="400"
+                data-aos-delay="100"
+              >
+                Update Your Profile
+              </h2>
 
-            <% if(typeof error !== 'undefined' && error) { %>
-              <p class="text-red-500 text-sm text-center" data-aos="fade-in" data-aos-duration="400"><%= error %></p>
-            <% } %>
+              <% if(typeof error !== 'undefined' && error) { %>
+              <p
+                class="text-red-500 text-sm text-center"
+                data-aos="fade-in"
+                data-aos-duration="400"
+              >
+                <%= error %>
+              </p>
+              <% } %>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" data-aos="fade-up" data-aos-duration="400" data-aos-delay="200">
-              <div class="flex flex-col gap-2">
-                <label for="firstName" class="text-sm font-semibold text-gray-700">First Name</label>
-                <input
-                  type="text"
-                  id="firstName"
-                  name="firstName"
-                  value="<%= user.firstName %>"
-                  required
-                  class="w-full p-3 text-sm text-gray-800 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
-                  placeholder="Enter first name"
-                  aria-label="First name"
-                />
+              <div
+                class="grid grid-cols-1 sm:grid-cols-2 gap-4"
+                data-aos="fade-up"
+                data-aos-duration="400"
+                data-aos-delay="200"
+              >
+                <div class="flex flex-col gap-2">
+                  <label
+                    for="firstName"
+                    class="text-sm font-semibold text-gray-700"
+                    >First Name</label
+                  >
+                  <input
+                    type="text"
+                    id="firstName"
+                    name="firstName"
+                    value="<%= user.firstName %>"
+                    required
+                    class="w-full p-3 text-sm text-gray-800 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
+                    placeholder="Enter first name"
+                    aria-label="First name"
+                  />
+                </div>
+                <div class="flex flex-col gap-2">
+                  <label
+                    for="lastName"
+                    class="text-sm font-semibold text-gray-700"
+                    >Last Name</label
+                  >
+                  <input
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    value="<%= user.lastName %>"
+                    required
+                    class="w-full p-3 text-sm text-gray-800 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
+                    placeholder="Enter last name"
+                    aria-label="Last name"
+                  />
+                </div>
               </div>
-              <div class="flex flex-col gap-2">
-                <label for="lastName" class="text-sm font-semibold text-gray-700">Last Name</label>
-                <input
-                  type="text"
-                  id="lastName"
-                  name="lastName"
-                  value="<%= user.lastName %>"
-                  required
-                  class="w-full p-3 text-sm text-gray-800 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
-                  placeholder="Enter last name"
-                  aria-label="Last name"
-                />
-              </div>
-            </div>
 
-            <div class="flex flex-col gap-2" data-aos="fade-up" data-aos-duration="400" data-aos-delay="300">
-              <label for="profilePic" class="text-sm font-semibold text-gray-700">Profile Picture</label>
-              <input
-                type="file"
-                id="profilePic"
-                name="profilePic"
-                accept="image/*"
-                class="w-full p-3 text-sm text-gray-700 bg-white border border-gray-200 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100 transition"
-                aria-label="Upload profile picture"
-              />
-              <% if (user.profilePic) { %>
+              <div
+                class="flex flex-col gap-2"
+                data-aos="fade-up"
+                data-aos-duration="400"
+                data-aos-delay="300"
+              >
+                <label
+                  for="profilePic"
+                  class="text-sm font-semibold text-gray-700"
+                  >Profile Picture</label
+                >
+                <input
+                  type="file"
+                  id="profilePic"
+                  name="profilePic"
+                  accept="image/*"
+                  class="w-full p-3 text-sm text-gray-700 bg-white border border-gray-200 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100 transition"
+                  aria-label="Upload profile picture"
+                />
+                <% if (user.profilePic) { %>
                 <img
                   src="/Uploads/<%= user.profilePic %>"
                   alt="Current profile picture"
@@ -75,57 +112,68 @@
                   data-aos-delay="400"
                   onerror="this.src='/public/assets/placeholder.jpg';"
                 />
-              <% } %>
-            </div>
+                <% } %>
+              </div>
 
-            <div class="flex justify-between gap-4 mt-6" data-aos="fade-up" data-aos-duration="400" data-aos-delay="500">
-              <a
-                href="#"
-                onclick="window.history.back(); return false;"
-                class="bg-gray-600 text-white px-5 py-2.5 rounded-lg hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 transition flex items-center gap-2 w-full sm:w-auto"
-                aria-label="Back to previous page"
+              <div
+                class="flex justify-between gap-4 mt-6"
+                data-aos="fade-up"
+                data-aos-duration="400"
+                data-aos-delay="500"
               >
-                <i class="fa-solid fa-arrow-left"></i> Back
-              </a>
-              <button
-                type="submit"
-                class="bg-emerald-600 text-white px-5 py-2.5 rounded-lg hover:bg-emerald-700 focus:ring-2 focus:ring-emerald-500 transition flex items-center gap-2 w-full sm:w-auto"
-                aria-label="Update profile"
-              >
-                <i class="fa-solid fa-save"></i> Update
-              </button>
-            </div>
-          </form>
-        </div>
-      <% } else { %>
-        <div class="max-w-2xl mx-auto p-6 sm:p-8 bg-white rounded-lg shadow-md border border-gray-200 text-center" data-aos="fade-up" data-aos-duration="400">
-          <p class="text-lg font-semibold text-gray-700 mb-4">User profile not available.</p>
-          <a
-            href="#"
-            onclick="window.history.back(); return false;"
-            class="bg-gray-600 text-white px-5 py-2.5 rounded-lg hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 transition flex items-center gap-2 mx-auto"
-            aria-label="Back to previous page"
+                <a
+                  href="#"
+                  onclick="window.history.back(); return false;"
+                  class="bg-gray-600 text-white px-5 py-2.5 rounded-lg hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 transition flex items-center gap-2 w-full sm:w-auto"
+                  aria-label="Back to previous page"
+                >
+                  <i class="fa-solid fa-arrow-left"></i> Back
+                </a>
+                <button
+                  type="submit"
+                  class="bg-emerald-600 text-white px-5 py-2.5 rounded-lg hover:bg-emerald-700 focus:ring-2 focus:ring-emerald-500 transition flex items-center gap-2 w-full sm:w-auto"
+                  aria-label="Update profile"
+                >
+                  <i class="fa-solid fa-save"></i> Update
+                </button>
+              </div>
+            </form>
+          </div>
+          <% } else { %>
+          <div
+            class="max-w-2xl mx-auto p-6 sm:p-8 bg-white rounded-lg shadow-md border border-gray-200 text-center"
+            data-aos="fade-up"
+            data-aos-duration="400"
           >
-            <i class="fa-solid fa-arrow-left"></i> Back
-          </a>
+            <p class="text-lg font-semibold text-gray-700 mb-4">
+              User profile not available.
+            </p>
+            <a
+              href="#"
+              onclick="window.history.back(); return false;"
+              class="bg-gray-600 text-white px-5 py-2.5 rounded-lg hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 transition flex items-center gap-2 mx-auto"
+              aria-label="Back to previous page"
+            >
+              <i class="fa-solid fa-arrow-left"></i> Back
+            </a>
+          </div>
+          <% } %>
         </div>
-      <% } %>
+        <%- include('../partials/footer') %>
+      </div>
     </div>
-  </div>
 
-  <%- include('../partials/footer') %>
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script>
-    // Initialize AOS
-    document.addEventListener('DOMContentLoaded', () => {
-      AOS.init({
-        duration: 400,
-        easing: 'ease-out',
-        once: true,
-        offset: 120,
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+      // Initialize AOS
+      document.addEventListener("DOMContentLoaded", () => {
+        AOS.init({
+          duration: 400,
+          easing: "ease-out",
+          once: true,
+          offset: 120,
+        });
       });
-     
-    });
-  </script>
-</body>
+    </script>
+  </body>
 </html>

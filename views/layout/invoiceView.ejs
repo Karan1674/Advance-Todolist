@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('../partials/header.ejs') %>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <style>
+      .status-active {
+        background-color: #ecfdf5;
+        color: #047857;
+      }
+      .status-cancelled {
+        background-color: #fee2e2;
+        color: #b91c1c;
+      }
+      .status-pending {
+        background-color: #fef9c3;
+        color: #ca8a04;
+      }
+      .btn-hover {
+        transition: background-color 0.3s ease, transform 0.3s ease;
+      }
+      .btn-hover:hover {
+        transform: scale(1.05);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen bg-gray-100 flex flex-col font-sans">
+    <%- include('../partials/navbar.ejs') %>
+    <div class="flex min-h-screen flex-grow">
+      <% if (user) { %> <%- include('../partials/sidebar.ejs') %> <% } %>
+      <div class="flex-grow flex flex-col min-h-screen">
+        <main
+          class="flex-grow w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+          role="main"
+        >
+          <section
+            class="bg-white rounded-xl shadow-lg p-8 sm:p-10"
+            role="region"
+            aria-labelledby="invoice-heading"
+            data-aos="fade-up"
+            data-aos-duration="600"
+            data-aos-delay="100"
+          >
+            <h2
+              id="invoice-heading"
+              class="text-3xl sm:text-4xl font-bold text-gray-900 mb-8 text-center"
+            >
+              Invoice Details
+            </h2>
+            <div class="bg-emerald-50 rounded-md p-4 mb-6">
+              <!-- <h3 class="text-lg font-semibold text-gray-900">Invoice #<%= invoice._id %></h3> -->
+              <p class="text-sm font-medium text-gray-700 mt-1">
+                Issued on: <%= invoice.createdAt ? new
+                Date(invoice.createdAt).toLocaleDateString('en-GB', { day:
+                '2-digit', month: 'short', year: 'numeric' }) : 'N/A' %>
+              </p>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div
+                class="border border-gray-200 rounded-md p-4"
+                data-aos="fade-in"
+                data-aos-duration="600"
+                data-aos-delay="150"
+              >
+                <span class="text-sm font-semibold text-gray-900">Plan</span>
+                <p
+                  id="plan-value"
+                  class="text-sm sm:text-base font-medium text-gray-700 capitalize mt-1"
+                  aria-describedby="plan-value"
+                >
+                  <%= invoice.plan || 'N/A' %>
+                </p>
+              </div>
+              <div
+                class="border border-gray-200 rounded-md p-4"
+                data-aos="fade-in"
+                data-aos-duration="600"
+                data-aos-delay="200"
+              >
+                <span class="text-sm font-semibold text-gray-900">Gateway</span>
+                <p
+                  id="gateway-value"
+                  class="text-sm sm:text-base font-medium text-gray-700 capitalize mt-1"
+                  aria-describedby="gateway-value"
+                >
+                  <%= invoice.gateway || 'N/A' %>
+                </p>
+              </div>
+              <div
+                class="border border-gray-200 rounded-md p-4"
+                data-aos="fade-in"
+                data-aos-duration="600"
+                data-aos-delay="250"
+              >
+                <span class="text-sm font-semibold text-gray-900"
+                  >Amount Paid</span
+                >
+                <p
+                  id="amount-value"
+                  class="text-sm sm:text-base font-medium text-gray-700 mt-1"
+                  aria-describedby="amount-value"
+                >
+                  <% if (['stripe',
+                  'paypal'].includes(invoice.gateway?.toLowerCase())) { %> <%=
+                  invoice.amountPaid ? `$${(invoice.amountPaid /
+                  100).toFixed(2)}` : 'N/A' %> <% } else if (['razorpay',
+                  'phonepe'].includes(invoice.gateway?.toLowerCase())) { %> <%=
+                  invoice.amountPaid ? `₹${(invoice.amountPaid /
+                  100).toFixed(2)}` : 'N/A' %> <% } else { %> <%=
+                  invoice.amountPaid ? `${(invoice.amountPaid /
+                  100).toFixed(2)}` : 'N/A' %> <% } %>
+                </p>
+              </div>
+              <div
+                class="border border-gray-200 rounded-md p-4"
+                data-aos="fade-in"
+                data-aos-duration="600"
+                data-aos-delay="300"
+              >
+                <span class="text-sm font-semibold text-gray-900">Status</span>
+                <p
+                  id="status-value"
+                  class="text-sm sm:text-base font-medium text-gray-700 mt-1 <%= (invoice.status).toLowerCase() === 'pending' ? 'text-red-500' : (invoice.status).toLowerCase() === 'active' ? 'text-green-500' : 'text-yellow-700' %>"
+                  aria-label="Invoice status: <%= invoice.status || 'pending' %>"
+                >
+                  <%= invoice.status || 'Pending' %>
+                </p>
+              </div>
+              <div
+                class="border border-gray-200 rounded-md p-4"
+                data-aos="fade-in"
+                data-aos-duration="600"
+                data-aos-delay="350"
+              >
+                <span class="text-sm font-semibold text-gray-900"
+                  >Last Payment</span
+                >
+                <p
+                  id="last-payment-value"
+                  class="text-sm sm:text-base font-medium text-gray-700 mt-1"
+                  aria-describedby="last-payment-value"
+                >
+                  <%= invoice.lastPaymentDate ? new
+                  Date(invoice.lastPaymentDate).toLocaleDateString('en-GB', {
+                  day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A' %>
+                </p>
+              </div>
+              <div
+                class="border border-gray-200 rounded-md p-4"
+                data-aos="fade-in"
+                data-aos-duration="600"
+                data-aos-delay="400"
+              >
+                <span class="text-sm font-semibold text-gray-900"
+                  >Next Billing</span
+                >
+                <p
+                  id="next-billing-value"
+                  class="text-sm sm:text-base font-medium text-gray-700 mt-1"
+                  aria-describedby="next-billing-value"
+                >
+                  <%= invoice.nextBillingDate ? new
+                  Date(invoice.nextBillingDate).toLocaleDateString('en-GB', {
+                  day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A' %>
+                </p>
+              </div>
+              <div
+                class="border border-gray-200 rounded-md p-4 sm:col-span-2"
+                data-aos="fade-in"
+                data-aos-duration="600"
+                data-aos-delay="450"
+              >
+                <span class="text-sm font-semibold text-gray-900">Country</span>
+                <p
+                  id="country-value"
+                  class="text-sm sm:text-base font-medium text-gray-700 mt-1"
+                  aria-describedby="country-value"
+                >
+                  <%= invoice.country || 'N/A' %>
+                </p>
+              </div>
+            </div>
+            <div class="mt-8 flex space-x-6 justify-center">
+              <a
+                href="/invoice/<%= invoice._id %>"
+                class="inline-flex items-center bg-emerald-600 text-white px-6 py-2.5 rounded-md font-semibold shadow-sm btn-hover focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all"
+                aria-label="Download invoice <%= invoice._id %> for <%= invoice.plan || 'payment' %>"
+                data-aos="fade-in"
+                data-aos-duration="600"
+                data-aos-delay="500"
+              >
+                <svg
+                  class="w-5 h-5 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                  />
+                </svg>
+                Download PDF
+              </a>
+              <a
+                href="/invoices"
+                class="inline-flex items-center bg-gray-500 text-white px-6 py-2.5 rounded-md font-semibold shadow-sm btn-hover focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-all"
+                aria-label="Back to invoices list"
+                data-aos="fade-in"
+                data-aos-duration="600"
+                data-aos-delay="550"
+              >
+                <svg
+                  class="w-5 h-5 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+                Back to Invoices
+              </a>
+            </div>
+          </section>
+        </main>
+        <%- include('../partials/footer.ejs') %>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        if (typeof AOS === "undefined") {
+          console.error("AOS library failed to load");
+          return;
+        }
+        AOS.init({
+          once: true,
+          offset: 100,
+          duration: 600,
+          easing: "ease-out",
+        });
+        console.log("AOS initialized for invoice view page");
+      });
+    </script>
+  </body>
+</html>
