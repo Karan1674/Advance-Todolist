@@ -6,7 +6,7 @@
 
 <body class="min-h-screen bg-gray-100 flex flex-col">
   <%- include('../partials/navbar') %>
-
+  <%- include('../partials/toast.ejs') %>
   <div class="flex min-h-screen flex-grow">
     <%- include('../partials/sidebar') %>
     <div>
@@ -175,6 +175,7 @@
     <%- include("../partials/footer") %>
     </div>
   </div>
+  <%- include('../partials/mediaPop') %>
 
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>
@@ -188,13 +189,7 @@
       });
     });
 
-    const editor = new Jodit("#editor", {
-      height: 400,
-      toolbarAdaptive: false,
-      uploader: {
-        insertImageAsBase64URI: true
-      }
-    });
+  
 
     const handleSubTargets = () => {
       const subtargetsBox = document.querySelector(".subtargetsBox");

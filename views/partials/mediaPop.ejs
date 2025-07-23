@@ -57,7 +57,7 @@
         />
         <button
           class="bg-emerald-600 text-white px-5 py-3 rounded-lg hover:bg-emerald-700 focus:ring-2 focus:ring-emerald-500 transition-all duration-200 flex items-center gap-2"
-          onclick="window.location.href='/medialibrary'"
+          id="AddMedia"
           aria-label="Add new media"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -148,6 +148,112 @@
     </div>
   </div>
 </div>
+
+
+
+
+
+<div
+    id="popupMedia"
+    class="fixed hidden bg-black bg-opacity-60 inset-0 flex justify-center items-center z-50"
+    data-aos="zoom-in"
+    data-aos-duration="500"
+  >
+    <div class="bg-white w-full max-w-lg p-8 rounded-2xl shadow-2xl relative">
+      <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">Add Media</h3>
+      <div class="flex justify-center gap-4 mb-6">
+        <button
+          id="showMediaDataPop"
+          class="flex-1 py-2.5 text-sm font-semibold bg-gray-100 rounded-lg hover:bg-gray-200 btn-hover focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          aria-label="Upload image"
+        >
+          Upload Image
+        </button>
+        <button
+          id="showUrlDataPop"
+          class="flex-1 py-2.5 text-sm font-semibold bg-gray-100 rounded-lg hover:bg-gray-200 btn-hover focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          aria-label="Add image URL"
+        >
+          Add URL
+        </button>
+      </div>
+      <form
+        action="#"
+        method="post"
+        enctype="multipart/form-data"
+        class="mediaFormPop flex flex-col gap-5"
+      >
+        <div
+          class="showMediaPop flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-all duration-200"
+          onclick="document.getElementById('mediaInputPop').click()"
+        >
+          <label class="image-name text-gray-600 font-medium">Click to upload an image</label>
+          <input
+            id="mediaInputPop"
+            type="file"
+            name="mediaImage"
+            accept="image/*"
+            class="hidden"
+            aria-label="Upload media image"
+          />
+        </div>
+        <div class="showurlPop hidden flex flex-col w-full">
+          <input
+            id="urlInputPop"
+            type="text"
+            name="url"
+            placeholder="Enter image URL (e.g., https://example.com/image.jpg)"
+            class="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 input-focus text-gray-900"
+            aria-label="Image URL"
+            aria-describedby="url-help"
+          />
+          <p id="url-help" class="text-xs text-gray-500 mt-1">Enter a valid image URL.</p>
+        </div>
+        <input
+          id="tagInputPop"
+          name="tag"
+          type="text"
+          placeholder="Enter tags (comma-separated)"
+          class="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 input-focus text-gray-900 placeholder-gray-400"
+          aria-label="Media tags"
+          aria-describedby="tag-help"
+        />
+        <p id="tag-help" class="text-xs text-gray-500">Separate tags with commas (e.g., nature, landscape).</p>
+        <div class="flex justify-end gap-4">
+          <button
+            type="button"
+            class="px-5 py-2.5 bg-gray-200 text-gray-900 rounded-lg font-semibold btn-hover focus:ring-2 focus:ring-gray-300"
+            onclick="closePopup()"
+            aria-label="Cancel media upload"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="px-5 py-2.5 bg-emerald-600 text-white rounded-lg font-semibold btn-hover focus:ring-2 focus:ring-emerald-500 flex items-center gap-2"
+            aria-label="Submit media"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Submit
+          </button>
+        </div>
+      </form>
+      <button
+        class="absolute right-4 top-4 text-gray-500 hover:text-gray-900 focus:ring-2 focus:ring-gray-300 rounded-full p-2"
+        onclick="closePopup()"
+        aria-label="Close media upload popup"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+
+
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
@@ -297,6 +403,89 @@
   document.querySelectorAll("[data-modal-hide='default-modal']").forEach((btn) => {
     btn.addEventListener("click", toggleModal);
   });
+
+
+      const mediaFormPop = document.querySelector(".mediaFormPop");
+    const showMediaPop = document.querySelector(".showMediaPop");
+    const showUrlPop = document.querySelector(".showurlPop");
+    const mediaInputPop = document.getElementById("mediaInputPop");
+    const urlInputPop = document.getElementById("urlInputPop");
+    const tagInputPop = document.getElementById("tagInputPop");
+
+
+
+     // Media upload popup toggle
+    document.getElementById("AddMedia").addEventListener("click", () => {
+      document.getElementById("popupMedia").classList.remove("hidden");
+    });
+
+    // Close popup
+    function closePopup() {
+      mediaFormPop.reset();
+      document.querySelector(".image-name").textContent = "Click to upload an image";
+      showMediaPop.classList.remove("hidden");
+      showUrlPop.classList.add("hidden");
+      document.getElementById("popupMedia").classList.add("hidden");
+    }
+
+    // Toggle between image upload and URL input
+    document.getElementById("showMediaDataPop").addEventListener("click", () => {
+      showMediaPop.classList.remove("hidden");
+      showUrlPop.classList.add("hidden");
+      urlInputPop.value = "";
+      tagInputPop.value = "";
+      document.getElementById("showMediaDataPop").classList.add("bg-emerald-100", "text-emerald-700");
+      document.getElementById("showUrlDataPop").classList.remove("bg-emerald-100", "text-emerald-700");
+    });
+
+    document.getElementById("showUrlDataPop").addEventListener("click", () => {
+      showMediaPop.classList.add("hidden");
+      showUrlPop.classList.remove("hidden");
+      mediaInputPop.value = "";
+      tagInputPop.value = "";
+      document.getElementById("showUrlDataPop").classList.add("bg-emerald-100", "text-emerald-700");
+      document.getElementById("showMediaDataPop").classList.remove("bg-emerald-100", "text-emerald-700");
+    });
+
+    // Display selected file name
+    mediaInputPop.addEventListener("change", function (event) {
+      const file = event.target.files[0];
+      const label = document.querySelector(".image-name");
+      if (file) {
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if (file.size > maxSize) {
+          alert("File size exceeds 5MB. Please choose a smaller image.");
+          event.target.value = "";
+          label.textContent = "Click to upload an image";
+        } else {
+          label.textContent = `Selected: ${file.name}`;
+        }
+      }
+    });
+
+    document.querySelector('.mediaFormPop').addEventListener('submit',async()=>{
+      try {
+        event.preventDefault();
+        const formData = new FormData(mediaFormPop);
+        const response = await fetch('/media/upload', {
+          method: 'POST',
+          body: formData
+        });
+        if (response.ok) {
+          closePopup();
+      
+        } else {
+          alert('Failed to upload media.');
+        }
+      } catch (error) {
+        
+      }
+      finally{
+
+
+      }
+    })
+
 </script>
 <style>
   #default-modal:not(.hidden) {

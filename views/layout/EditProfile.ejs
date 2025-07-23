@@ -5,6 +5,7 @@
 
   <body class="min-h-screen bg-gray-100 flex flex-col font-sans">
     <%- include('../partials/navbar') %>
+      <%- include('../partials/toast.ejs') %>
 
     <div class="flex min-h-screen flex-grow">
       <%- include('../partials/sidebar') %>
@@ -110,7 +111,7 @@
                   data-aos="fade-up"
                   data-aos-duration="400"
                   data-aos-delay="400"
-                  onerror="this.src='/public/assets/placeholder.jpg';"
+       
                 />
                 <% } %>
               </div>

@@ -6,20 +6,17 @@
 
 <body class="min-h-screen bg-gray-100 flex flex-col font-sans">
   <%- include('../partials/navbar') %>
-
+  <%- include('../partials/toast.ejs') %>
   <div class="flex min-h-screen flex-grow">
     <%- include('../partials/sidebar') %>
-    <div class="flex-grow ">
-      <div class="mx-auto m-12 py-8 px-4 sm:px-6 max-w-4xl shadow-lg bg-white rounded-xl p-6 sm:p-8" data-aos="fade-up" data-aos-duration="400">
+    <div class="flex-grow w-full flex justify-between flex-col ">
+      <div class="mx-auto my-12 py-8 px-4 sm:px-6 max-w-5xl shadow-lg bg-white rounded-xl p-6 sm:p-8" data-aos="fade-up" data-aos-duration="400">
         <form action="/assigntask" method="post" enctype="multipart/form-data" class="flex flex-col gap-6">
           <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-6" data-aos="fade-up" data-aos-duration="400" data-aos-delay="100">
-            Add a New Task
+            Assign a New Task
           </h2>
 
-          <% if(typeof error !== 'undefined' && error) { %>
-            <p class="text-red-500 text-sm text-center" data-aos="fade-in" data-aos-duration="400"><%= error %></p>
-          <% } %>
-
+     
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" data-aos="fade-up" data-aos-duration="400" data-aos-delay="200">
             <div class="flex flex-col gap-2">
               <label for="title" class="text-sm font-semibold text-gray-700">Title</label>
@@ -63,6 +60,7 @@
             <input
               type="text"
               id="searchUser"
+              required
               placeholder="Search by name or email..."
               class="w-full p-3 text-sm text-gray-800 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition"
               aria-label="Search users to assign task"
@@ -98,6 +96,7 @@
                 type="date"
                 id="deadline"
                 name="deadline"
+                required
                 class="w-full p-3 text-sm text-gray-800 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition"
                 aria-label="Task deadline"
               />
@@ -108,6 +107,7 @@
                 type="date"
                 id="followup"
                 name="followup"
+                required
                 class="w-full p-3 text-sm text-gray-800 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition"
                 aria-label="Task follow-up date"
               />

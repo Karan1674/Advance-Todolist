@@ -14,7 +14,7 @@ const userStoragelimit = require("./models/userStoragelimit");
 const puppeteer = require("puppeteer");
 const fs = require("fs");
 const ejs = require("ejs");
-const PDFDocument = require('pdfkit');
+const PDFDocument = require("pdfkit");
 dotenv.config();
 const { OAuth2Client } = require("google-auth-library");
 const stripe = require("stripe")(process.env.Stripe_Secret_key);
@@ -36,6 +36,7 @@ const port = 3000;
 
 app.use(cookieParser());
 
+// Multer 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "uploads");
@@ -53,6 +54,7 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use("/task-reports", express.static(path.join("task-reports")));
 
+// Creating Razerpay Instance for RazerPay payment
 const razorPayInstance = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRET,
@@ -66,6 +68,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(express.urlencoded({ extended: true }));
 
+// Middleware to Check Authenication of a user
 const isAuthenicated = async (req, res, next) => {
   try {
     const token = req.cookies.token;
@@ -101,6 +104,7 @@ const isAuthenicated = async (req, res, next) => {
   }
 };
 
+//Middleware to check the Current user is Admin or not
 const isAdminCheck = async (req, res, next) => {
   const userId = req.id;
   if (userId) {
@@ -116,6 +120,7 @@ const isAdminCheck = async (req, res, next) => {
   next();
 };
 
+// Home Page Route
 app.get("/", isAuthenicated, isAdminCheck, async (req, res) => {
   const userId = req.id;
 
@@ -146,6 +151,7 @@ app.get("/", isAuthenicated, isAdminCheck, async (req, res) => {
   });
 });
 
+// SIgnup User Page Route
 app.get("/signupPage/:plan", async (req, res) => {
   const token = req.cookies.token;
   const toastMessage = req.query.message || "";
@@ -164,11 +170,11 @@ app.get("/signupPage/:plan", async (req, res) => {
   }
 });
 
+// Manual Signup User Submission Route
 app.post("/userSignUp", upload.single("profilePic"), async (req, res) => {
   try {
     const { firstName, lastName, email, password } = req.body;
     const profilePic = req.file;
-    
 
     if (!firstName || !lastName || !email || !password || !profilePic) {
       return res.redirect(
@@ -206,6 +212,7 @@ app.post("/userSignUp", upload.single("profilePic"), async (req, res) => {
   }
 });
 
+// Login User Page Route
 app.get("/loginPage", async (req, res) => {
   const token = req.cookies.token;
   const toastMessage = req.query.message || "";
@@ -218,6 +225,7 @@ app.get("/loginPage", async (req, res) => {
   }
 });
 
+// User Login Submission Route
 app.post("/userlogin", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -263,6 +271,7 @@ app.post("/userlogin", async (req, res) => {
   }
 });
 
+// Google Signup And Login Route
 app.post("/googleSignIn/:plan", async (req, res) => {
   try {
     const { credential } = req.body;
@@ -329,6 +338,7 @@ app.post("/googleSignIn/:plan", async (req, res) => {
   }
 });
 
+// Forget Password Page Route
 app.get("/forgetPassword", async (req, res) => {
   try {
     const toastMessage = req.query.message || "";
@@ -339,6 +349,7 @@ app.get("/forgetPassword", async (req, res) => {
   }
 });
 
+// Function To Generate Otp
 function generateOtp() {
   let otp = "";
   for (let i = 0; i < 6; i++) {
@@ -347,6 +358,7 @@ function generateOtp() {
   return otp;
 }
 
+// Function to Validate Otp
 function validateOtp(otpNumber, otp) {
   if (otpNumber == otp) {
     return true;
@@ -354,6 +366,7 @@ function validateOtp(otpNumber, otp) {
   return false;
 }
 
+// Forget Password Submission Route
 app.post("/forgetPassword", async (req, res) => {
   try {
     const { email } = req.body;
@@ -380,9 +393,9 @@ app.post("/forgetPassword", async (req, res) => {
   }
 });
 
+// Otp Verification Route
 app.post("/validateOtp", async (req, res) => {
   try {
-    
     const { email, otpNumber } = req.body;
 
     if (!email || !otpNumber) {
@@ -413,6 +426,7 @@ app.post("/validateOtp", async (req, res) => {
   }
 });
 
+// Reset Password Route
 app.post("/resetPassword", async (req, res) => {
   try {
     const { email, password, confirmPassword } = req.body;
@@ -450,6 +464,7 @@ app.post("/resetPassword", async (req, res) => {
   }
 });
 
+// Logout User Route
 app.get("/logout", isAuthenicated, (req, res) => {
   try {
     res.clearCookie("token");
@@ -459,10 +474,10 @@ app.get("/logout", isAuthenicated, (req, res) => {
   }
 });
 
+// Task List Route
 app.get("/task", isAuthenicated, isAdminCheck, async (req, res) => {
-  
   try {
-        const toastMessage = req.query.message || "";
+    const toastMessage = req.query.message || "";
     const toastType = req.query.type || "info"; // success, error, or inf
     const userId = req.id;
     const isAdmin = req.isAdmin;
@@ -476,7 +491,7 @@ app.get("/task", isAuthenicated, isAdminCheck, async (req, res) => {
         isAdmin,
         isShow: true,
         toastMessage,
-        toastType
+        toastType,
       });
     } else if (userData) {
       return res.render("layout/todolist.ejs", {
@@ -485,35 +500,51 @@ app.get("/task", isAuthenicated, isAdminCheck, async (req, res) => {
         isAdmin,
         isShow: true,
         toastMessage,
-        toastType
+        toastType,
       });
     } else {
-      return res.redirect("/loginPage");
+      return res.redirect("/loginPage?message=User not found&type=error");
     }
   } catch (error) {
-    console.log(error);
+    console.error("Error in /task route:", error);
+    return res.redirect("/errorpage?message=Error fetching tasks&type=error");
   }
 });
 
+// Add Task Page Route
 app.get("/addtask", isAuthenicated, isAdminCheck, async (req, res) => {
   try {
+    const toastMessage = req.query.message || "";
+    const toastType = req.query.type || "info";
     const userId = req.id;
     const isAdmin = req.isAdmin;
     const userData = await user.findById(userId);
     const media = await mediaLibrary.findOne({ userId });
 
     if (userData) {
-      res.render("layout/addTask", { user: userData, isAdmin, media });
+      res.render("layout/addTask", {
+        user: userData,
+        isAdmin,
+        media,
+        toastMessage,
+        toastType,
+      });
     } else {
-      return res.redirect("/loginPage");
+      return res.redirect("/loginPage?message=User not found&type=error");
     }
   } catch (error) {
-    console.log("error", error);
+    console.error("Error in /addtask route:", error);
+    return res.redirect(
+      "/errorpage?message=Error loading add task page&type=error"
+    );
   }
 });
 
+// Assign Task Page Route
 app.get("/assigntask", isAuthenicated, isAdminCheck, async (req, res) => {
   try {
+    const toastMessage = req.query.message || "";
+    const toastType = req.query.type || "info";
     const userId = req.id;
     const isAdmin = req.isAdmin;
     const userData = await user.findById(userId);
@@ -526,16 +557,23 @@ app.get("/assigntask", isAuthenicated, isAdminCheck, async (req, res) => {
         isAdmin,
         allUsers,
         media,
+        toastMessage,
+        toastType,
       });
     } else {
-      return res.redirect("/loginPage");
+      return res.redirect("/loginPage?message=User not found&type=error");
     }
   } catch (error) {
-    console.log("error", error);
+    console.error("Error in /assigntask route:", error);
+    return res.redirect(
+      "/errorpage?message=Error loading assign task page&type=error"
+    );
   }
 });
 
-app.post("/addtask",
+// Add Task Submission Route
+app.post(
+  "/addtask",
   isAuthenicated,
   upload.single("taskImage"),
   async (req, res) => {
@@ -567,7 +605,9 @@ app.post("/addtask",
         !status ||
         !priority
       ) {
-        res.redirect("/addtask");
+        return res.redirect(
+          "/addtask?message=All fields are required&type=error"
+        );
       }
 
       const subTargets = [];
@@ -594,14 +634,17 @@ app.post("/addtask",
 
       await newTask.save();
 
-      res.redirect("/task");
+      res.redirect("/task?message=Task added successfully&type=success");
     } catch (error) {
-      console.log("Error", error);
+      console.error("Error in /addtask POST route:", error);
+      res.redirect("/addtask?message=Error adding task&type=error");
     }
   }
 );
 
-app.post("/assigntask",
+// Assign Task Submission Route
+app.post(
+  "/assigntask",
   isAuthenicated,
   isAdminCheck,
   upload.single("taskImage"),
@@ -635,7 +678,9 @@ app.post("/assigntask",
         !priority ||
         !assignedTo
       ) {
-        res.redirect("/assigntask");
+        return res.redirect(
+          "/assigntask?message=All fields are required&type=error"
+        );
       }
 
       const subTargets = [];
@@ -662,18 +707,19 @@ app.post("/assigntask",
 
       await newTask.save();
 
-      res.redirect("/assignedtask");
+      res.redirect(
+        "/assignedtask?message=Task assigned successfully&type=success"
+      );
     } catch (error) {
-      console.log("Error", error);
+      console.error("Error in /assigntask POST route:", error);
+      res.redirect("/assigntask?message=Error assigning task&type=error");
     }
   }
 );
 
-// app.get("/back", isAuthenicated, async (req, res) => {
-//   res.redirect("back");
-// });
-
-app.post("/deletetask/:taskId",
+// Delete Task Route
+app.post(
+  "/deletetask/:taskId",
   isAuthenicated,
   isAdminCheck,
   async (req, res) => {
@@ -681,50 +727,69 @@ app.post("/deletetask/:taskId",
       const { taskId } = req.params;
       const isAdmin = req.isAdmin;
       if (!taskId) {
-        console.log("Task ID required");
-        return res.redirect("/");
+        return res.redirect(
+          `/${
+            isAdmin ? "assignedtask" : "task"
+          }?message=Task ID required&type=error`
+        );
+      }
+
+      const taskToDelete = await task.findById(taskId);
+      if (!taskToDelete) {
+        return res.redirect(
+          `/${
+            isAdmin ? "assignedtask" : "task"
+          }?message=Task not found&type=error`
+        );
       }
 
       await task.findByIdAndDelete(taskId);
       await comments.deleteMany({ taskId });
 
-      console.log(`Task ${taskId} deleted`);
-      if (isAdmin) {
-        res.redirect("/assignedtask");
-      } else {
-        res.redirect("/task");
-      }
+      res.redirect(
+        `/${
+          isAdmin ? "assignedtask" : "task"
+        }?message=Task deleted successfully&type=success`
+      );
     } catch (error) {
-      console.log("error", error);
+      console.error("Error in /deletetask route:", error);
+      res.redirect(
+        `/${
+          req.isAdmin ? "assignedtask" : "task"
+        }?message=Error deleting task&type=error`
+      );
     }
   }
 );
 
-app.get("/taskDetail/:taskId",
+// Task Detail Route
+app.get(
+  "/taskDetail/:taskId",
   isAuthenicated,
   isAdminCheck,
   async (req, res) => {
     try {
+      const toastMessage = req.query.message || "";
+      const toastType = req.query.type || "info";
       const userId = req.id;
       const isAdmin = req.isAdmin;
       const { taskId } = req.params;
       if (!taskId) {
-        return res.redirect("/task");
+        return res.redirect("/task?message=Task ID required&type=error");
       }
 
       const userData = await user.findById(userId);
       const todoTask = await task.findById(taskId);
       const taskComments = await comments.find({ taskId });
-      let isShow = false;
 
       if (!todoTask) {
-        console.log("No such task exit in the database");
-        return res.redirect("/task");
+        return res.redirect("/task?message=Task not found&type=error");
       }
 
+      let isShow = false;
       if (isAdmin) {
         isShow = true;
-      } else if (todoTask.assignedBy == "admin") {
+      } else if (todoTask.assignedBy === "admin") {
         isShow = false;
       } else {
         isShow = true;
@@ -736,37 +801,61 @@ app.get("/taskDetail/:taskId",
         user: userData,
         isAdmin,
         isShow,
+        toastMessage,
+        toastType,
       });
     } catch (error) {
-      console.log("error", error);
+      console.error("Error in /taskDetail route:", error);
+      res.redirect("/task?message=Error loading task details&type=error");
     }
   }
 );
 
-app.get("/edittaskpage/:taskId",
+// Edit Task Page Route
+app.get(
+  "/edittaskpage/:taskId",
   isAuthenicated,
   isAdminCheck,
   async (req, res) => {
     try {
+      const toastMessage = req.query.message || "";
+      const toastType = req.query.type || "info";
       const userId = req.id;
       const isAdmin = req.isAdmin;
       const { taskId } = req.params;
+      const media = await mediaLibrary.findOne({ userId });
+
       if (!taskId) {
-        return res.redirect("errorpage");
+        return res.redirect("/errorpage?message=Task ID required&type=error");
       }
 
       const userData = await user.findById(userId);
       const todoTask = await task.findById(taskId);
+
+      if (!todoTask) {
+        return res.redirect("/errorpage?message=Task not found&type=error");
+      }
+
       res.render("layout/EditTaskPage", {
         task: todoTask,
         user: userData,
         isAdmin,
+        media,
+        toastMessage,
+        toastType,
       });
-    } catch (error) {}
+    } catch (error) {
+      console.error("Error in /edittaskpage route:", error);
+      res.redirect(
+        "/errorpage?message=Error loading edit task page&type=error"
+      );
+    }
   }
 );
 
-app.post("/editTask/:taskId",
+// Edit Task Submission Route
+app.post(
+  "/editTask/:taskId",
   isAuthenicated,
   upload.single("taskImage"),
   async (req, res) => {
@@ -776,8 +865,8 @@ app.post("/editTask/:taskId",
       const todoTask = await task.findById(taskId);
 
       if (!todoTask) {
-        console.log("No such task exit in the database");
-        return res.redirect("/");
+        console.error("No such task exists in the database, taskId:", taskId);
+        return res.redirect(`/task?message=Task not found&type=error`);
       }
 
       const {
@@ -790,6 +879,19 @@ app.post("/editTask/:taskId",
         subtargets,
         completed,
       } = req.body;
+
+      if (
+        !title ||
+        !discription ||
+        !deadline ||
+        !followup ||
+        !status ||
+        !priority
+      ) {
+        return res.redirect(
+          `/taskDetail/${taskId}?message=All fields are required&type=error`
+        );
+      }
 
       const subTargets = [];
       subtargets &&
@@ -816,26 +918,36 @@ app.post("/editTask/:taskId",
       }
       await task.findByIdAndUpdate(taskId, { ...editTask });
 
-      // const updatedTask = await task.findById(taskId);
-      // const taskComments = await comments.find({ taskId })
-      // res.render('layout/todoDetail', { task: updatedTask, comments: taskComments });
-      res.redirect("/taskDetail/" + taskId);
+      res.redirect(
+        `/taskDetail/${taskId}?message=Task updated successfully&type=success`
+      );
     } catch (error) {
-      console.log("error", error);
+      console.error("Error in /editTask route:", error);
+      res.redirect(
+        `/taskDetail/${req.params.taskId}?message=Error updating task&type=error`
+      );
     }
   }
 );
 
-app.get("/editAdminpage/:taskId",
+// Edit Admin Task Page Route
+app.get(
+  "/editAdminpage/:taskId",
   isAuthenicated,
   isAdminCheck,
   async (req, res) => {
     try {
+      const toastMessage = req.query.message || "";
+      const toastType = req.query.type || "info";
       const userId = req.id;
       const isAdmin = req.isAdmin;
       const { taskId } = req.params;
+      const media = await mediaLibrary.findOne({ userId });
+
       if (!taskId) {
-        return res.redirect("/errorpage&message=Task ID is required&type=error");
+        return res.redirect(
+          "/errorpage?message=Task ID is required&type=error"
+        );
       }
 
       const userData = await user.findById(userId);
@@ -843,29 +955,42 @@ app.get("/editAdminpage/:taskId",
       const Users = await user.find();
       const allUsers = Users.filter((u) => u.email !== process.env.AdminEmail);
 
+      if (!todoTask) {
+        return res.redirect("/errorpage?message=Task not found&type=error");
+      }
+
       res.render("layout/EditAdminPage", {
         task: todoTask,
         user: userData,
         isAdmin,
         allUsers,
+        media,
+        toastMessage,
+        toastType,
       });
-    } catch (error) {}
+    } catch (error) {
+      console.error("Error in /editAdminpage route:", error);
+      res.redirect(
+        "/errorpage?message=Error loading admin edit page&type=error"
+      );
+    }
   }
 );
 
-app.post("/editAdminTask/:taskId",
+// Edit Admin Task Submission Route
+app.post(
+  "/editAdminTask/:taskId",
   isAuthenicated,
   isAdminCheck,
   upload.single("taskImage"),
   async (req, res) => {
     try {
       const { taskId } = req.params;
-
       const todoTask = await task.findById(taskId);
 
       if (!todoTask) {
-        console.log("No such task exit in the database");
-        return res.redirect("/");
+        console.error("No such task exists in the database, taskId:", taskId);
+        return res.redirect("/assignedtask?message=Task not found&type=error");
       }
 
       const {
@@ -880,8 +1005,22 @@ app.post("/editAdminTask/:taskId",
         assignedTo,
       } = req.body;
 
+      if (
+        !title ||
+        !discription ||
+        !deadline ||
+        !followup ||
+        !status ||
+        !priority ||
+        !assignedTo
+      ) {
+        return res.redirect(
+          `/editAdminpage/${taskId}?message=All fields are required&type=error`
+        );
+      }
+
       const subTargets = [];
-      subtargets &&
+      if (subtargets) {
         subtargets.forEach((data, index) => {
           const isCompleted = completed && completed.includes(String(index));
           subTargets.push({
@@ -889,6 +1028,7 @@ app.post("/editAdminTask/:taskId",
             completed: isCompleted,
           });
         });
+      }
 
       const editTask = {
         userId: assignedTo,
@@ -904,116 +1044,186 @@ app.post("/editAdminTask/:taskId",
       if (req.file) {
         editTask.filename = req.file.filename;
       }
-      await task.findByIdAndUpdate(taskId, { ...editTask });
 
-      res.redirect("/assignedtask");
+      await task.findByIdAndUpdate(taskId, { ...editTask });
+      res.redirect(
+        "/assignedtask?message=Task updated successfully&type=success"
+      );
     } catch (error) {
-      console.log("error", error);
+      console.error("Error in /editAdminTask route:", error);
+      res.redirect(
+        `/editAdminpage/${req.params.taskId}?message=Error updating task&type=error`
+      );
     }
   }
 );
 
-app.post("/addComment/:taskId",
+// Add Comment Route
+app.post(
+  "/addComment/:taskId",
   isAuthenicated,
   upload.single("commentfile"),
   async (req, res) => {
-    const { comment } = req.body;
-    const { taskId } = req.params;
-
-    if (!comment || !taskId) {
-      console.log("Missing comment or task ID");
-      return res.redirect("/taskDetail/" + taskId);
-    }
-
-    let commentfile = "";
-    if (req.file) {
-      commentfile = req.file.filename;
-    }
-
     try {
+      const { comment } = req.body;
+      const { taskId } = req.params;
+
+      if (!comment || !taskId) {
+        console.error("Missing comment or taskId:", { comment, taskId });
+        return res.redirect(
+          `/taskDetail/${taskId}?message=Missing comment or task ID&type=error`
+        );
+      }
+
+      let commentfile = "";
+      if (req.file) {
+        commentfile = req.file.filename;
+      }
+
       const newComment = new comments({ comment, taskId, commentfile });
       await newComment.save();
 
-      res.redirect("/taskDetail/" + taskId);
+      res.redirect(
+        `/taskDetail/${taskId}?message=Comment added successfully&type=success`
+      );
     } catch (error) {
-      console.log("Error saving comment:", error);
-      // res.redirect('/taskDetail/' + taskId);
+      console.error("Error in /addComment route:", error);
+      res.redirect(
+        `/taskDetail/${req.params.taskId}?message=Error adding comment&type=error`
+      );
     }
   }
 );
 
-app.get("/commentfileShow/:commentId",
+// Comment File Show Route
+app.get(
+  "/commentfileShow/:commentId",
   isAuthenicated,
   isAdminCheck,
   async (req, res) => {
-    const { commentId } = req.params;
-    const userId = req.id;
-    const isAdmin = req.isAdmin;
-    if (!commentId) {
-      return res.redirect("/errorpage");
-    }
+    try {
+      const toastMessage = req.query.message || "";
+      const toastType = req.query.type || "info";
+      const { commentId } = req.params;
+      const userId = req.id;
+      const isAdmin = req.isAdmin;
 
-    const userData = await user.findById(userId);
-    const commentData = await comments.findById(commentId);
-    res.render("layout/commentFile", { commentData, user: userData, isAdmin });
+      if (!commentId) {
+        return res.redirect(
+          "/errorpage?message=Comment ID required&type=error"
+        );
+      }
+
+      const userData = await user.findById(userId);
+      const commentData = await comments.findById(commentId);
+
+      if (!commentData) {
+        return res.redirect("/errorpage?message=Comment not found&type=error");
+      }
+
+      res.render("layout/commentFile", {
+        commentData,
+        user: userData,
+        isAdmin,
+        toastMessage,
+        toastType,
+      });
+    } catch (error) {
+      console.error("Error in /commentfileShow route:", error);
+      res.redirect("/errorpage?message=Error loading comment file&type=error");
+    }
   }
 );
 
+// Admin Task List Route (User Perspective)
 app.get("/Admintask", isAuthenicated, async (req, res) => {
   try {
+    const toastMessage = req.query.message || "";
+    const toastType = req.query.type || "info";
     const isAdmin = false;
     const userId = req.id;
+
     if (!userId) {
-      return res.redirect("/task");
+      return res.redirect("/task?message=User ID required&type=error");
     }
 
     const userData = await user.findById(userId);
 
+    if (!userData) {
+      return res.redirect("/task?message=User not found&type=error");
+    }
+
     const todo = await task.find({ userId }).sort({ createdAt: -1 });
     const todolist = todo.filter((t) => t.assignedBy === "admin");
+
     res.render("layout/todolist", {
       user: userData,
       isAdmin,
       todolist,
       isShow: false,
+      toastMessage,
+      toastType,
     });
-  } catch (error) {}
+  } catch (error) {
+    console.error("Error in /Admintask route:", error);
+    res.redirect("/task?message=Error loading admin tasks&type=error");
+  }
 });
 
+// Assigned Task List Route (Admin Perspective)
 app.get("/assignedtask", isAuthenicated, isAdminCheck, async (req, res) => {
   try {
+    const toastMessage = req.query.message || "";
+    const toastType = req.query.type || "info";
     const isAdmin = req.isAdmin;
     const userId = req.id;
+
     if (!userId) {
-      return res.redirect("/task");
+      return res.redirect("/task?message=User ID required&type=error");
     }
 
     const userData = await user.findById(userId);
 
-    const todo = await task.find().populate("userId").sort({ createdAt: -1 });
+    if (!userData) {
+      return res.redirect("/task?message=User not found&type=error");
+    }
 
+    const todo = await task.find().populate("userId").sort({ createdAt: -1 });
     const todolist = todo.filter((t) => t.assignedBy === "admin");
 
     res.render("layout/AdminTaskShow", {
       user: userData,
       isAdmin,
       todolist,
+      toastMessage,
+      toastType,
     });
-  } catch (error) {}
+  } catch (error) {
+    console.error("Error in /assignedtask route:", error);
+    res.redirect("/task?message=Error loading assigned tasks&type=error");
+  }
 });
 
+// Profile Page Route
 app.get("/profile", isAuthenicated, isAdminCheck, async (req, res) => {
   try {
+    const toastMessage = req.query.message || "";
+    const toastType = req.query.type || "info";
     const isAdmin = req.isAdmin;
     const userId = req.id;
+
     if (!userId) {
-      return res.redirect("/task");
+      return res.redirect("/task?message=User ID required&type=error");
     }
 
     const userData = await user.findById(userId);
+
+    if (!userData) {
+      return res.redirect("/task?message=User not found&type=error");
+    }
+
     const totalTask = await task.find();
     const todolist = await task.find({ userId });
-
     const adminAssignedtask = totalTask.filter(
       (t) => t.assignedBy === "admin"
     ).length;
@@ -1023,29 +1233,48 @@ app.get("/profile", isAuthenicated, isAdminCheck, async (req, res) => {
       isAdmin,
       todolist,
       adminAssignedtask,
+      toastMessage,
+      toastType,
     });
-  } catch (error) {}
+  } catch (error) {
+    console.error("Error in /profile route:", error);
+    res.redirect("/task?message=Error loading profile&type=error");
+  }
 });
 
+// Edit Profile Page Route
 app.get("/edit-profilePage", isAuthenicated, isAdminCheck, async (req, res) => {
   try {
+    const toastMessage = req.query.message || "";
+    const toastType = req.query.type || "info";
     const isAdmin = req.isAdmin;
     const userId = req.id;
+
     if (!userId) {
-      return res.redirect("/task");
+      return res.redirect("/task?message=User ID required&type=error");
     }
 
     const userData = await user.findById(userId);
-    if (userData) {
-      res.render("layout/EditProfile", {
-        isAdmin,
-        user: userData,
-      });
+
+    if (!userData) {
+      return res.redirect("/task?message=User not found&type=error");
     }
-  } catch (error) {}
+
+    res.render("layout/EditProfile", {
+      isAdmin,
+      user: userData,
+      toastMessage,
+      toastType,
+    });
+  } catch (error) {
+    console.error("Error in /edit-profilePage route:", error);
+    res.redirect("/task?message=Error loading edit profile page&type=error");
+  }
 });
 
-app.post("/editProfile",
+// Edit Profile Submission Route
+app.post(
+  "/editProfile",
   isAuthenicated,
   isAdminCheck,
   upload.single("profilePic"),
@@ -1053,14 +1282,16 @@ app.post("/editProfile",
     try {
       const userId = req.id;
       if (!userId) {
-        return res.redirect("/");
+        return res.redirect("/task?message=User ID required&type=error");
       }
-      const { firstName, lastName } = req.body;
 
+      const { firstName, lastName } = req.body;
       const profilePic = req.file;
 
       if (!firstName || !lastName) {
-        return res.redirect("/profile");
+        return res.redirect(
+          "/edit-profilePage?message=First and last name are required&type=error"
+        );
       }
 
       const updateUser = {
@@ -1075,30 +1306,59 @@ app.post("/editProfile",
       const userData = await user.findByIdAndUpdate(userId, updateUser);
 
       if (userData) {
-        return res.redirect("/profile");
+        return res.redirect(
+          "/profile?message=Profile updated successfully&type=success"
+        );
       } else {
-        return res.redirect("/");
+        return res.redirect("/task?message=User not found&type=error");
       }
-    } catch (error) {}
+    } catch (error) {
+      console.error("Error in /editProfile route:", error);
+      res.redirect(
+        "/edit-profilePage?message=Error updating profile&type=error"
+      );
+    }
   }
 );
 
+// Media Library Page Route
 app.get("/medialibrary", isAuthenicated, isAdminCheck, async (req, res) => {
   try {
+    const toastMessage = req.query.message || req.query.error || "";
+    const toastType = req.query.type || (req.query.error ? "error" : "info");
     const userId = req.id;
     const isAdmin = req.isAdmin;
-    if (userId) {
-      const userData = await user.findById(userId);
-      let media = await mediaLibrary.findOne({ userId });
-      if (!media) {
-        media = "";
-      }
-      res.render("layout/MediaLibrary", { isAdmin, user: userData, media });
+
+    if (!userId) {
+      return res.redirect("/task?message=User ID required&type=error");
     }
-  } catch (error) {}
+
+    const userData = await user.findById(userId);
+    if (!userData) {
+      return res.redirect("/task?message=User not found&type=error");
+    }
+
+    let media = await mediaLibrary.findOne({ userId });
+    if (!media) {
+      media = "";
+    }
+
+    res.render("layout/MediaLibrary", {
+      isAdmin,
+      user: userData,
+      media,
+      toastMessage,
+      toastType,
+    });
+  } catch (error) {
+    console.error("Error in /medialibrary route:", error);
+    res.redirect("/task?message=Error loading media library&type=error");
+  }
 });
 
-app.post("/submitMedia",
+// Submit Media Route
+app.post(
+  "/submitMedia",
   upload.single("mediaImage"),
   isAuthenicated,
   isAdminCheck,
@@ -1106,18 +1366,22 @@ app.post("/submitMedia",
     try {
       const userId = req.id;
       if (!userId) {
-        return res.redirect("/medialibrary");
+        return res.redirect(
+          "/medialibrary?message=User ID required&type=error"
+        );
       }
 
       const { url, tag } = req.body;
       const mediaImage = req.file;
 
       if (!tag) {
-        return res.redirect("/medialibrary");
+        return res.redirect("/medialibrary?message=Tag is required&type=error");
       }
 
       if (!mediaImage && !url) {
-        return res.redirect("/medialibrary");
+        return res.redirect(
+          "/medialibrary?message=Either an image or URL is required&type=error"
+        );
       }
 
       let media = await mediaLibrary.findOne({ userId });
@@ -1142,14 +1406,16 @@ app.post("/submitMedia",
       if (mediaImage) {
         newSize = mediaImage.size / (1024 * 1024);
         if (userLimit.useStorage + newSize > userLimit.maxStorage) {
-          return res.redirect("/medialibrary?error=Storage limit exceeded");
+          return res.redirect(
+            "/medialibrary?message=Storage limit exceeded&type=error"
+          );
         }
         userLimit.useStorage += newSize;
         await userLimit.save();
       }
 
       if (mediaImage) {
-        const imageUrl = `uploads/${mediaImage.filename}`;
+        const imageUrl = `Uploads/${mediaImage.filename}`;
         media.medialibrary.push({
           type: "image",
           url: imageUrl,
@@ -1167,21 +1433,118 @@ app.post("/submitMedia",
             size: 0,
           });
         } catch (error) {
-          return res.redirect("/medialibrary");
+          console.error("Error adding URL to media library:", error);
+          return res.redirect(
+            "/medialibrary?message=Invalid URL format&type=error"
+          );
         }
       }
 
       await media.save();
-
-      res.redirect("/medialibrary");
+      res.redirect(
+        "/medialibrary?message=Media added successfully&type=success"
+      );
     } catch (error) {
-      console.error("Error", error);
-      res.redirect("/medialibrary");
+      console.error("Error in /submitMedia route:", error);
+      res.redirect("/medialibrary?message=Error adding media&type=error");
     }
   }
 );
 
-app.post("/EditMedia/:imageId",
+// Media Upload Route (for task-related media)
+app.post(
+  "/media/upload",
+  upload.single("mediaImage"),
+  isAuthenicated,
+  isAdminCheck,
+  async (req, res) => {
+    try {
+      const userId = req.id;
+      if (!userId) {
+        return res.redirect("/addtask?message=User ID required&type=error");
+      }
+
+      const { url, tag } = req.body;
+      const mediaImage = req.file;
+
+      if (!tag) {
+        return res.redirect("/addtask?message=Tag is required&type=error");
+      }
+
+      if (!mediaImage && !url) {
+        return res.redirect(
+          "/addtask?message=Either an image or URL is required&type=error"
+        );
+      }
+
+      let media = await mediaLibrary.findOne({ userId });
+      let userLimit = await userStoragelimit.findOne({ userId });
+
+      if (!media) {
+        media = new mediaLibrary({
+          userId,
+          medialibrary: [],
+        });
+      }
+
+      if (!userLimit) {
+        userLimit = new userStoragelimit({
+          userId,
+          maxStorage: 1024,
+          useStorage: 0,
+        });
+      }
+
+      let newSize = 0;
+      if (mediaImage) {
+        newSize = mediaImage.size / (1024 * 1024);
+        if (userLimit.useStorage + newSize > userLimit.maxStorage) {
+          return res.redirect(
+            "/addtask?message=Storage limit exceeded&type=error"
+          );
+        }
+        userLimit.useStorage += newSize;
+        await userLimit.save();
+      }
+
+      if (mediaImage) {
+        const imageUrl = `Uploads/${mediaImage.filename}`;
+        media.medialibrary.push({
+          type: "image",
+          url: imageUrl,
+          tag: tag.trim(),
+          size: newSize,
+        });
+      }
+
+      if (url) {
+        try {
+          media.medialibrary.push({
+            type: "url",
+            url: url.trim(),
+            tag: tag.trim(),
+            size: 0,
+          });
+        } catch (error) {
+          console.error("Error adding URL to media library:", error);
+          return res.redirect("/addtask?message=Invalid URL format&type=error");
+        }
+      }
+
+      await media.save();
+      res.redirect(
+        "/addtask?message=Image added to media library&type=success"
+      );
+    } catch (error) {
+      console.error("Error in /media/upload route:", error);
+      res.redirect("/addtask?message=Error adding media&type=error");
+    }
+  }
+);
+
+// Edit Media Route
+app.post(
+  "/EditMedia/:imageId",
   upload.single("mediaImage"),
   isAuthenicated,
   isAdminCheck,
@@ -1191,45 +1554,62 @@ app.post("/EditMedia/:imageId",
       const imageId = req.params.imageId;
 
       if (!userId || !imageId) {
-        return res
-          .status(400)
-          .json({ error: "User ID or Image ID is missing" });
+        return res.redirect(
+          "/medialibrary?message=User ID or Image ID is missing&type=error"
+        );
       }
 
       const { url, tag } = req.body;
       const mediaImage = req.file;
 
       if (!tag) {
-        return res.status(400).json({ message: "Tag is required" });
+        return res.redirect("/medialibrary?message=Tag is required&type=error");
       }
 
       if (!mediaImage && !url) {
-        return res
-          .status(400)
-          .json({ message: "Either an image or URL must be provided" });
+        return res.redirect(
+          "/medialibrary?message=Either an image or URL is required&type=error"
+        );
       }
 
       const media = await mediaLibrary.findOne({ userId });
       let userLimit = await userStoragelimit.findOne({ userId });
 
       if (!media) {
-        return res
-          .status(404)
-          .json({ message: "Media library not found for this user" });
+        return res.redirect(
+          "/medialibrary?message=Media library not found&type=error"
+        );
       }
 
       const mediaItem = media.medialibrary.find(
         (item) => item._id.toString() === imageId
       );
       if (!mediaItem) {
-        return res.status(404).json({ message: "Media item not found" });
+        return res.redirect(
+          "/medialibrary?message=Media item not found&type=error"
+        );
+      }
+
+           const filename = mediaItem.url.replace(/^Uploads\//, ''); // Extract filename from URL
+      const filePath = path.join(__dirname, 'Uploads', filename);
+      if (fs.existsSync(filePath)) {
+        try {
+          fs.unlinkSync(filePath);
+          console.log(`Deleted file: ${filePath}`);
+        } catch (fileError) {
+          console.error(`Error deleting file ${filePath}:`, fileError);
+        }
+      } else {
+        console.warn(`File not found for deletion: ${filePath}`);
       }
 
       let newSize = 0;
       if (mediaImage) {
         newSize = mediaImage.size / (1024 * 1024);
         if (userLimit.useStorage + newSize > userLimit.maxStorage) {
-          return res.redirect("/medialibrary?error=Storage limit exceeded");
+          return res.redirect(
+            "/medialibrary?message=Storage limit exceeded&type=error"
+          );
         }
         userLimit.useStorage -= mediaItem.size;
         userLimit.useStorage += newSize;
@@ -1240,124 +1620,176 @@ app.post("/EditMedia/:imageId",
 
       if (mediaImage) {
         mediaItem.type = "image";
-        mediaItem.url = `../../uploads/${mediaImage.filename}`;
+        mediaItem.url = `Uploads/${mediaImage.filename}`; // Adjusted path for consistency
         mediaItem.size = newSize;
       } else if (url) {
         try {
           mediaItem.type = "url";
           mediaItem.url = url.trim();
+          mediaItem.size = 0;
         } catch (error) {
-          return res.status(400).json({ error: "Invalid URL format" });
+          console.error("Error updating URL in media library:", error);
+          return res.redirect(
+            "/medialibrary?message=Invalid URL format&type=error"
+          );
         }
       }
 
       await media.save();
-
-      return res.redirect("/medialibrary");
+      return res.redirect(
+        "/medialibrary?message=Media updated successfully&type=success"
+      );
     } catch (error) {
-      console.error("Error updating media:", error);
-      return res.status(500).json({ error: "Internal server error" });
+      console.error("Error in /EditMedia route:", error);
+      return res.redirect(
+        "/medialibrary?message=Error updating media&type=error"
+      );
     }
   }
 );
 
+// Delete Image Route
 app.post("/deleteImage/:imageId", isAuthenicated, async (req, res) => {
   try {
     const userId = req.id;
-
     if (!userId) {
-      return res
-        .status(401)
-        .json({ message: "Unauthorized: User ID not found" });
-    }
-
-    const mediaData = await mediaLibrary.findOne({ userId });
-    let userLimit = await userStoragelimit.findOne({ userId });
-    if (!mediaData) {
-      return res
-        .status(404)
-        .json({ message: "Media library not found for this user" });
+      return res.redirect("/medialibrary?message=User ID required&type=error");
     }
 
     const imageId = req.params.imageId;
     if (!imageId) {
-      return res.status(400).json({ message: "Invalid image ID" });
+      return res.redirect("/medialibrary?message=Invalid image ID&type=error");
     }
 
-    if (userLimit) {
-      const mediaItem = mediaData.medialibrary.filter(
-        (item) => item._id.toString() === imageId
+    const mediaData = await mediaLibrary.findOne({ userId });
+    if (!mediaData) {
+      return res.redirect(
+        "/medialibrary?message=Media library not found&type=error"
       );
+    }
 
-      userLimit.useStorage -= mediaItem[0].size;
+    const mediaItem = mediaData.medialibrary.find(
+      (item) => item._id.toString() === imageId
+    );
+
+
+  
+    if (!mediaItem) {
+      return res.redirect(
+        "/medialibrary?message=Media item not found&type=error"
+      );
+    }
+    
+    
+     const filename = mediaItem.url.replace(/^Uploads\//, ''); // Extract filename from URL
+      const filePath = path.join(__dirname, 'Uploads', filename);
+      if (fs.existsSync(filePath)) {
+        try {
+          fs.unlinkSync(filePath);
+          console.log(`Deleted file: ${filePath}`);
+        } catch (fileError) {
+          console.error(`Error deleting file ${filePath}:`, fileError);
+        }
+      } else {
+        console.warn(`File not found for deletion: ${filePath}`);
+      }
+
+    let userLimit = await userStoragelimit.findOne({ userId });
+    if (userLimit && mediaItem.size) {
+      userLimit.useStorage -= mediaItem.size;
       await userLimit.save();
     }
 
-    const updatedLibrary = mediaData.medialibrary.filter(
+    mediaData.medialibrary = mediaData.medialibrary.filter(
       (item) => item._id.toString() !== imageId
     );
-
-    mediaData.medialibrary = updatedLibrary;
     await mediaData.save();
-    return res.status(200).json({ message: "image deleted successfully" });
-  } catch (error) {}
+
+    return res.redirect(
+      "/medialibrary?message=Image deleted successfully&type=success"
+    );
+  } catch (error) {
+    console.error("Error in /deleteImage route:", error);
+    return res.redirect(
+      "/medialibrary?message=Error deleting image&type=error"
+    );
+  }
 });
 
-app.get("/imagepreview/:imageId",
+// Image Preview Route
+app.get(
+  "/imagepreview/:imageId",
   isAuthenicated,
   isAdminCheck,
   async (req, res) => {
     try {
+      const toastMessage = req.query.message || "";
+      const toastType = req.query.type || "info";
       const userId = req.id;
       const isAdmin = req.isAdmin;
-      if (!userId) {
-        return res.status(404).json({
-          message: "No Image Id found",
-        });
-      }
-      const userData = await user.findById(userId);
-      const mediaData = await mediaLibrary.findOne({ userId });
-
-      if (!mediaData) {
-        return res
-          .status(404)
-          .json({ message: "Media library not found for this user" });
-      }
-
       const imageId = req.params.imageId;
+
+      if (!userId) {
+        return res.redirect("/task?message=User ID required&type=error");
+      }
+
       if (!imageId) {
-        return res.status(400).json({ message: "Invalid image ID" });
+        return res.redirect(
+          "/medialibrary?message=Invalid image ID&type=error"
+        );
+      }
+
+      const userData = await user.findById(userId);
+      if (!userData) {
+        return res.redirect("/task?message=User not found&type=error");
+      }
+
+      const mediaData = await mediaLibrary.findOne({ userId });
+      if (!mediaData) {
+        return res.redirect(
+          "/medialibrary?message=Media library not found&type=error"
+        );
       }
 
       const Library = mediaData.medialibrary.filter(
         (item) => item._id.toString() === imageId
       );
-
-      if (!Library) {
-        return res.status(400).json({ message: "No Image found" });
+      if (!Library.length) {
+        return res.redirect("/medialibrary?message=Image not found&type=error");
       }
 
       return res.render("layout/imagePreview", {
         Library,
         user: userData,
         isAdmin,
+        toastMessage,
+        toastType,
       });
     } catch (error) {
-      console.log("error", error);
+      console.error("Error in /imagepreview route:", error);
+      return res.redirect(
+        "/medialibrary?message=Error loading image preview&type=error"
+      );
     }
   }
 );
 
+// Download Task Report Route
 app.get("/downloadTask", isAuthenicated, isAdminCheck, async (req, res) => {
   try {
+    const toastMessage = req.query.message || "";
+    const toastType = req.query.type || "info";
     const isAdmin = req.isAdmin;
     const userId = req.id;
 
     if (!userId) {
-      return res.redirect("/");
+      return res.redirect("/task?message=User ID required&type=error");
     }
 
     const userData = await user.findById(userId);
+    if (!userData) {
+      return res.redirect("/task?message=User not found&type=error");
+    }
 
     const tasks = await task.find({ userId }).populate("userId");
     const taskIds = tasks.map((task) => task._id);
@@ -1386,6 +1818,7 @@ app.get("/downloadTask", isAuthenicated, isAdminCheck, async (req, res) => {
     await page.emulateMediaType("screen");
 
     const filePath = path.join(`task-reports/user-${userId}-tasks.pdf`);
+    console.log(filePath);
     await page.pdf({
       path: filePath,
       format: "A4",
@@ -1395,25 +1828,48 @@ app.get("/downloadTask", isAuthenicated, isAdminCheck, async (req, res) => {
 
     await browser.close();
 
-    return res.render("layout/Download", { user: userData, isAdmin, filePath });
-  } catch (error) {}
-});
-
-app.get("/download-pdf", (req, res) => {
-  const filePath = req.query.filePath;
-  if (fs.existsSync(filePath)) {
-    res.download(filePath, (err) => {
-      if (err) {
-        console.error("Error downloading PDF:", err);
-      }
-
-      fs.unlinkSync(filePath);
+    return res.render("layout/Download", {
+      user: userData,
+      isAdmin,
+      filePath,
+      toastMessage,
+      toastType,
+      message: "Task report generated successfully",
+      type: "success",
     });
-  } else {
-    res.status(404).send("PDF not found");
+  } catch (error) {
+    console.error("Error in /downloadTask route:", error);
+    return res.redirect(
+      "/task?message=Error generating task report&type=error"
+    );
   }
 });
 
+// Download PDF Route
+app.get("/download-pdf", (req, res) => {
+  try {
+    const filePath = req.query.filePath;
+    if (fs.existsSync(filePath)) {
+      res.download(filePath, (err) => {
+        if (err) {
+          console.error("Error downloading PDF:", err);
+          fs.unlinkSync(filePath); // Clean up file even on error
+          return res.redirect("/task?message=Error downloading PDF&type=error");
+        }
+        fs.unlinkSync(filePath); // Clean up file after successful download
+      });
+    } else {
+      return res.redirect("/task?message=PDF not found&type=error");
+    }
+  } catch (error) {
+    console.error("Error in /download-pdf route:", error);
+    return res.redirect(
+      "/task?message=Error processing PDF download&type=error"
+    );
+  }
+});
+
+// Package Upgrade Page Route
 app.get("/upgrade", isAuthenicated, isAdminCheck, async (req, res) => {
   try {
     const userId = req.id;
@@ -1430,6 +1886,7 @@ app.get("/upgrade", isAuthenicated, isAdminCheck, async (req, res) => {
   }
 });
 
+// Payment method By Stripe Route
 app.post("/payment/stripe", isAuthenicated, async (req, res) => {
   const { country, plan } = req.body;
   const userData = await user.findById(req.id);
@@ -1498,6 +1955,7 @@ app.post("/payment/stripe", isAuthenicated, async (req, res) => {
   }
 });
 
+// Stripe Payment Successful Route
 app.get("/success", isAuthenicated, async (req, res) => {
   const { session_id, plan } = req.query;
   const userData = await user.findById(req.id);
@@ -1540,6 +1998,7 @@ app.get("/success", isAuthenicated, async (req, res) => {
   }
 });
 
+// Function to Get Paypal Access Token
 const getPaypalAccessToken = async () => {
   try {
     const clientId = process.env.PAYPAL_CLIENT_ID;
@@ -1566,6 +2025,7 @@ const getPaypalAccessToken = async () => {
   }
 };
 
+// Payment method By Paypal Route
 app.post("/payment/paypal", isAuthenicated, async (req, res) => {
   const { country, plan } = req.body;
   const userData = await user.findById(req.id);
@@ -1671,6 +2131,7 @@ app.post("/payment/paypal", isAuthenicated, async (req, res) => {
   }
 });
 
+// Stripe Payment Successful Route
 app.get("/success/paypal", isAuthenicated, async (req, res) => {
   const { token, plan, gateway } = req.query;
   const userData = await user.findById(req.id);
@@ -1741,6 +2202,7 @@ app.get("/success/paypal", isAuthenicated, async (req, res) => {
   }
 });
 
+// Payment method By PhonePe Route
 app.post("/payment/phonepe", isAuthenicated, async (req, res) => {
   const { country, plan } = req.body;
   const userData = await user.findById(req.id);
@@ -1824,6 +2286,7 @@ app.post("/payment/phonepe", isAuthenicated, async (req, res) => {
   }
 });
 
+// Stripe Payment Successful Route
 app.post("/success/phonepe", async (req, res) => {
   try {
     const { plan } = req.query;
@@ -1875,6 +2338,7 @@ app.post("/success/phonepe", async (req, res) => {
   }
 });
 
+// Payment method By RazerPay Route
 app.post("/payment/razorpay", isAuthenicated, async (req, res) => {
   const { country, plan } = req.body;
   const userData = await user.findById(req.id);
@@ -1933,6 +2397,7 @@ app.post("/payment/razorpay", isAuthenicated, async (req, res) => {
   }
 });
 
+// Stripe Payment Successful Route
 app.post("/success/razorpay", isAuthenicated, async (req, res) => {
   const { razorpay_order_id, razorpay_payment_id, razorpay_signature, plan } =
     req.body;
@@ -1970,10 +2435,10 @@ app.post("/success/razorpay", isAuthenicated, async (req, res) => {
   }
 });
 
-
-app.get("/errorpage", isAuthenicated, async(req, res) => {
-
-  const toastMessage = req.query.message || "An error occurred. Please try again later.";
+// Error Page Route
+app.get("/errorpage", isAuthenicated, async (req, res) => {
+  const toastMessage =
+    req.query.message || "An error occurred. Please try again later.";
   const toastType = req.query.type || "error";
   const userId = req.id;
   const isAdmin = req.isAdmin;
@@ -1996,188 +2461,315 @@ app.get("/errorpage", isAuthenicated, async(req, res) => {
     });
   }
   res.render("layout/ErrorPage", {
-   toastMessage: toastMessage,
+    toastMessage: toastMessage,
     toastType: toastType,
     user: userData,
     isAdmin,
   });
 });
 
-app.get('/invoices', isAuthenicated, async (req, res) => {
+// Invoices of User Shown Page Route
+app.get("/invoices", isAuthenicated, async (req, res) => {
   const userId = req.id;
   const isAdmin = req.isAdmin;
   if (!userId) {
-    return res.status(401).redirect('/errorpage?message=Unauthorized access. Please log in.&type=error');
+    return res
+      .status(401)
+      .redirect(
+        "/errorpage?message=Unauthorized access. Please log in.&type=error"
+      );
   }
   const userData = await user.findById(userId);
   if (!userData) {
-    return res.status(404).redirect('/errorpage?message=User not found&type=error');  
+    return res
+      .status(404)
+      .redirect("/errorpage?message=User not found&type=error");
   }
 
   try {
     const invoices = await paymentDetail.find({ userId });
-    res.render('layout/invoices', { invoices, user: userData, isAdmin });
+    res.render("layout/invoices", { invoices, user: userData, isAdmin });
   } catch (error) {
     console.error("Error fetching invoices:", error);
-    res.status(500).redirect('/errorpage?message=Error fetching invoices&type=error');
+    res
+      .status(500)
+      .redirect("/errorpage?message=Error fetching invoices&type=error");
   }
 });
 
-
-app.get('/invoice/view/:id', isAuthenicated, async (req, res) => {
+// Show Particular Invoice of User Shown Page Route
+app.get("/invoice/view/:id", isAuthenicated, async (req, res) => {
   const userId = req.id;
   const isAdmin = req.isAdmin;
   const invoiceId = req.params.id;
 
   if (!mongoose.isValidObjectId(invoiceId)) {
-    return res.status(400).redirect('/errorpage?message=Invalid invoice ID&type=error');
+    return res
+      .status(400)
+      .redirect("/errorpage?message=Invalid invoice ID&type=error");
   }
 
   try {
     const invoice = await paymentDetail.findById(invoiceId);
     if (!invoice) {
-      return res.status(404).redirect('/errorpage?message=Invoice not found&type=error');
+      return res
+        .status(404)
+        .redirect("/errorpage?message=Invoice not found&type=error");
     }
 
     if (invoice.userId.toString() !== userId) {
-      return res.status(403).redirect('/errorpage?message=You are not authorized to view this invoice&type=error');
+      return res
+        .status(403)
+        .redirect(
+          "/errorpage?message=You are not authorized to view this invoice&type=error"
+        );
     }
 
     const userData = await user.findById(userId).lean();
     if (!userData) {
-      return res.status(404).redirect('/errorpage?message=User not found&type=error');
+      return res
+        .status(404)
+        .redirect("/errorpage?message=User not found&type=error");
     }
 
-    res.render('layout/invoiceView', {
+    res.render("layout/invoiceView", {
       invoice,
       user: userData,
       isAdmin,
-      currentPage: 'invoices',
+      currentPage: "invoices",
     });
   } catch (error) {
-    console.error('Error fetching invoice:', error);
-    res.status(500).redirect('/errorpage?message=Error fetching invoice&type=error');
+    console.error("Error fetching invoice:", error);
+    res
+      .status(500)
+      .redirect("/errorpage?message=Error fetching invoice&type=error");
   }
 });
 
-app.get('/invoice/:id', isAuthenicated, async (req, res) => {
- const userId = req.id;
+// Download Particular Invoice of User Shown Page Route
+app.get("/invoice/:id", isAuthenicated, async (req, res) => {
+  const userId = req.id;
   const invoiceId = req.params.id;
 
   if (!mongoose.isValidObjectId(invoiceId)) {
-    return res.status(400).redirect('/errorpage?message=Invalid invoice ID&type=error');
+    return res
+      .status(400)
+      .redirect("/errorpage?message=Invalid invoice ID&type=error");
   }
 
   try {
-    const invoice = await paymentDetail.findById(invoiceId).populate('userId');
+    const invoice = await paymentDetail.findById(invoiceId).populate("userId");
     if (!invoice) {
-      return res.status(404).redirect('/errorpage?message=Invoice not found&type=error');
+      return res
+        .status(404)
+        .redirect("/errorpage?message=Invoice not found&type=error");
     }
 
     if (invoice.userId._id.toString() !== userId) {
-      return res.status(403).redirect('/errorpage?message=You are not authorized to view this invoice&type=error');
+      return res
+        .status(403)
+        .redirect(
+          "/errorpage?message=You are not authorized to view this invoice&type=error"
+        );
     }
 
-
-    const doc = new PDFDocument({ margin: 50, size: 'A4' });
-    res.setHeader('Content-Disposition', `attachment; filename=invoice-${invoiceId}.pdf`);
-    res.setHeader('Content-Type', 'application/pdf');
+    const doc = new PDFDocument({ margin: 50, size: "A4" });
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=invoice-${invoiceId}.pdf`
+    );
+    res.setHeader("Content-Type", "application/pdf");
     doc.pipe(res);
 
     const colors = {
-      emerald600: '#10B981',
-      gray900: '#111827',
-      gray700: '#374151',
-      gray500: '#6B7280',
-      gray300: '#D1D5DB',
-      emerald50: '#ECFDF5',
+      emerald600: "#10B981",
+      gray900: "#111827",
+      gray700: "#374151",
+      gray500: "#6B7280",
+      gray300: "#D1D5DB",
+      emerald50: "#ECFDF5",
     };
 
-  
-    doc.registerFont('Roboto', 'Roboto-Regular.ttf'); 
-    doc.registerFont('Roboto-Bold', 'Roboto-Bold.ttf');
+    doc.registerFont("Roboto", "Roboto-Regular.ttf");
+    doc.registerFont("Roboto-Bold", "Roboto-Bold.ttf");
 
-
-    const logoPath = path.join(__dirname, '../public/assets/list-check-solid.svg');
+    const logoPath = path.join(
+      __dirname,
+      "../public/assets/list-check-solid.svg"
+    );
     if (fs.existsSync(logoPath)) {
       doc.image(logoPath, 50, 50, { width: 100 });
     } else {
-      doc.font('Helvetica-Bold').fontSize(14).fillColor(colors.gray900).text('Task Manager', 50, 50);
+      doc
+        .font("Helvetica-Bold")
+        .fontSize(14)
+        .fillColor(colors.gray900)
+        .text("Task Manager", 50, 50);
     }
-    doc.font('Helvetica').fontSize(10).fillColor(colors.gray700)
-      .text('Task Manager Inc.', 400, 50, { align: 'right' })
-      .text('123 Productivity Lane, Tech City, TX 12345', 400, 65, { align: 'right' })
-      .text('support@taskmanager.com', 400, 90, { align: 'right' });
+    doc
+      .font("Helvetica")
+      .fontSize(10)
+      .fillColor(colors.gray700)
+      .text("Task Manager Inc.", 400, 50, { align: "right" })
+      .text("123 Productivity Lane, Tech City, TX 12345", 400, 65, {
+        align: "right",
+      })
+      .text("support@taskmanager.com", 400, 90, { align: "right" });
     doc.moveDown(4);
 
-
-    doc.font('Helvetica-Bold').fontSize(20).fillColor(colors.emerald600)
-      .text('Invoice', 50, 120, { align: 'center' });
+    doc
+      .font("Helvetica-Bold")
+      .fontSize(20)
+      .fillColor(colors.emerald600)
+      .text("Invoice", 50, 120, { align: "center" });
     doc.rect(50, 150, 495, 40).fill(colors.emerald50);
-    doc.font('Helvetica-Bold').fontSize(14).fillColor(colors.gray900)
+    doc
+      .font("Helvetica-Bold")
+      .fontSize(14)
+      .fillColor(colors.gray900)
       .text(`Invoice`, 60, 160);
-    doc.font('Helvetica').fontSize(12).fillColor(colors.gray700)
-      .text(`Issued: ${invoice.createdAt ? new Date(invoice.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A'}`, 400, 160, { align: 'right' });
+    doc
+      .font("Helvetica")
+      .fontSize(12)
+      .fillColor(colors.gray700)
+      .text(
+        `Issued: ${
+          invoice.createdAt
+            ? new Date(invoice.createdAt).toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })
+            : "N/A"
+        }`,
+        400,
+        160,
+        { align: "right" }
+      );
     doc.moveDown(2);
 
-
-    doc.font('Helvetica-Bold').fontSize(14).fillColor(colors.gray900)
-      .text('Billed To', 55, 200);
-    doc.font('Helvetica').fontSize(12).fillColor(colors.gray700)
+    doc
+      .font("Helvetica-Bold")
+      .fontSize(14)
+      .fillColor(colors.gray900)
+      .text("Billed To", 55, 200);
+    doc
+      .font("Helvetica")
+      .fontSize(12)
+      .fillColor(colors.gray700)
       .text(`${invoice.userId.firstName} ${invoice.userId.lastName}`, 55, 220)
       .text(`${invoice.userId.email}`, 55, 235)
-      .text(`${invoice.country || 'N/A'}`, 55, 250);
+      .text(`${invoice.country || "N/A"}`, 55, 250);
     doc.moveDown(2);
-
 
     const tableTop = 280;
     const rowHeight = 30;
     const colWidths = [150, 150, 150, 150];
-    const headers = ['Plan', 'Gateway', 'Amount Paid', 'Status'];
+    const headers = ["Plan", "Gateway", "Amount Paid", "Status"];
     const details = [
-      invoice.plan || 'N/A',
-      invoice.gateway || 'N/A',
+      invoice.plan || "N/A",
+      invoice.gateway || "N/A",
       (() => {
-        const currency = ['stripe', 'paypal'].includes(invoice.gateway?.toLowerCase()) ? '$' :
-                        ['razorpay', 'phonepe'].includes(invoice.gateway?.toLowerCase()) ? '₹' : '';
-        return invoice.amountPaid ? `${currency}${(invoice.amountPaid / 100).toFixed(2)}` : 'N/A';
+        const currency = ["stripe", "paypal"].includes(
+          invoice.gateway?.toLowerCase()
+        )
+          ? "$"
+          : ["razorpay", "phonepe"].includes(invoice.gateway?.toLowerCase())
+          ? "₹"
+          : "";
+        return invoice.amountPaid
+          ? `${currency}${(invoice.amountPaid / 100).toFixed(2)}`
+          : "N/A";
       })(),
-      invoice.status || 'Pending',
+      invoice.status || "Pending",
     ];
-
 
     doc.rect(50, tableTop, 495, rowHeight).fill(colors.emerald50);
     headers.forEach((header, i) => {
-      doc.font('Helvetica-Bold').fontSize(12).fillColor(colors.gray900)
-        .text(header, 50 + (i * colWidths[i]), tableTop + 8, { width: colWidths[i], align: 'left' });
+      doc
+        .font("Helvetica-Bold")
+        .fontSize(12)
+        .fillColor(colors.gray900)
+        .text(header, 50 + i * colWidths[i], tableTop + 8, {
+          width: colWidths[i],
+          align: "left",
+        });
     });
 
-
-    doc.rect(50, tableTop + rowHeight, 495, rowHeight).fill('white');
+    doc.rect(50, tableTop + rowHeight, 495, rowHeight).fill("white");
     details.forEach((detail, i) => {
-      doc.font('Helvetica').fontSize(12).fillColor(colors.gray700)
-        .text(detail, 50 + (i * colWidths[i]), tableTop + rowHeight + 8, { width: colWidths[i], align: 'left' });
+      doc
+        .font("Helvetica")
+        .fontSize(12)
+        .fillColor(colors.gray700)
+        .text(detail, 50 + i * colWidths[i], tableTop + rowHeight + 8, {
+          width: colWidths[i],
+          align: "left",
+        });
     });
 
+    doc
+      .font("Helvetica")
+      .fontSize(12)
+      .fillColor(colors.gray700)
+      .text(
+        `Last Payment: ${
+          invoice.lastPaymentDate
+            ? new Date(invoice.lastPaymentDate).toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })
+            : "N/A"
+        }`,
+        50,
+        tableTop + rowHeight * 2 + 10
+      )
+      .text(
+        `Next Billing: ${
+          invoice.nextBillingDate
+            ? new Date(invoice.nextBillingDate).toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })
+            : "N/A"
+        }`,
+        350,
+        tableTop + rowHeight * 2 + 10
+      );
 
-    doc.font('Helvetica').fontSize(12).fillColor(colors.gray700)
-      .text(`Last Payment: ${invoice.lastPaymentDate ? new Date(invoice.lastPaymentDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A'}`, 50, tableTop + rowHeight * 2 + 10)
-      .text(`Next Billing: ${invoice.nextBillingDate ? new Date(invoice.nextBillingDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A'}`, 350, tableTop + rowHeight * 2 + 10);
+    doc
+      .moveTo(50, tableTop + rowHeight * 3 + 20)
+      .lineTo(545, tableTop + rowHeight * 3 + 20)
+      .strokeColor(colors.gray300)
+      .stroke();
 
-    doc.moveTo(50, tableTop + rowHeight * 3 + 20).lineTo(545, tableTop + rowHeight * 3 + 20)
-      .strokeColor(colors.gray300).stroke();
-
-
-    doc.font('Helvetica-Oblique').fontSize(10).fillColor(colors.gray500)
-      .text(`Generated on: ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}`, 50, 720, { align: 'center' })
-      .text('Contact: support@taskmanager.com', 50, 735, { align: 'center' });
+    doc
+      .font("Helvetica-Oblique")
+      .fontSize(10)
+      .fillColor(colors.gray500)
+      .text(
+        `Generated on: ${new Date().toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        })}`,
+        50,
+        720,
+        { align: "center" }
+      )
+      .text("Contact: support@taskmanager.com", 50, 735, { align: "center" });
 
     doc.end();
   } catch (error) {
-    console.error('Error generating invoice PDF:', error);
-    res.status(500).redirect('/errorpage?message=Error generating invoice PDF&type=error');
+    console.error("Error generating invoice PDF:", error);
+    res
+      .status(500)
+      .redirect("/errorpage?message=Error generating invoice PDF&type=error");
   }
 });
+
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);

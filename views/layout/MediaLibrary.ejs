@@ -37,6 +37,7 @@
 </head>
 <body class="min-h-screen  flex flex-col font-sans">
   <%- include('../partials/navbar') %>
+    <%- include('../partials/toast.ejs') %>
   <div class="flex flex-grow min-h-screen">
     <%- include('../partials/sidebar') %>
     <div class="flex-grow p-4 sm:p-6 lg:p-8">
@@ -80,7 +81,7 @@
                 />
                 <div class="absolute inset-0 bg-black opacity-0 hover:opacity-30 transition-opacity duration-200"></div>
                 <button
-                  class="absolute right-3 top-3 text-black text-xl hover:bg-white rounded-full p-2"
+                  class="absolute cursor-pointer right-3 top-3 text-black text-xl hover:bg-white rounded-full p-2"
                   aria-label="Media options for <%= item.tag %>"
                   onclick="toggleDropdown(event, this)"
                 >
@@ -88,7 +89,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v.01M12 12v.01M12 18v.01" />
                   </svg>
                 </button>
-                <div class="dropdown-menu absolute hidden bg-white rounded-lg shadow-xl top-12 right-3 w-48 z-20 border border-gray-200">
+                <div class="dropdown-menu absolute hidden bg-white rounded-lg shadow-xl top-12 right-3 w-34 z-20 border border-gray-200">
                   <ul class="flex flex-col text-sm text-gray-900">
                     <li
                       class="px-4 py-3 hover:bg-emerald-50 cursor-pointer flex items-center gap-2"
@@ -358,8 +359,7 @@
     function handleCopy(url, dropdown) {
       navigator.clipboard.writeText(window.location.origin + "/" + url).then(() => {
         dropdown.classList.add("hidden");
-        // Assuming toast notification is defined in toast.ejs
-        showToast('URL copied to clipboard!', 'success');
+
       }).catch((err) => {
         console.error('Failed to copy URL:', err);
         showToast('Failed to copy URL', 'error');
@@ -384,15 +384,16 @@
             method: "POST",
             headers: { "Content-Type": "application/json" },
           });
+
           if (response.ok) {
-            showToast('Image deleted successfully!', 'success');
-            setTimeout(() => window.location.reload(), 1000);
+
+           window.location.reload();
           } else {
-            showToast('Failed to delete image', 'error');
+
           }
         } catch (error) {
           console.error("Error deleting image:", error);
-          showToast('Error occurred while deleting', 'error');
+ 
         } finally {
           popup.classList.add("hidden");
           dropdown.classList.add("hidden");

@@ -23,10 +23,11 @@
 </head>
 <body class="min-h-screen bg-gray-100 flex flex-col font-sans">
   <%- include('../partials/navbar') %>
+    <%- include('../partials/toast.ejs') %>
   <div class="flex min-h-screen flex-grow">
     <%- include('../partials/sidebar') %>
-    <main class="flex-grow">
-      <div class="mx-auto my-12 max-w-6xl bg-white shadow-md rounded-lg p-8 sm:p-10 relative" data-aos="fade-up" data-aos-duration="600">
+    <main class="flex-grow min-h-screen">
+      <div class="mx-auto my-12 m-10 max-w-4xl bg-white shadow-md rounded-lg p-8 sm:p-10 relative" data-aos="fade-up" data-aos-duration="600">
         <h2 class="text-3xl font-bold text-gray-900 tracking-tight mb-6 text-center" data-aos="fade-in" data-aos-duration="600">PDF Preview</h2>
 
         <% if (filePath) { %>
@@ -49,7 +50,7 @@
           </div>
           <div class="bg-gray-50 rounded-lg shadow-sm border border-gray-300" data-aos="fade-up" data-aos-duration="600" data-aos-delay="200">
             <iframe
-              src="../<%= filePath %>"
+              src="/<%= filePath %>"
               frameborder="0"
               class="w-full h-[70vh] sm:h-[80vh] rounded-lg"
               title="PDF preview for <%= filePath %>"

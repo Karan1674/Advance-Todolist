@@ -23,13 +23,15 @@
     .jodit-container { border: 1px solid #d1d5db !important; border-radius: 0.5rem !important; }
     .jodit-container:focus-within { border-color: #059669 !important; box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.5) !important; }
     input:disabled, select:disabled, textarea:disabled { background-color: #e5e7eb; cursor: not-allowed; }
+    .image-preview { max-width: 100%; height: auto; max-height: 200px; object-fit: contain; }
   </style>
 </head>
 <body class="min-h-screen bg-gray-100 flex flex-col font-sans">
   <%- include('../partials/navbar.ejs') %>
+  <%- include('../partials/toast.ejs') %>
   <div class="flex min-h-screen flex-grow">
     <%- include('../partials/sidebar') %>
-    <div class=" flex-grow flex justify-between flex-col">
+    <div class="flex-grow flex justify-between flex-col">
       <% if (task.status !== 'completed') { %>
         <section class="w-full my-12 sm:max-w-4xl mx-auto" data-aos="fade-up" data-aos-duration="600">
           <form action="/editTask/<%= task._id %>" method="post" enctype="multipart/form-data" class="flex flex-col gap-6 bg-white p-8 sm:p-10 rounded-lg shadow-lg">
@@ -64,6 +66,15 @@
                   aria-label="Upload task image"
                   aria-describedby="formError"
                 >
+                <% if (task.filename) { %>
+                  <div class="mt-4" data-aos="fade-up" data-aos-duration="600" data-aos-delay="200">
+                    <img
+                      src="/Uploads/<%= task.filename %>"
+                      alt="Current task image"
+                      class="image-preview rounded-lg shadow-sm border border-gray-300"
+                    >
+                  </div>
+                <% } %>
               </div>
             </div>
 
@@ -145,7 +156,7 @@
                 <label class="text-base font-medium text-gray-700 tracking-wide mb-1.5">Subtargets</label>
                 <div id="subtargets" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <% task.subTargets.forEach((item, index) => { %>
-                    <div class="relative" data-aos="fade-in" data-aos-duration="600" data-aos-delay="<%= 400 + index * 50 %>">
+                    <div class="relative flex items-center" data-subtarget-index="<%= index %>" data-aos="fade-in" data-aos-duration="600" data-aos-delay="<%= 400 + index * 50 %>">
                       <input
                         type="text"
                         name="subtargets[]"
@@ -155,12 +166,21 @@
                       >
                       <input
                         type="checkbox"
-                        class="absolute right-3 top-3.5 h-5 w-5 accent-emerald-600"
+                        class="absolute right-10 top-3.5 h-5 w-5 accent-emerald-600"
                         name="completed[]"
                         value="<%= index %>"
                         <%= item.completed ? 'checked' : '' %>
                         aria-label="Mark subtarget <%= index + 1 %> as completed"
                       >
+                      <button
+                        type="button"
+                        class="delete-subtarget absolute right-2 top-3.5 text-red-500 hover:text-red-700"
+                        aria-label="Delete subtarget <%= index + 1 %>"
+                      >
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                      </button>
                     </div>
                   <% }) %>
                 </div>
@@ -190,6 +210,7 @@
       <%- include('../partials/footer.ejs') %>
     </div>
   </div>
+  <%- include('../partials/mediaPop') %>
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jodit@4.0.12/build/jodit.min.js"></script>
   <script>
@@ -210,11 +231,11 @@
         console.error('Jodit library failed to load');
         return;
       }
-      const editor = new Jodit('#editor', {
-        height: 400,
-        toolbarAdaptive: false,
-        uploader: { insertImageAsBase64URI: true }
-      });
+      // const editor = new Jodit('#editor', {
+      //   height: 400,
+      //   toolbarAdaptive: false,
+      //   uploader: { insertImageAsBase64URI: true }
+      // });
 
       const form = document.querySelector('form');
       const titleInput = document.getElementById('title');
@@ -234,12 +255,28 @@
       });
 
       const addSubtargetBtn = document.getElementById('addSubtarget');
+      const subtargetsDiv = document.getElementById('subtargets');
+      
+      function updateSubtargetIndices() {
+        const subtargetContainers = subtargetsDiv.querySelectorAll('[data-subtarget-index]');
+        subtargetContainers.forEach((container, index) => {
+          const textInput = container.querySelector('input[name="subtargets[]"]');
+          const checkbox = container.querySelector('input[name="completed[]"]');
+          textInput.setAttribute('aria-label', `Edit subtarget ${index + 1}`);
+          checkbox.value = index;
+          checkbox.setAttribute('aria-label', `Mark subtarget ${index + 1} as completed`);
+          const deleteBtn = container.querySelector('.delete-subtarget');
+          deleteBtn.setAttribute('aria-label', `Delete subtarget ${index + 1}`);
+          container.setAttribute('data-subtarget-index', index);
+        });
+      }
+
       if (addSubtargetBtn) {
         addSubtargetBtn.addEventListener('click', () => {
-          const subtargetsDiv = document.getElementById('subtargets');
           const index = subtargetsDiv.querySelectorAll('input[name="subtargets[]"]').length;
           const div = document.createElement('div');
-          div.className = 'relative';
+          div.className = 'relative flex items-center';
+          div.setAttribute('data-subtarget-index', index);
           div.innerHTML = `
             <input
               type="text"
@@ -249,14 +286,34 @@
             >
             <input
               type="checkbox"
-              class="absolute right-3 top-3.5 h-5 w-5 accent-emerald-600"
+              class="absolute right-10 top-3.5 h-5 w-5 accent-emerald-600"
               name="completed[]"
               value="${index}"
               aria-label="Mark subtarget ${index + 1} as completed"
             >
+            <button
+              type="button"
+              class="delete-subtarget absolute right-2 top-3.5 text-red-500 hover:text-red-700"
+              aria-label="Delete subtarget ${index + 1}"
+            >
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
           `;
           subtargetsDiv.appendChild(div);
           AOS.refresh();
+        });
+      }
+
+      if (subtargetsDiv) {
+        subtargetsDiv.addEventListener('click', (e) => {
+          if (e.target.closest('.delete-subtarget')) {
+            const container = e.target.closest('[data-subtarget-index]');
+            container.remove();
+            updateSubtargetIndices();
+            AOS.refresh();
+          }
         });
       }
     });

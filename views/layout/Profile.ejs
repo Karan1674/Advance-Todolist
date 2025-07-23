@@ -5,6 +5,7 @@
 
 <body class="min-h-screen bg-gray-100 flex flex-col font-sans">
   <%- include('../partials/navbar') %>
+    <%- include('../partials/toast.ejs') %>
 
   <div class="flex min-h-screen flex-grow">
     <%- include('../partials/sidebar') %>
@@ -22,7 +23,7 @@
                 class="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-gray-100 transition-transform duration-300 group-hover:scale-105"
                 src="/Uploads/<%= user.profilePic || 'placeholder.jpg' %>"
                 alt="Profile picture for <%= user.firstName %> <%= user.lastName %>"
-                onerror="this.src='/public/assets/placeholder.jpg';"
+
               />
               <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full absolute inset-0 bg-gray-900/30 opacity-40 group-hover:opacity-20 transition-opacity"></div>
             </div>
