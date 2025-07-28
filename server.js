@@ -178,7 +178,7 @@ app.post("/userSignUp", upload.single("profilePic"), async (req, res) => {
 
     if (!firstName || !lastName || !email || !password || !profilePic) {
       return res.redirect(
-        "/signupPage?message=All fields are required&type=error"
+        "/signupPage/starter?message=All fields are required&type=error"
       );
     }
 
@@ -186,7 +186,7 @@ app.post("/userSignUp", upload.single("profilePic"), async (req, res) => {
 
     if (userExist) {
       return res.redirect(
-        "/signupPage?message=Email already registered&type=error"
+        "/signupPage/starter?message=Email already registered&type=error"
       );
     }
 
