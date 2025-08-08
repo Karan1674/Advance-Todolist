@@ -242,7 +242,7 @@ app.post("/userlogin", async (req, res) => {
       return res.redirect("/loginPage?message=User not found&type=error");
     }
 
-    const isPasswordMatch = bcrypt.compare(password, userData.password);
+    const isPasswordMatch = await bcrypt.compare(password, userData.password);
 
     if (!isPasswordMatch) {
       return res.redirect("/loginPage?message=Incorrect password&type=error");
