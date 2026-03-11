@@ -55,6 +55,14 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 app.use("/uploads", express.static("uploads"));
+
+const reportsDir = path.join(__dirname, "task-reports");
+
+if (!fs.existsSync(reportsDir)) {
+  fs.mkdirSync(reportsDir, { recursive: true });
+}
+
+
 app.use("/public", express.static("public"));
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -1420,7 +1428,7 @@ app.post(
       }
 
       if (mediaImage) {
-        const imageUrl = `Uploads/${mediaImage.filename}`;
+        const imageUrl = `uploads/${mediaImage.filename}`;
         media.medialibrary.push({
           type: "image",
           url: imageUrl,
@@ -1513,7 +1521,7 @@ app.post(
       }
 
       if (mediaImage) {
-        const imageUrl = `Uploads/${mediaImage.filename}`;
+        const imageUrl = `uploads/${mediaImage.filename}`;
         media.medialibrary.push({
           type: "image",
           url: imageUrl,
