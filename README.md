@@ -223,33 +223,6 @@ You may also create your own account and test the system as a regular user.
 
 ---
 
-# ▶ Running the Application
-
-Install dependencies
-
-```
-
-npm install
-
-```
-Start the server
-
-```
-
-node server.js
-
-```
-
-The application will run locally on:
-
-```
-
-http://localhost:3000
-
-```
-
----
-
 # 📚 Learning Purpose
 
 This project was created mainly for **learning and experimentation** with real-world backend systems.
