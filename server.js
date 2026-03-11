@@ -2243,9 +2243,9 @@ app.post("/payment/phonepe", isAuthenicated, async (req, res) => {
       amount: amount,
       currency: currency,
       merchantTransactionId: `${userData._id}_${Date.now()}`,
-      redirectUrl: `http://localhost:3000/success/phonepe?plan=${plan}`,
+      redirectUrl: `${req.protocol}://${req.get("host")}/success/phonepe?plan=${plan}`,
       redirectMode: "POST",
-      // callbackUrl: `http://localhost:3000/payment/phonepe/callback`,
+      // callbackUrl: `${req.protocol}://${req.get("host")}/success/phonepe?plan=${plan}`,
       paymentInstrument: {
         type: "PAY_PAGE",
       },
